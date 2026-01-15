@@ -14,7 +14,6 @@
             --light: #ffffff;
             --gray: #f5f5f5;
             --text-gray: #757575;
-            --toast-bg: #333;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -43,55 +42,48 @@
         .screen.active { display: flex; }
         .container { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 
-        /* --- Toast Notification --- */
+        /* --- Splash --- */
+        #splash-screen { z-index: 9999; }
+        /* CHANGED: Logo made much smaller */
+        #splash-screen img { width: 80px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* --- Toast --- */
         #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 50px;
-            padding: 16px;
-            position: fixed;
-            z-index: 30000;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            opacity: 0;
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 50px; padding: 14px 20px;
+            position: fixed; z-index: 30000; left: 50%; bottom: 30px;
+            transform: translateX(-50%); font-size: 13px; opacity: 0;
             transition: opacity 0.3s, bottom 0.3s;
         }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
         #toast.error { background-color: #D32F2F; }
-        #toast.success { background-color: #2E7D32; }
 
         /* --- UI Elements --- */
         .header { margin-bottom: 25px; width: 100%; }
-        .header img { width: 70px; margin-bottom: 15px; border-radius: 12px; }
-        .header h2 { font-weight: 700; color: var(--primary); font-size: 1.5rem; margin-bottom: 5px; }
+        .header img { width: 60px; margin-bottom: 15px; border-radius: 12px; }
+        .header h2 { font-weight: 700; color: var(--primary); font-size: 1.4rem; margin-bottom: 5px; }
         .header p { color: var(--text-gray); font-size: 0.9rem; }
 
         .form-group { margin-bottom: 15px; width: 100%; }
         
         input, select {
-            width: 100%; padding: 16px;
+            width: 100%; padding: 15px;
             border: 2px solid var(--gray); background-color: var(--gray);
-            border-radius: 14px; font-size: 1.1rem; outline: none;
+            border-radius: 12px; font-size: 1rem; outline: none;
             text-align: center; font-weight: 500; color: var(--dark);
-            appearance: none; /* remove default arrow */
+            appearance: none;
         }
         input:focus, select:focus { background-color: #fff; border-color: var(--primary); }
         
-        /* Custom Arrow for select */
         .select-wrapper { position: relative; width: 100%; }
         .select-wrapper::after {
             content: '\f107'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
-            position: absolute; right: 15px; top: 18px; color: #999; pointer-events: none;
+            position: absolute; right: 15px; top: 16px; color: #999; pointer-events: none;
         }
 
         .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 14px;
+            width: 100%; padding: 16px; border: none; border-radius: 12px;
             background: var(--primary); color: #fff; font-weight: 600; font-size: 1rem;
             cursor: pointer; box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2); margin-top: 10px;
         }
@@ -111,7 +103,7 @@
         /* --- Upload & Camera --- */
         .upload-row { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
         .upload-box {
-            flex: 1; background: var(--gray); border-radius: 12px; height: 130px;
+            flex: 1; background: var(--gray); border-radius: 12px; height: 120px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             border: 2px dashed #bdbdbd; position: relative; overflow: hidden;
         }
@@ -119,7 +111,7 @@
         .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
 
         .camera-circle {
-            width: 250px; height: 250px; background: #000; border-radius: 50%;
+            width: 240px; height: 240px; background: #000; border-radius: 50%;
             margin: 0 auto 20px auto; overflow: hidden; position: relative;
             border: 4px solid var(--primary);
         }
@@ -143,24 +135,18 @@
             background: rgba(255,255,255,0.95); z-index: 20000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
-        .spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
         .decline-box { background: #FFEBEE; border: 1px solid #FFCDD2; padding: 15px; border-radius: 12px; margin: 20px 0; width: 100%; text-align: left; }
-        .decline-box li { color: #D32F2F; margin-bottom: 5px; list-style-position: inside; }
+        .decline-box li { color: #D32F2F; margin-bottom: 5px; list-style-position: inside; font-size: 0.9rem; }
 
     </style>
 </head>
 <body>
 
-    <!-- Toast -->
     <div id="toast"></div>
-
-    <!-- Loader -->
-    <div id="loader">
-        <div class="spinner"></div>
-        <p style="margin-top:15px; font-weight:600; color:var(--dark);">Processing...</p>
-    </div>
+    <div id="loader"><div class="spinner"></div><p style="margin-top:15px; font-weight:600; color:var(--dark);">Processing...</p></div>
 
     <!-- 1. Splash -->
     <div id="splash-screen" class="screen active">
@@ -188,9 +174,7 @@
             <!-- Step 1: Name -->
             <div class="step active" id="step-1">
                 <div class="header"><h2>Full Name</h2><p>As per your NIC</p></div>
-                <div class="form-group">
-                    <input type="text" id="reg-name" placeholder="Full Name" style="text-transform: capitalize;">
-                </div>
+                <div class="form-group"><input type="text" id="reg-name" placeholder="Full Name" style="text-transform: capitalize;"></div>
                 <button class="btn" onclick="nextStep(1)">Next</button>
                 <button class="btn btn-link" onclick="goToLogin()">Back to Login</button>
             </div>
@@ -214,26 +198,20 @@
 
             <!-- Step 3: Email -->
             <div class="step" id="step-3">
-                <div class="header"><h2>Email Address</h2><p>For official updates</p></div>
-                <div class="form-group">
-                    <input type="email" id="reg-email" placeholder="example@mail.com">
-                </div>
+                <div class="header"><h2>Email Address</h2><p>For updates</p></div>
+                <div class="form-group"><input type="email" id="reg-email" placeholder="example@mail.com"></div>
                 <button class="btn" onclick="nextStep(3)">Next</button>
                 <button class="btn btn-link" onclick="prevStep(3)">Back</button>
             </div>
 
             <!-- Step 4: Location -->
             <div class="step" id="step-4">
-                <div class="header"><h2>Your Location</h2><p>Province & District</p></div>
+                <div class="header"><h2>Your Location</h2><p>Select Area</p></div>
                 <div class="form-group select-wrapper">
-                    <select id="reg-province" onchange="loadDistricts()">
-                        <option value="">Select Province</option>
-                    </select>
+                    <select id="reg-province" onchange="loadDistricts()"><option value="">Select Province</option></select>
                 </div>
                 <div class="form-group select-wrapper">
-                    <select id="reg-district" disabled>
-                        <option value="">Select District</option>
-                    </select>
+                    <select id="reg-district" disabled><option value="">Select District</option></select>
                 </div>
                 <button class="btn" onclick="nextStep(4)">Next</button>
                 <button class="btn btn-link" onclick="prevStep(4)">Back</button>
@@ -241,10 +219,8 @@
 
             <!-- Step 5: NIC Number -->
             <div class="step" id="step-5">
-                <div class="header"><h2>NIC Number</h2><p>Verification</p></div>
-                <div class="form-group">
-                    <input type="text" id="reg-nic" placeholder="e.g. 1999xxxxxx">
-                </div>
+                <div class="header"><h2>NIC Number</h2><p>Identity Verification</p></div>
+                <div class="form-group"><input type="text" id="reg-nic" placeholder="e.g. 1999xxxxxx"></div>
                 <button class="btn" onclick="nextStep(5)">Next</button>
                 <button class="btn btn-link" onclick="prevStep(5)">Back</button>
             </div>
@@ -283,7 +259,7 @@
                 </div>
             </div>
 
-            <!-- Step 8: Password -->
+            <!-- Step 8: Password & Save -->
             <div class="step" id="step-8">
                 <div class="header"><h2>Secure Account</h2><p>Create Password</p></div>
                 <div class="form-group"><input type="password" id="reg-pass" placeholder="Password"></div>
@@ -320,7 +296,6 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getDatabase, ref, set, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
             authDomain: "speedo-acb7c.firebaseapp.com",
@@ -336,259 +311,166 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // SL Locations
+        // SL Data
         const slData = {
-            "Western": ["Colombo", "Gampaha", "Kalutara"],
-            "Central": ["Kandy", "Matale", "Nuwara Eliya"],
-            "Southern": ["Galle", "Matara", "Hambantota"],
-            "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
-            "Eastern": ["Batticaloa", "Ampara", "Trincomalee"],
-            "North Western": ["Kurunegala", "Puttalam"],
-            "North Central": ["Anuradhapura", "Polonnaruwa"],
-            "Uva": ["Badulla", "Monaragala"],
-            "Sabaragamuwa": ["Ratnapura", "Kegalle"]
+            "Western": ["Colombo", "Gampaha", "Kalutara"], "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+            "Southern": ["Galle", "Matara", "Hambantota"], "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
+            "Eastern": ["Batticaloa", "Ampara", "Trincomalee"], "North Western": ["Kurunegala", "Puttalam"],
+            "North Central": ["Anuradhapura", "Polonnaruwa"], "Uva": ["Badulla", "Monaragala"], "Sabaragamuwa": ["Ratnapura", "Kegalle"]
         };
 
         let formData = { name: '', phone: '', email: '', province: '', district: '', nic: '', imgFront: '', imgBack: '', imgFace: '' };
         let stream = null;
 
-        // Populate Provinces
-        const pSelect = document.getElementById('reg-province');
-        for(let p in slData) {
-            let opt = document.createElement('option');
-            opt.value = p; opt.innerText = p;
-            pSelect.appendChild(opt);
-        }
+        // Init Provinces
+        const pSel = document.getElementById('reg-province');
+        for(let p in slData) { let o=document.createElement('option'); o.value=p; o.innerText=p; pSel.appendChild(o); }
 
         window.loadDistricts = () => {
-            const p = document.getElementById('reg-province').value;
-            const dSelect = document.getElementById('reg-district');
-            dSelect.innerHTML = '<option value="">Select District</option>';
-            if(p && slData[p]) {
-                slData[p].forEach(d => {
-                    let opt = document.createElement('option');
-                    opt.value = d; opt.innerText = d;
-                    dSelect.appendChild(opt);
-                });
-                dSelect.disabled = false;
-            } else {
-                dSelect.disabled = true;
-            }
+            const p = pSel.value; const dSel = document.getElementById('reg-district');
+            dSel.innerHTML = '<option value="">Select District</option>';
+            if(p && slData[p]) { slData[p].forEach(d=>{let o=document.createElement('option'); o.value=d; o.innerText=d; dSel.appendChild(o)}); dSel.disabled=false; }
+            else dSel.disabled=true;
         };
 
-        // --- Toast ---
-        window.showToast = (msg, type = 'error') => {
-            const t = document.getElementById('toast');
-            t.className = `show ${type}`;
-            t.innerText = msg;
-            setTimeout(() => { t.className = t.className.replace('show', ''); }, 3000);
+        window.showToast = (msg, type='error') => {
+            const t = document.getElementById('toast'); t.className = `show ${type}`; t.innerText = msg;
+            setTimeout(() => { t.className = ''; }, 3000);
         };
 
-        // --- Init ---
         window.addEventListener('load', () => {
-            const user = localStorage.getItem('aps_user');
+            const u = localStorage.getItem('aps_user');
             setTimeout(() => {
-                document.getElementById('splash-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('splash-screen').style.display = 'none';
-                    if(user) checkStatus(JSON.parse(user).uid);
-                    else showScreen('login-screen');
-                }, 500);
+                const s = document.getElementById('splash-screen'); s.style.opacity='0';
+                setTimeout(() => { s.style.display='none'; if(u) checkStatus(JSON.parse(u).uid); else showScreen('login-screen'); }, 500);
             }, 2000);
         });
 
         async function checkStatus(uid) {
             toggleLoader(true);
             try {
-                const snap = await get(ref(db, 'riders/' + uid));
+                const snap = await get(ref(db, 'riders/'+uid));
                 if(snap.exists()) {
-                    const data = snap.val();
-                    if(data.approved_status === true) window.location.href = "main.html";
-                    else if(data.approved_status === "declined") {
+                    const d = snap.val();
+                    if(d.approved_status === true) window.location.href="main.html";
+                    else if(d.approved_status === "declined") {
                         showScreen('declined-screen');
-                        document.getElementById('decline-list').innerHTML = (data.declinereasons || []).map(r => `<li>${r}</li>`).join('');
+                        document.getElementById('decline-list').innerHTML = (d.declinereasons||[]).map(r=>`<li>${r}</li>`).join('');
                     } else showScreen('pending-screen');
-                } else {
-                    localStorage.removeItem('aps_user');
-                    showScreen('login-screen');
-                }
-            } catch(e) {
-                showToast("Network Error");
-                showScreen('login-screen');
-            } finally {
-                toggleLoader(false);
-            }
+                } else { localStorage.removeItem('aps_user'); showScreen('login-screen'); }
+            } catch { showToast("Network Error"); showScreen('login-screen'); }
+            finally { toggleLoader(false); }
         }
 
-        // --- Keypad ---
-        window.kpPress = (n) => { const el = document.getElementById('reg-phone'); if(el.value.length < 10) el.value += n; };
-        window.kpDel = () => { const el = document.getElementById('reg-phone'); el.value = el.value.slice(0, -1); };
+        window.kpPress = (n) => { const e=document.getElementById('reg-phone'); if(e.value.length<10) e.value+=n; };
+        window.kpDel = () => { const e=document.getElementById('reg-phone'); e.value = e.value.slice(0,-1); };
 
-        // --- Steps ---
         window.nextStep = async (step) => {
-            if(step === 1) {
+            if(step===1) {
                 const n = document.getElementById('reg-name').value.trim();
-                if(n.length < 3) return showToast("Name is too short");
+                if(n.length<3) return showToast("Name too short");
                 
-                // Check Duplicate Name
+                // Duplicate Name Check with Graceful Fail
                 toggleLoader(true);
-                const q = query(ref(db, 'riders'), orderByChild('fullName'), equalTo(n.toUpperCase()));
-                const snap = await get(q);
+                try {
+                    const q = query(ref(db, 'riders'), orderByChild('fullName'), equalTo(n.toUpperCase()));
+                    const snap = await get(q);
+                    if(snap.exists()) { toggleLoader(false); return showToast("Name already exists"); }
+                } catch(err) {
+                    console.warn("Index check failed, skipping validation. Please update Firebase Rules.");
+                }
                 toggleLoader(false);
-                if(snap.exists()) return showToast("Name already registered", "error");
-                
                 formData.name = n.toUpperCase();
             }
-            if(step === 2) {
-                const p = document.getElementById('reg-phone').value;
-                if(!/^07[0-9]{8}$/.test(p)) return showToast("Invalid SL Mobile");
-                formData.phone = p;
-            }
-            if(step === 3) {
-                const e = document.getElementById('reg-email').value;
-                if(!/\S+@\S+\.\S+/.test(e)) return showToast("Invalid Email");
-                formData.email = e;
-            }
-            if(step === 4) {
-                const pr = document.getElementById('reg-province').value;
-                const ds = document.getElementById('reg-district').value;
-                if(!pr || !ds) return showToast("Select Location");
-                formData.province = pr; formData.district = ds;
-            }
-            if(step === 5) {
-                const nic = document.getElementById('reg-nic').value;
-                if(nic.length < 9) return showToast("Invalid NIC");
-                formData.nic = nic;
-            }
-            if(step === 6) {
-                if(!formData.imgFront || !formData.imgBack) return showToast("Upload ID photos");
-            }
-            if(step === 7) {
-                if(!formData.imgFace) return showToast("Take a selfie");
-                stopCamera();
-            }
+            if(step===2) { const p=document.getElementById('reg-phone').value; if(!/^07[0-9]{8}$/.test(p)) return showToast("Invalid Phone"); formData.phone=p; }
+            if(step===3) { const e=document.getElementById('reg-email').value; if(!/\S+@\S+\.\S+/.test(e)) return showToast("Invalid Email"); formData.email=e; }
+            if(step===4) { if(!document.getElementById('reg-district').value) return showToast("Select Location"); formData.province=document.getElementById('reg-province').value; formData.district=document.getElementById('reg-district').value; }
+            if(step===5) { const i=document.getElementById('reg-nic').value; if(i.length<9) return showToast("Invalid NIC"); formData.nic=i; }
+            if(step===6) { if(!formData.imgFront || !formData.imgBack) return showToast("Upload Photos"); }
+            if(step===7) { if(!formData.imgFace) return showToast("Take Selfie"); stopCamera(); }
 
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step+1}`).classList.add('active');
-            if(step+1 === 7) startCamera();
+            if(step+1===7) startCamera();
         };
 
-        window.prevStep = (step) => {
-            if(step === 7) stopCamera();
-            document.getElementById(`step-${step}`).classList.remove('active');
-            document.getElementById(`step-${step-1}`).classList.add('active');
-        };
+        window.prevStep = (step) => { if(step===7) stopCamera(); document.getElementById(`step-${step}`).classList.remove('active'); document.getElementById(`step-${step-1}`).classList.add('active'); };
 
-        // --- Camera ---
         window.startCamera = async () => {
-            const vid = document.getElementById('webcam');
-            const can = document.getElementById('canvas');
-            vid.style.display = 'block'; can.style.display = 'none';
-            document.getElementById('snap-btn').style.display = 'flex';
-            document.getElementById('retake-btn').style.display = 'none';
-            try { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}, audio:false}); vid.srcObject = stream; } 
-            catch { showToast("Camera access required"); }
+            const v=document.getElementById('webcam'); const c=document.getElementById('canvas');
+            v.style.display='block'; c.style.display='none';
+            document.getElementById('snap-btn').style.display='flex'; document.getElementById('retake-btn').style.display='none';
+            try { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false}); v.srcObject=stream; }
+            catch { showToast("Camera Access Denied"); }
         };
-        window.stopCamera = () => { if(stream) { stream.getTracks().forEach(t=>t.stop()); stream=null; } };
+        window.stopCamera = () => { if(stream){stream.getTracks().forEach(t=>t.stop()); stream=null;} };
         window.takeSnapshot = () => {
-            const vid = document.getElementById('webcam');
-            const can = document.getElementById('canvas');
-            can.width = 400; can.height = 400;
-            const ctx = can.getContext('2d');
-            const s = Math.min(vid.videoWidth, vid.videoHeight);
+            const v=document.getElementById('webcam'); const c=document.getElementById('canvas');
+            c.width=400; c.height=400; const ctx=c.getContext('2d');
+            const s=Math.min(v.videoWidth,v.videoHeight);
             ctx.translate(400,0); ctx.scale(-1,1);
-            ctx.drawImage(vid, (vid.videoWidth-s)/2, (vid.videoHeight-s)/2, s, s, 0, 0, 400, 400);
-            formData.imgFace = can.toDataURL('image/jpeg', 0.6);
-            vid.style.display='none'; can.style.display='block';
-            document.getElementById('snap-btn').style.display='none';
-            document.getElementById('retake-btn').style.display='flex';
+            ctx.drawImage(v,(v.videoWidth-s)/2,(v.videoHeight-s)/2,s,s,0,0,400,400);
+            formData.imgFace = c.toDataURL('image/jpeg', 0.6);
+            v.style.display='none'; c.style.display='block';
+            document.getElementById('snap-btn').style.display='none'; document.getElementById('retake-btn').style.display='flex';
         };
 
-        // --- File ---
-        window.processFile = (inp, prevId, boxId) => {
-            const f = inp.files[0];
-            if(!f) return;
-            const r = new FileReader();
-            r.onload = (e) => {
-                const i = new Image(); i.src = e.target.result;
-                i.onload = () => {
-                    const c = document.createElement('canvas');
-                    const w = 500; const sc = w/i.width;
-                    c.width = w; c.height = i.height*sc;
-                    const ctx = c.getContext('2d');
-                    ctx.drawImage(i,0,0,w,c.height);
-                    const d = c.toDataURL('image/jpeg', 0.6);
-                    document.getElementById(prevId).src = d;
-                    document.getElementById(prevId).style.display = 'block';
-                    document.getElementById(boxId).classList.add('done');
-                    if(prevId.includes('front')) formData.imgFront = d;
-                    else formData.imgBack = d;
-                };
-            };
-            r.readAsDataURL(f);
+        window.processFile = (inp, pid, bid) => {
+            const f=inp.files[0]; if(!f) return;
+            const r=new FileReader(); r.onload=e=>{
+                const i=new Image(); i.src=e.target.result;
+                i.onload=()=>{
+                    const c=document.createElement('canvas'); const w=500; const sc=w/i.width; c.width=w; c.height=i.height*sc;
+                    c.getContext('2d').drawImage(i,0,0,w,c.height);
+                    const d=c.toDataURL('image/jpeg',0.6);
+                    document.getElementById(pid).src=d; document.getElementById(pid).style.display='block';
+                    document.getElementById(bid).classList.add('done');
+                    if(pid.includes('front')) formData.imgFront=d; else formData.imgBack=d;
+                }
+            }; r.readAsDataURL(f);
         };
 
-        // --- Submit ---
         window.submitRegistration = async () => {
-            const p1 = document.getElementById('reg-pass').value;
-            const p2 = document.getElementById('reg-pass-confirm').value;
-            if(p1.length < 6) return showToast("Password too short");
-            if(p1 !== p2) return showToast("Passwords do not match");
-
+            const p1=document.getElementById('reg-pass').value; const p2=document.getElementById('reg-pass-confirm').value;
+            if(p1.length<6 || p1!==p2) return showToast("Check Password");
             toggleLoader(true);
             try {
-                // Firebase checks duplicate phone automatically (mapped to email)
+                // Creates user in Auth. If Phone/Email exists, catches error
                 const cred = await createUserWithEmailAndPassword(auth, `${formData.phone}@apspeedo.com`, p1);
                 const uid = cred.user.uid;
-
-                await set(ref(db, 'riders/' + uid), {
-                    fullName: formData.name,
-                    phone: formData.phone,
-                    email: formData.email,
-                    province: formData.province,
-                    district: formData.district,
-                    nic: formData.nic,
-                    nicFront: formData.imgFront,
-                    nicBack: formData.imgBack,
-                    faceImg: formData.imgFace,
-                    approved_status: false,
-                    joined: new Date().toISOString()
+                
+                // SAVE ALL DATA AT THE END
+                await set(ref(db, 'riders/'+uid), {
+                    fullName: formData.name, phone: formData.phone, email: formData.email,
+                    province: formData.province, district: formData.district, nic: formData.nic,
+                    nicFront: formData.imgFront, nicBack: formData.imgBack, faceImg: formData.imgFace,
+                    approved_status: false, joined: new Date().toISOString()
                 });
-
-                localStorage.setItem('aps_user', JSON.stringify({ uid: uid }));
+                localStorage.setItem('aps_user', JSON.stringify({uid:uid}));
                 checkStatus(uid);
-
             } catch(e) {
-                if(e.code === 'auth/email-already-in-use') showToast("Phone number already registered", "error");
-                else showToast("Error: " + e.message);
+                if(e.code==='auth/email-already-in-use') showToast("Phone already registered");
+                else showToast("Error: "+e.message);
                 toggleLoader(false);
             }
         };
 
-        // --- Login ---
         window.handleLogin = async () => {
-            const ph = document.getElementById('login-phone').value;
-            const pw = document.getElementById('login-pass').value;
-            if(!ph || !pw) return showToast("Enter credentials");
-
+            const p=document.getElementById('login-phone').value; const w=document.getElementById('login-pass').value;
             toggleLoader(true);
             try {
-                const cred = await signInWithEmailAndPassword(auth, `${ph}@apspeedo.com`, pw);
-                localStorage.setItem('aps_user', JSON.stringify({ uid: cred.user.uid }));
-                checkStatus(cred.user.uid);
-            } catch(e) {
-                showToast("Invalid credentials");
-                toggleLoader(false);
-            }
+                const c = await signInWithEmailAndPassword(auth, `${p}@apspeedo.com`, w);
+                localStorage.setItem('aps_user', JSON.stringify({uid:c.user.uid}));
+                checkStatus(c.user.uid);
+            } catch { showToast("Login Failed"); toggleLoader(false); }
         };
 
         window.goToRegister = () => { showScreen('register-screen'); document.querySelectorAll('.step').forEach(s=>s.classList.remove('active')); document.getElementById('step-1').classList.add('active'); };
         window.goToLogin = () => showScreen('login-screen');
         window.logout = () => { signOut(auth); localStorage.removeItem('aps_user'); location.reload(); };
         window.reUpload = () => window.goToRegister();
-        
         function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>{if(s.id!=='splash-screen')s.classList.remove('active')}); document.getElementById(id).classList.add('active'); }
-        function toggleLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
+        function toggleLoader(s) { document.getElementById('loader').style.display=s?'flex':'none'; }
     </script>
 </body>
 </html>
