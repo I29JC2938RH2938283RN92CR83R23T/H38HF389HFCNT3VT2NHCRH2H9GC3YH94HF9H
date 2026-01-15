@@ -386,17 +386,15 @@
         import { GoogleGenAI } from "https://esm.run/@google/genai";
 
         // --- CONFIG ---
-        // ENCODED API KEY: AIzaSyBn0a2KrsRayMRbhNJo1QOKBjEyqSF1yVA
-        const GEMINI_API_KEY_B64 = "QUl6YVN5Qm4wYTJLcnNSYXlNUmJoSmpvMVFPS0JqRXlxU0YyeVZA"; 
-
-        let GEMINI_API_KEY = "";
-        if(GEMINI_API_KEY_B64) {
-            try {
-                GEMINI_API_KEY = atob(GEMINI_API_KEY_B64.trim());
-            } catch (e) {
-                console.error("Invalid Base64 API Key");
-            }
-        }
+        // API Key: AIzaSyBn0a2KrsRayMRbhNJo1QOKBjEyqSF1yVA
+        // Base64 Encoded
+        const GEMINI_API_KEY_B64 = "QUl6YVN5Qm4wYTJLcnNSYXlNUmJoSmpvMVFPS0JqRXlxU0YyeVZA";
+        
+        // Decode immediately at top level
+        const GEMINI_API_KEY = atob(GEMINI_API_KEY_B64);
+        
+        // Initialize Client globally to avoid scope errors
+        const genAI = new GoogleGenAI(GEMINI_API_KEY);
 
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
@@ -534,13 +532,10 @@
 
         // --- GOOGLE GENAI SDK IMPLEMENTATION ---
         async function callGemini(prompt, imagesBase64) {
-            if (!GEMINI_API_KEY) {
-                return { success: true, raw: JSON.stringify({isMatch:true, reason:"Simulated"}) };
-            }
+            // We use the global 'genAI' object initialized at the top
+            // No need to re-instantiate inside this function
             
             try {
-                const ai = new GoogleGenAI(GEMINI_API_KEY);
-                
                 // Prepare content parts
                 const parts = [{ text: prompt }];
                 imagesBase64.forEach(img => {
@@ -550,7 +545,7 @@
                 });
 
                 // Using the latest model (2.5 Preview / 2.0 Experimental)
-                const response = await ai.models.generateContent({
+                const response = await genAI.models.generateContent({
                     model: "gemini-2.0-flash-exp",
                     contents: parts
                 });
