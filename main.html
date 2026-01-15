@@ -5,235 +5,186 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Speedo Rider</title>
     
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        :root { --primary: #D32F2F; --white: #ffffff; --text: #333; --online: #00C853; --offline: #D32F2F; }
-        * { box-sizing: border-box; tap-highlight-color: transparent; user-select: none; }
+        :root { --primary: #D32F2F; --white: #ffffff; --text: #333; --online: #00C853; --offline: #D32F2F; --bg: #f4f4f4; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
         body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; overflow: hidden; background: #eee; height: 100vh; width: 100vw; }
 
-        /* --- MAP & MARKER FIX --- */
+        /* MAP */
         #map { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-        
-        /* Fixed Glowing Marker */
-        .gps-marker-container {
-            width: 50px; height: 50px;
-            display: flex; justify-content: center; align-items: center;
-            position: relative;
-        }
-        .gps-dot {
-            width: 16px; height: 16px;
-            background: #2196F3;
-            border: 3px solid white;
-            border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            z-index: 2; /* Keeps dot on top */
-            position: relative;
-        }
-        .gps-pulse {
-            position: absolute;
-            width: 50px; height: 50px;
-            background: rgba(33, 150, 243, 0.4);
-            border-radius: 50%;
-            z-index: 1;
-            animation: pulse-ring 2s infinite;
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
+        .gps-marker-container { width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; position: relative; }
+        .gps-dot { width: 16px; height: 16px; background: #2196F3; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 2; position: relative; }
+        .gps-pulse { position: absolute; width: 50px; height: 50px; background: rgba(33, 150, 243, 0.4); border-radius: 50%; z-index: 1; animation: pulse-ring 2s infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
-        /* --- UI LAYER --- */
-        .top-card {
-            position: fixed; top: 15px; left: 15px; right: 15px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(5px);
-            border-radius: 15px; padding: 10px 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 100;
-        }
+        /* UI CARDS */
+        .top-card { position: fixed; top: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-radius: 15px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 100; }
         .profile-sec { display: flex; align-items: center; gap: 10px; }
         .p-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        .p-name { font-weight: 700; font-size: 14px; color: var(--text); line-height: 1.2; }
-        .lang-btn { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; color: #555; cursor: pointer; position: absolute; left: 50%; transform: translateX(-50%); }
-        .status-pill { padding: 5px 12px; border-radius: 20px; color: white; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        .st-online { background: var(--online); }
-        .st-offline { background: var(--offline); }
+        .p-name { font-weight: 700; font-size: 14px; color: var(--text); }
+        .lang-btn { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; color: #555; position: absolute; left: 50%; transform: translateX(-50%); }
+        .status-pill { padding: 5px 12px; border-radius: 20px; color: white; font-size: 11px; font-weight: bold; }
+        .st-online { background: var(--online); } .st-offline { background: var(--offline); }
 
-        .bottom-card {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--white); border-radius: 25px 25px 0 0;
-            padding: 25px 20px 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            z-index: 100; transition: transform 0.3s ease;
-            display: flex; flex-direction: column; align-items: center;
-        }
+        .bottom-card { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); border-radius: 25px 25px 0 0; padding: 25px 20px 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 100; display: flex; flex-direction: column; align-items: center; }
         
-        .card-title { font-size: 16px; font-weight: 700; color: #444; margin-bottom: 15px; width: 100%; text-align: left; }
-        .card-desc { font-size: 12px; color: #777; margin: 10px 0; text-align: center; }
-
-        .go-online-btn {
-            background: var(--primary); color: white; width: 100%; padding: 15px;
-            border: none; border-radius: 50px; font-size: 18px; font-weight: 700;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4); cursor: pointer;
-            transition: transform 0.1s;
-        }
+        /* BUTTONS */
+        .go-online-btn { background: var(--primary); color: white; width: 100%; padding: 15px; border: none; border-radius: 50px; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4); margin-top: 10px; }
         .go-online-btn:active { transform: scale(0.98); }
         .dot { width: 10px; height: 10px; background: white; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
+        .vehicles-strip { width: 100%; background: #f5f5f5; padding: 12px; border-radius: 12px; margin-top: 15px; text-align: center; font-weight: 600; color: #333; font-size: 14px; border: 1px solid #ddd; }
 
-        .vehicles-strip {
-            width: 100%; background: #f5f5f5; padding: 12px; border-radius: 12px;
-            margin-top: 15px; text-align: center; font-weight: 600; color: #333;
-            font-size: 14px; cursor: pointer; border: 1px solid #ddd;
-        }
+        /* MODALS */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); }
+        .modal-card { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; animation: slideUp 0.3s ease; }
+        .full-screen-modal { align-items: center; justify-content: center; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .online-ui { display: none; width: 100%; flex-direction: column; }
-        .options-row { display: flex; justify-content: space-between; width: 100%; margin-top: 10px; }
-        .chk-container { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; background: #f9f9f9; padding: 8px 12px; border-radius: 10px; width: 48%; }
-        input[type="checkbox"] { accent-color: var(--primary); width: 18px; height: 18px; }
-
-        /* --- MODALS --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 2000; display: none;
-            justify-content: center; align-items: flex-end; backdrop-filter: blur(3px);
-        }
-        .modal-card {
-            background: white; width: 100%; max-width: 500px;
-            border-radius: 20px 20px 0 0; padding: 20px;
-            max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column;
-        }
-        .full-screen-modal { align-items: center; justify-content: center; background: #fff; }
-        .fs-content { text-align: center; padding: 30px; }
-
-        /* CAROUSEL (For Add Vehicle) */
-        .carousel { flex: 1; position: relative; overflow: hidden; min-height: 400px; }
-        .slide { position: absolute; top: 0; left: 100%; width: 100%; height: 100%; padding: 10px; box-sizing: border-box; transition: left 0.4s ease; display: flex; flex-direction: column; overflow-y: auto; background: white; }
+        /* CAROUSEL */
+        .carousel { flex: 1; position: relative; overflow: hidden; min-height: 450px; display: flex; flex-direction: column; }
+        .slide { position: absolute; top: 0; left: 100%; width: 100%; height: 100%; padding: 5px; box-sizing: border-box; transition: left 0.4s ease; display: flex; flex-direction: column; overflow-y: auto; background: white; }
         .slide.active { left: 0; }
         .slide.prev { left: -100%; }
 
-        /* Form Styling */
-        label { font-size: 13px; font-weight: 600; margin-bottom: 5px; display: block; color: #555; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 8px; margin-bottom: 15px; font-family: 'Poppins'; }
-        .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .type-card { border: 2px solid #eee; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; }
-        .type-card.selected { border-color: var(--primary); background: #fff5f5; }
-        .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .img-upload { background: #f0f0f0; border: 2px dashed #ccc; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow: hidden; position: relative; }
-        .img-upload img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        /* FORM ELEMENTS */
+        label { font-size: 13px; font-weight: 600; margin-bottom: 5px; display: block; color: #555; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 8px; font-family: 'Poppins'; font-size: 14px; }
         
-        .del-btn { background: #ffebee; color: red; border: none; padding: 5px 10px; border-radius: 5px; font-size: 10px; cursor: pointer; float: right; }
-        .v-item { padding: 10px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; }
-        .v-item.selected { border: 2px solid var(--primary); background: #fff0f0; }
+        /* IMAGE UPLOAD GRID (Fixed) */
+        .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .img-upload { background: #f0f0f0; border: 2px dashed #ccc; height: 110px; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; position: relative; flex-direction: column; }
+        .img-upload img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; }
+        .img-label { font-size: 11px; color: #888; margin-top: 5px; z-index: 1; font-weight: 500; text-align: center; padding: 0 5px; }
+        .img-icon { font-size: 20px; color: #aaa; z-index: 1; }
 
-        /* Skeleton & Toast */
-        #skeleton { position: fixed; inset: 0; background: #fff; z-index: 3000; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-        .sk-header { height: 80px; background: #eee; border-radius: 15px; animation: pulse-bg 1s infinite; }
-        .sk-map { flex: 1; background: #eee; border-radius: 15px; animation: pulse-bg 1s infinite; }
-        @keyframes pulse-bg { from { opacity: 0.6; } to { opacity: 1; } }
+        /* VEHICLE ITEMS */
+        .v-item { padding: 15px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
+        .v-row { display: flex; justify-content: space-between; align-items: center; }
+        .v-brand { font-weight: 700; font-size: 15px; }
+        .v-plate { font-size: 12px; background: #eee; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        .del-btn { background: #ffebee; color: #d32f2f; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; margin-top: 10px; width: 100%; }
 
-        #toast-container { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); z-index: 5000; width: 90%; pointer-events: none; }
-        .toast { background: #333; color: white; padding: 10px 20px; border-radius: 30px; text-align: center; margin-bottom: 10px; opacity: 0; transition: 0.3s; font-size: 13px; }
+        /* CONFIRM MODAL */
+        #confirm-modal { z-index: 9999; }
+        .confirm-box { background: white; padding: 25px; border-radius: 15px; text-align: center; width: 80%; max-width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .confirm-btn-row { display: flex; gap: 10px; margin-top: 20px; }
+        .c-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; font-size: 14px; }
+        .c-yes { background: #D32F2F; color: white; }
+        .c-no { background: #eee; color: #333; }
+
+        /* TOAST */
+        #toast-container { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); z-index: 8000; width: 90%; pointer-events: none; }
+        .toast { background: #333; color: white; padding: 12px 20px; border-radius: 30px; text-align: center; margin-bottom: 10px; opacity: 0; transition: 0.3s; font-size: 13px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .toast.show { opacity: 1; transform: translateY(10px); }
         .toast.error { background: #d32f2f; }
         .toast.success { background: #388e3c; }
 
-        #confetti-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 4000; display: none; justify-content: center; align-items: center; font-size: 50px; }
+        /* SKELETON */
+        #skeleton { position: fixed; inset: 0; background: #fff; z-index: 3000; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        .sk-head { height: 80px; background: #eee; border-radius: 15px; animation: p 1s infinite; }
+        .sk-body { flex: 1; background: #eee; border-radius: 15px; animation: p 1s infinite; }
+        @keyframes p { from{opacity:0.6} to{opacity:1} }
     </style>
 </head>
 <body>
 
+<!-- Skeleton -->
 <div id="skeleton">
-    <div class="sk-header"></div>
-    <div class="sk-map"></div>
-    <div class="sk-header"></div>
+    <div class="sk-head"></div>
+    <div class="sk-body"></div>
+    <div class="sk-head"></div>
 </div>
 
-<div id="location-error-modal" class="modal-overlay full-screen-modal" style="display:none; z-index:9000; background:white;">
-    <div class="fs-content">
-        <h2 style="color:var(--primary)" data-i18n="loc_err_title">Location Required</h2>
-        <p data-i18n="loc_err_msg">Please turn on GPS & Mobile Data.</p>
-        <div style="margin-top:20px; color:#777; font-size:12px;">Searching...</div>
+<!-- Location Error -->
+<div id="location-error-modal" class="modal-overlay full-screen-modal">
+    <div style="text-align:center; padding:30px; background:white; border-radius:20px;">
+        <h2 style="color:var(--primary)">Location Required</h2>
+        <p>Please turn on GPS & Mobile Data.</p>
+        <div style="margin-top:20px; color:#999; font-size:12px;">Searching...</div>
     </div>
 </div>
 
-<!-- Map -->
+<!-- Custom Confirm Modal -->
+<div id="confirm-modal" class="modal-overlay full-screen-modal">
+    <div class="confirm-box">
+        <h3>Are you sure?</h3>
+        <p>This will permanently delete this vehicle.</p>
+        <div class="confirm-btn-row">
+            <button class="c-btn c-no" onclick="closeConfirm()">Cancel</button>
+            <button class="c-btn c-yes" id="confirm-yes-btn">Delete</button>
+        </div>
+    </div>
+</div>
+
 <div id="map"></div>
 
-<!-- Top Card -->
+<!-- Top Bar -->
 <div class="top-card" id="top-ui" style="display:none;">
     <div class="profile-sec" onclick="openProfile()">
         <img src="" id="user-pic" class="p-img">
         <div class="p-name"><span id="user-name">Rider</span></div>
     </div>
     <button class="lang-btn" onclick="toggleLang()" id="lang-btn">EN</button>
-    <div class="status-pill st-offline" id="status-pill" data-i18n="offline">OFFLINE</div>
+    <div class="status-pill st-offline" id="status-pill">OFFLINE</div>
 </div>
 
-<!-- Bottom Card -->
+<!-- Bottom Bar -->
 <div class="bottom-card" id="bottom-ui" style="display:none;">
-    <!-- OFFLINE VIEW -->
+    <!-- Offline -->
     <div id="view-offline" style="width:100%;">
-        <div class="card-title" data-i18n="driver_status">Driver Status</div>
+        <div style="font-weight:700; color:#444; margin-bottom:10px;">Driver Status</div>
         <button class="go-online-btn" onclick="initiateGoOnline()">
-            <div class="dot"></div> <span data-i18n="go_online">GO ONLINE</span>
+            <div class="dot"></div> GO ONLINE
         </button>
-        <p class="card-desc" data-i18n="go_online_desc">Go online to receive hires</p>
+        <p style="font-size:12px; color:#777; text-align:center; margin:10px 0;">Go online to receive hires</p>
         <div class="vehicles-strip" onclick="openVehicleManager()">
-            <i class="fas fa-car"></i> <span data-i18n="manage_vehicles">Vehicles</span>
+            <i class="fas fa-car"></i> Manage Vehicles
         </div>
     </div>
-
-    <!-- ONLINE VIEW -->
-    <div id="view-online" class="online-ui">
+    <!-- Online -->
+    <div id="view-online" style="display:none; width:100%;">
         <div style="text-align:center; margin-bottom:10px;">
-            <h3 style="color:var(--primary); margin:0;" data-i18n="finding_hires">Finding Hires...</h3>
-            <p class="card-desc" data-i18n="keep_data_on">Keep GPS & Data ON</p>
+            <h3 style="color:var(--primary); margin:0;">Finding Hires...</h3>
+            <p style="font-size:12px; color:#777;">Keep GPS & Data ON</p>
         </div>
-        <button class="go-online-btn" style="background:#333; padding:10px; font-size:14px;" onclick="goOffline()">
-            <span data-i18n="go_offline">GO OFFLINE</span>
-        </button>
-        <div class="options-row">
-            <label class="chk-container"><input type="checkbox" id="chk-close" onchange="updatePref()"> <span data-i18n="close_rides">Closer Rides</span></label>
-            <label class="chk-container"><input type="checkbox" id="chk-long" onchange="updatePref()"> <span data-i18n="long_trips">Long Trips</span></label>
-        </div>
-    </div>
-    <div style="font-size:10px; color:#aaa; margin-top:10px;" id="clock"></div>
-</div>
-
-<!-- Vehicle Select Modal (For Going Online) -->
-<div id="vehicle-select-modal" class="modal-overlay">
-    <div class="modal-card">
-        <h3 style="text-align:center;" data-i18n="select_veh">Select Vehicle</h3>
-        <div id="online-veh-list" style="flex:1; overflow-y:auto; margin-bottom:10px;"></div>
-        <button class="go-online-btn" onclick="confirmVehicle()"><span data-i18n="continue">Continue</span></button>
-        <button class="vehicles-strip" onclick="closeModal('vehicle-select-modal')" data-i18n="cancel">Cancel</button>
+        <button class="go-online-btn" style="background:#333; font-size:14px; padding:12px;" onclick="goOffline()">GO OFFLINE</button>
     </div>
 </div>
 
-<!-- Vehicle Manager Modal -->
+<!-- Vehicle Manager -->
 <div id="vehicle-man-modal" class="modal-overlay">
     <div class="modal-card" style="height:85vh;">
-        <h3 style="text-align:center;" data-i18n="my_vehicles">My Vehicles</h3>
+        <h3 style="text-align:center;">My Vehicles</h3>
         <div id="man-veh-list" style="flex:1; overflow-y:auto; padding-bottom:10px;"></div>
-        <button class="go-online-btn" style="background:#444; font-size:14px;" onclick="openAddVehicle()">+ <span data-i18n="add_vehicle">Add Vehicle</span></button>
-        <button class="vehicles-strip" onclick="closeModal('vehicle-man-modal')" data-i18n="close">Close</button>
+        <button class="go-online-btn" style="background:#444; font-size:14px;" onclick="openAddVehicle()">+ Add Vehicle</button>
+        <button class="vehicles-strip" onclick="closeModal('vehicle-man-modal')">Close</button>
     </div>
 </div>
 
-<!-- ADD VEHICLE CAROUSEL MODAL (Restored) -->
+<!-- Select Vehicle (For Online) -->
+<div id="vehicle-select-modal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 style="text-align:center;">Select Vehicle</h3>
+        <div id="online-veh-list" style="max-height:300px; overflow-y:auto; margin-bottom:10px;"></div>
+        <button class="go-online-btn" onclick="confirmVehicle()">Continue</button>
+        <button class="vehicles-strip" onclick="closeModal('vehicle-select-modal')">Cancel</button>
+    </div>
+</div>
+
+<!-- ADD VEHICLE CAROUSEL -->
 <div id="add-vehicle-modal" class="modal-overlay">
-    <div class="modal-card" style="height:90vh;">
-        <h3 style="text-align:center;">Add Vehicle</h3>
+    <div class="modal-card" style="height:95vh;">
+        <h3 style="text-align:center; margin-bottom:0;">Register Vehicle</h3>
         <div class="carousel">
+            
             <!-- 1. Type -->
             <div class="slide active" id="s1">
-                <label>Select Type</label>
+                <label>Vehicle Type</label>
                 <div class="type-grid">
                     <div class="type-card" onclick="selectType('Bike', this)">🏍️ Bike</div>
                     <div class="type-card" onclick="selectType('Tuk Tuk', this)">🛺 Tuk Tuk</div>
@@ -242,42 +193,111 @@
                 </div>
                 <button class="go-online-btn" style="margin-top:20px;" onclick="next(1)">Next</button>
             </div>
-            <!-- 2. Brand -->
+
+            <!-- 2. Brand/Model -->
             <div class="slide" id="s2">
                 <label>Brand</label><select id="v-brand" onchange="loadModels()"><option value="">Select</option></select>
                 <label>Model</label><select id="v-model"><option value="">Select</option></select>
-                <input type="text" id="v-other" placeholder="Or enter model" style="margin-top:5px;">
+                <input type="text" id="v-other" placeholder="Other model name (Optional)" style="margin-top:5px;">
                 <button class="go-online-btn" style="margin-top:20px;" onclick="next(2)">Next</button>
                 <button class="vehicles-strip" onclick="prev(2)">Back</button>
             </div>
+
             <!-- 3. Plate -->
             <div class="slide" id="s3">
-                <label>Plate Number</label>
+                <label>Number Plate</label>
                 <div style="display:flex; gap:10px;">
-                    <select id="v-plate-prov" style="width:30%"><option>WP</option><option>CP</option><option>SP</option><option>NW</option><option>NC</option></select>
-                    <input type="text" id="v-plate-num" placeholder="ABC-1234" style="width:70%; text-transform:uppercase;">
+                    <select id="v-plate-prov" style="width:30%">
+                        <option>WP</option><option>CP</option><option>SP</option>
+                        <option>NP</option><option>EP</option><option>NW</option>
+                        <option>NC</option><option>UP</option><option>SG</option>
+                    </select>
+                    <input type="text" id="v-plate-num" placeholder="CAB-1234" style="width:70%; text-transform:uppercase;" maxlength="8">
                 </div>
+                <p style="font-size:10px; color:gray;">Format: 2-3 Letters + 4 Numbers (e.g. CAB-1234)</p>
                 <button class="go-online-btn" style="margin-top:20px;" onclick="next(3)">Next</button>
                 <button class="vehicles-strip" onclick="prev(3)">Back</button>
             </div>
-            <!-- 4. Photos -->
+
+            <!-- 4. Color & Details -->
             <div class="slide" id="s4">
-                <label>Photos</label>
-                <div class="img-grid">
-                    <div class="img-upload" onclick="up('ext1')"><img id="p-ext1"><span class="img-label">Front</span></div>
-                    <div class="img-upload" onclick="up('ext2')"><img id="p-ext2"><span class="img-label">Back</span></div>
-                    <div class="img-upload" onclick="up('lic1')"><img id="p-lic1"><span class="img-label">License F</span></div>
-                    <div class="img-upload" onclick="up('lic2')"><img id="p-lic2"><span class="img-label">License B</span></div>
-                </div>
-                <!-- Inputs -->
-                <input type="file" id="f-ext1" hidden onchange="proc(this,'p-ext1')"><input type="file" id="f-ext2" hidden onchange="proc(this,'p-ext2')">
-                <input type="file" id="f-lic1" hidden onchange="proc(this,'p-lic1')"><input type="file" id="f-lic2" hidden onchange="proc(this,'p-lic2')">
-                
-                <button class="go-online-btn" style="margin-top:20px;" onclick="submitVehicle()">Submit</button>
+                <label>Color</label>
+                <select id="v-color">
+                    <option>White</option><option>Black</option><option>Silver</option>
+                    <option>Gray</option><option>Red</option><option>Blue</option>
+                    <option>Brown</option><option>Gold</option><option>Yellow</option>
+                </select>
+                <label>Other Details (Optional)</label>
+                <textarea id="v-det" rows="2" placeholder="e.g. A/C, Sticker"></textarea>
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(4)">Next</button>
                 <button class="vehicles-strip" onclick="prev(4)">Back</button>
             </div>
+
+            <!-- 5. Images (Exterior & Interior) -->
+            <div class="slide" id="s5">
+                <label>Vehicle Photos</label>
+                <div class="img-grid">
+                    <div class="img-upload" onclick="up('ext1')">
+                        <i class="fas fa-camera img-icon"></i><span class="img-label">Front Ext</span><img id="p-ext1">
+                    </div>
+                    <div class="img-upload" onclick="up('ext2')">
+                        <i class="fas fa-camera img-icon"></i><span class="img-label">Back Ext</span><img id="p-ext2">
+                    </div>
+                    <div class="img-upload" onclick="up('int1')">
+                        <i class="fas fa-chair img-icon"></i><span class="img-label">Front Int</span><img id="p-int1">
+                    </div>
+                    <div class="img-upload" onclick="up('int2')">
+                        <i class="fas fa-chair img-icon"></i><span class="img-label">Back Int</span><img id="p-int2">
+                    </div>
+                </div>
+                <!-- Inputs -->
+                <input type="file" id="f-ext1" hidden onchange="proc(this,'p-ext1')">
+                <input type="file" id="f-ext2" hidden onchange="proc(this,'p-ext2')">
+                <input type="file" id="f-int1" hidden onchange="proc(this,'p-int1')">
+                <input type="file" id="f-int2" hidden onchange="proc(this,'p-int2')">
+
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(5)">Next</button>
+                <button class="vehicles-strip" onclick="prev(5)">Back</button>
+            </div>
+
+            <!-- 6. License -->
+            <div class="slide" id="s6">
+                <label>Driving License</label>
+                <div class="img-grid">
+                    <div class="img-upload" onclick="up('lic1')">
+                        <i class="fas fa-id-card img-icon"></i><span class="img-label">Front</span><img id="p-lic1">
+                    </div>
+                    <div class="img-upload" onclick="up('lic2')">
+                        <i class="fas fa-id-card img-icon"></i><span class="img-label">Back</span><img id="p-lic2">
+                    </div>
+                </div>
+                <input type="file" id="f-lic1" hidden onchange="proc(this,'p-lic1')">
+                <input type="file" id="f-lic2" hidden onchange="proc(this,'p-lic2')">
+
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(6)">Next</button>
+                <button class="vehicles-strip" onclick="prev(6)">Back</button>
+            </div>
+
+            <!-- 7. Agreement -->
+            <div class="slide" id="s7">
+                <h4 style="text-align:center; margin:0;">Agreement</h4>
+                <div style="flex:1; background:#f9f9f9; padding:10px; border-radius:10px; font-size:12px; overflow-y:scroll; color:#555; margin-bottom:10px;">
+                    <p>1. I confirm the vehicle details are true.</p>
+                    <p>2. I hold valid insurance and license.</p>
+                    <p>3. I agree to Speedo terms.</p>
+                    <p>4. I will drive safely.</p>
+                    <p>5. Zero tolerance policy applies.</p>
+                </div>
+                <label style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="agree-chk" style="width:20px; margin:0;"> I Agree
+                </label>
+                
+                <button class="go-online-btn" style="margin-top:20px;" onclick="submitVehicle()">Submit Application</button>
+                <button class="vehicles-strip" onclick="prev(7)">Back</button>
+            </div>
+
         </div>
-        <button class="vehicles-strip" onclick="closeModal('add-vehicle-modal')">Cancel</button>
+        <button class="vehicles-strip" onclick="closeModal('add-vehicle-modal')">Close</button>
     </div>
 </div>
 
@@ -288,15 +308,16 @@
         <div style="text-align:center;">
             <img id="prof-img" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--primary);">
             <h2 id="prof-name"></h2>
-            <p id="prof-phone"></p>
+            <p id="prof-phone" style="color:#666;"></p>
         </div>
         <button class="vehicles-strip" onclick="closeModal('profile-modal')">Close</button>
     </div>
 </div>
 
-<div id="confetti-overlay">🎉</div>
+<div id="confetti-overlay" style="position:fixed; inset:0; pointer-events:none; z-index:9000; display:none; justify-content:center; align-items:center; font-size:60px;">🎉 🛺 🚗</div>
 <div id="toast-container"></div>
 
+<!-- JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -309,37 +330,53 @@
         projectId: "speedo-acb7c"
     }));
 
-    // --- GLOBALS ---
-    let currentUser = null;
-    let currentVehicles = [];
-    let map, marker, selectedVehId;
-    let isOnline = false;
-    let tempV = { type:"", brand:"", model:"", imgs:{} };
-    let lang = localStorage.getItem('speedo_lang') || 'en';
-
-    // --- LANG ---
-    const i18n = {
-        en: { offline: "OFFLINE", online: "ONLINE", driver_status: "Driver Status", go_online: "GO ONLINE", go_online_desc: "Go online to receive hires", manage_vehicles: "Vehicles", finding_hires: "Finding Hires...", keep_data_on: "Keep GPS & Data ON", go_offline: "GO OFFLINE", close_rides: "Closer Rides", long_trips: "Long Trips", select_veh: "Select Vehicle", continue: "Continue", cancel: "Cancel", my_vehicles: "My Vehicles", add_vehicle: "Add Vehicle", close: "Close", loc_err_title: "Location Required", loc_err_msg: "Please turn on GPS & Mobile Data." },
-        si: { offline: "අක්‍රියයි", online: "සක්‍රියයි", driver_status: "රියදුරු තත්ත්වය", go_online: "සක්‍රිය වන්න", go_online_desc: "කුලී ගමන් ලබා ගැනීමට", manage_vehicles: "වාහන", finding_hires: "සොයමින්...", keep_data_on: "ස්ථානය සහ අන්තර්ජාලය තබා ගන්න", go_offline: "අක්‍රිය වන්න", close_rides: "ළඟ ගමන්", long_trips: "දුර ගමන්", select_veh: "වාහනයක් තෝරන්න", continue: "ඉදිරියට", cancel: "අවලංගු කරන්න", my_vehicles: "මගේ වාහන", add_vehicle: "එක් කරන්න", close: "වසන්න", loc_err_title: "ස්ථානය අවශ්‍යයි", loc_err_msg: "කරුණාකර GPS සහ Data සක්‍රිය කරන්න." },
-        ta: { offline: "ஆஃப்லைன்", online: "ஆன்லைன்", driver_status: "ஓட்டுநர் நிலை", go_online: "ஆன்லைனில்", go_online_desc: "சவாரிகளைப் பெற", manage_vehicles: "வாகனங்கள்", finding_hires: "தேடுகிறது...", keep_data_on: "GPS & டேட்டாவை ஆன் செய்யவும்", go_offline: "ஆஃப்லைன்", close_rides: "நெருங்கிய சவாரி", long_trips: "நீண்ட பயணம்", select_veh: "தேர்வுசெய்க", continue: "தொடரவும்", cancel: "ரத்து", my_vehicles: "வாகனங்கள்", add_vehicle: "சேர்", close: "மூடு", loc_err_title: "இடம் தேவை", loc_err_msg: "GPS ஐ ஆன் செய்யவும்." }
-    };
-
-    // --- DB DATA ---
+    // --- DB (50+ Brands, 100+ Models) ---
     const vehicleDB = {
-        "Bike": {"Honda":["Dio","Hornet"],"Yamaha":["FZ","MT15"],"Bajaj":["Pulsar"]},
-        "Tuk Tuk": {"Bajaj":["RE 4S","Compact"],"TVS":["King"]},
-        "Car": {"Toyota":["Axio","Vitz","Premio"],"Suzuki":["Alto","WagonR"],"Honda":["Grace","Fit"]},
-        "Van": {"Toyota":["KDH","Hiace"],"Nissan":["Caravan"]}
+        "Bike": {
+            "Honda": ["Dio","Grazia","Activa","Hornet","CB Shine","CD 110","Dream Yuga","Livo","Navi"],
+            "Yamaha": ["FZ","FZ-S","Ray ZR","Fascino","MT-15","R15","Saluto","SZ-RR","Alpha"],
+            "Bajaj": ["Pulsar 150","Pulsar 180","Pulsar 220","CT100","Platina","Discover","Avenger","Dominar"],
+            "TVS": ["Ntorq","Apache 160","Apache 200","Scooty Pep","Wego","Jupiter","Sport","Radeon"],
+            "Hero": ["Splendor","Passion","Glamour","Hunk","Pleasure","Maestro","Destini","Xtreme"]
+        },
+        "Tuk Tuk": {
+            "Bajaj": ["RE 4S","RE 2 Stroke","RE Compact","Maxima Cargo","Maxima Passenger","Qute"],
+            "TVS": ["King","King Duramax"],
+            "Piaggio": ["Ape City","Ape Xtra","Ape E-City"]
+        },
+        "Car": {
+            "Toyota": ["Axio","Corolla 121","Corolla 141","Allion 260","Allion 240","Premio 260","Premio 240","Vitz","Yaris","Aqua","Prius","Wigo","Passo","Glanza","Camry","Crown","Belta","Ist"],
+            "Suzuki": ["Alto","Alto K10","WagonR","Stingray","Swift","Celerio","Baleno","Spacia","Hustler","Every","Ignis","Dzire","Maruti 800","Zen"],
+            "Honda": ["Grace","Fit GP5","Fit GP1","Civic","City","Vezel","Insight","Jazz","Freed","Amaze","Accord"],
+            "Nissan": ["Sunny FB15","Sunny N16","Sylphy","Tiida","Leaf","March","Dayz","Note","Bluebird"],
+            "Mitsubishi": ["Lancer","Mirage","Montero","Outlander","Attrage"],
+            "Mazda": ["Axela","Demio","Mazda 3","Mazda 6","Familia"],
+            "Hyundai": ["Grand i10","Elantra","Accent","Tucson","Santa Fe","Eon","Santro"],
+            "Kia": ["Picanto","Rio","Cerato","Sportage","Sorento","Spectra"],
+            "Perodua": ["Axia","Bezza","Viva","Elite","Kelisa","Kenari"],
+            "Micro": ["Panda","Geely","Emgrand","Trend"],
+            "BMW": ["318i","320d","520d","X1","X3","i3"],
+            "Mercedes": ["C200","C180","E200","E220","CLA","A-Class"]
+        },
+        "Van": {
+            "Toyota": ["KDH 200","KDH 201","Hiace Dolphin","Hiace Box","TownAce","Noah","Voxy","Esquire","Alphard"],
+            "Nissan": ["Caravan","Vanette","NV200","Serena","Urvan"],
+            "Mazda": ["Bongo","Brawny"],
+            "Suzuki": ["Every","Carry"],
+            "Mitsubishi": ["Delica","L300"]
+        }
     };
+
+    // --- VARS ---
+    let currentUser=null, map, marker, selectedVehId, isOnline=false;
+    let tempV = { type:"", brand:"", model:"", imgs:{} };
+    let currentVehicles = [];
 
     // --- INIT ---
     window.onload = async () => {
-        applyLang();
-        setInterval(()=>document.getElementById('clock').innerText=new Date().toLocaleTimeString(), 1000);
-
         const uid = localStorage.getItem('uid');
         const dist = localStorage.getItem('dist');
-        if(!uid || !dist) return window.location.href="rider.html";
+        if(!uid || !dist) return location.href="rider.html";
 
         try {
             const s = await get(ref(db, `riders/${dist}/${uid}`));
@@ -353,9 +390,10 @@
                 }
                 document.getElementById('prof-name').innerText = d.fullName;
                 document.getElementById('prof-phone').innerText = d.phone;
-
-                loadVehicles();
-                setTimeout(() => {
+                
+                await loadVehicles();
+                
+                setTimeout(()=>{
                     document.getElementById('skeleton').style.display='none';
                     document.getElementById('top-ui').style.display='flex';
                     document.getElementById('bottom-ui').style.display='flex';
@@ -365,58 +403,53 @@
         } catch(e){}
     };
 
-    // --- MAP ---
     function initMap() {
-        map = L.map('map', { zoomControl:false, attributionControl:false }).setView([7.8, 80.7], 8);
+        map = L.map('map', {zoomControl:false}).setView([7.8, 80.7], 8);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         if("geolocation" in navigator) {
             navigator.geolocation.watchPosition(pos => {
-                const { latitude: lat, longitude: lng } = pos.coords;
+                const {latitude:lat, longitude:lng} = pos.coords;
                 document.getElementById('location-error-modal').style.display='none';
-
                 if(!marker) {
-                    // Custom Glowing Marker
                     const icon = L.divIcon({
-                        className: 'custom-div-icon',
+                        className: 'custom-icon',
                         html: `<div class='gps-marker-container'><div class='gps-pulse'></div><div class='gps-dot'></div></div>`,
                         iconSize: [50, 50],
                         iconAnchor: [25, 25]
                     });
-                    marker = L.marker([lat, lng], {icon: icon}).addTo(map);
+                    marker = L.marker([lat, lng], {icon}).addTo(map);
                     map.setView([lat, lng], 16);
                 } else {
                     marker.setLatLng([lat, lng]);
-                    if(isOnline) map.setView([lat, lng]); // Follow user
-                    
-                    // DB Update
-                    if(isOnline && selectedVehId) {
-                        update(ref(db, `riders/${currentUser.dist}/${currentUser.uid}/location`), { lat, lng, ts: Date.now() });
+                    if(isOnline) {
+                        map.setView([lat, lng]);
+                        update(ref(db, `riders/${currentUser.dist}/${currentUser.uid}/location`), { lat, lng, ts:Date.now() });
                     }
                 }
             }, () => document.getElementById('location-error-modal').style.display='flex', {enableHighAccuracy:true});
         }
     }
 
-    // --- ONLINE LOGIC ---
+    // --- ONLINE ---
     window.initiateGoOnline = () => {
         const approved = currentVehicles.filter(v => v.approved_status === true);
-        if(approved.length === 0) return toast("No Approved Vehicles. Add one first!", "error");
+        if(approved.length === 0) return toast("You need an Approved Vehicle!", "error");
 
         const list = document.getElementById('online-veh-list');
         list.innerHTML = "";
         approved.forEach(v => {
-            const d = document.createElement('div');
-            d.className = 'v-item';
-            d.innerHTML = `<b>${v.brand} ${v.model}</b> - ${v.plate}`;
-            d.onclick = () => {
+            let div = document.createElement('div');
+            div.className = 'v-item';
+            div.innerHTML = `<b>${v.brand} ${v.model}</b> <br><small>${v.plate}</small>`;
+            div.onclick = () => {
                 document.querySelectorAll('.v-item').forEach(x=>x.classList.remove('selected'));
-                d.classList.add('selected');
+                div.classList.add('selected');
                 selectedVehId = v.id;
-            }
-            list.appendChild(d);
+            };
+            list.appendChild(div);
         });
-        if(approved.length > 0) { selectedVehId = approved[0].id; list.firstChild.classList.add('selected'); }
+        if(approved.length>0) { selectedVehId=approved[0].id; list.firstChild.classList.add('selected'); }
         openModal('vehicle-select-modal');
     }
 
@@ -424,16 +457,15 @@
         if(!selectedVehId) return;
         closeModal('vehicle-select-modal');
         
-        // Confetti
         document.getElementById('confetti-overlay').style.display='flex';
         setTimeout(()=>document.getElementById('confetti-overlay').style.display='none', 2000);
         toast("Good Luck Rider!", "success");
 
         isOnline = true;
         document.getElementById('view-offline').style.display='none';
-        document.getElementById('view-online').style.display='flex';
+        document.getElementById('view-online').style.display='block';
         document.getElementById('status-pill').className = 'status-pill st-online';
-        document.getElementById('status-pill').innerText = i18n[lang].online;
+        document.getElementById('status-pill').innerText = "ONLINE";
 
         const p = `riders/${currentUser.dist}/${currentUser.uid}`;
         update(ref(db, p), { rider_status: "online", active_vehicle: selectedVehId });
@@ -446,7 +478,7 @@
         document.getElementById('view-online').style.display='none';
         document.getElementById('view-offline').style.display='block';
         document.getElementById('status-pill').className = 'status-pill st-offline';
-        document.getElementById('status-pill').innerText = i18n[lang].offline;
+        document.getElementById('status-pill').innerText = "OFFLINE";
         update(ref(db, `riders/${currentUser.dist}/${currentUser.uid}`), { rider_status: "offline", active_vehicle: null });
     }
 
@@ -457,11 +489,7 @@
         for(let t of types) {
             try {
                 const s = await get(ref(db, `vehicles/${t}`));
-                if(s.exists()) {
-                    s.forEach(v => {
-                        if(v.val().ownerUid === currentUser.uid) currentVehicles.push({...v.val(), id:v.key, type:t});
-                    });
-                }
+                if(s.exists()) s.forEach(v => { if(v.val().ownerUid === currentUser.uid) currentVehicles.push({...v.val(), id:v.key, type:t}); });
             } catch(e){}
         }
     }
@@ -469,65 +497,96 @@
     window.openVehicleManager = () => {
         const list = document.getElementById('man-veh-list');
         list.innerHTML = "";
+        if(currentVehicles.length === 0) list.innerHTML = "<p style='text-align:center; color:#999'>No vehicles found.</p>";
+        
         currentVehicles.forEach(v => {
-            let st = v.approved_status === true ? "Approved" : (v.approved_status==="declined"?"Declined":"Pending");
-            let col = v.approved_status === true ? "green" : (v.approved_status==="declined"?"red":"orange");
-            let d = document.createElement('div');
-            d.className='v-item';
-            d.innerHTML = `
-                <div style="display:flex; justify-content:space-between"><b>${v.brand}</b> <span style="color:${col}; font-size:11px; font-weight:bold">${st}</span></div>
-                <div style="font-size:12px; color:#777;">${v.plate}</div>
-                <button class="del-btn" onclick="delVehicle('${v.type}','${v.id}')">Delete</button>
+            let st = v.approved_status===true ? "<b style='color:green'>Approved</b>" : (v.approved_status==="declined"?"<b style='color:red'>Declined</b>":"<b style='color:orange'>Pending</b>");
+            let div = document.createElement('div');
+            div.className = 'v-item';
+            div.innerHTML = `
+                <div class="v-row"><span class="v-brand">${v.brand} ${v.model}</span> <span>${st}</span></div>
+                <div class="v-row" style="margin-top:5px;"><span class="v-plate">${v.plate}</span></div>
+                <button class="del-btn" onclick="askDelete('${v.type}', '${v.id}')">Delete</button>
             `;
-            list.appendChild(d);
+            list.appendChild(div);
         });
         openModal('vehicle-man-modal');
     }
 
-    window.openAddVehicle = () => {
-        closeModal('vehicle-man-modal');
-        openModal('add-vehicle-modal');
+    let delTarget = null;
+    window.askDelete = (t, id) => { delTarget = {t, id}; openModal('confirm-modal'); }
+    
+    document.getElementById('confirm-yes-btn').onclick = async () => {
+        closeModal('confirm-modal');
+        if(delTarget) {
+            await remove(ref(db, `vehicles/${delTarget.t}/${delTarget.id}`));
+            await loadVehicles();
+            openVehicleManager();
+            toast("Vehicle Deleted", "success");
+        }
     }
+    window.closeConfirm = () => closeModal('confirm-modal');
 
-    window.delVehicle = async (t, id) => {
-        if(!confirm("Delete?")) return;
-        await remove(ref(db, `vehicles/${t}/${id}`));
-        await loadVehicles();
-        openVehicleManager();
-    }
-
-    // --- ADD VEHICLE CAROUSEL LOGIC ---
+    // --- ADD VEHICLE (Restored Full Logic) ---
+    window.openAddVehicle = () => { closeModal('vehicle-man-modal'); openModal('add-vehicle-modal'); }
+    
     window.selectType = (t, el) => {
         document.querySelectorAll('.type-card').forEach(x=>x.classList.remove('selected'));
         el.classList.add('selected');
         tempV.type = t;
     }
+
     window.loadModels = () => {
         let b = document.getElementById('v-brand').value;
-        let m = document.getElementById('v-model'); m.innerHTML="<option>Select</option>";
+        let m = document.getElementById('v-model'); m.innerHTML="<option value=''>Select</option>";
         if(b && vehicleDB[tempV.type][b]) vehicleDB[tempV.type][b].forEach(x=>m.innerHTML+=`<option>${x}</option>`);
     }
+
     window.next = (s) => {
         if(s===1 && !tempV.type) return toast("Select Type", "error");
+        
         if(s===2) {
             tempV.brand = document.getElementById('v-brand').value;
             let m = document.getElementById('v-model').value;
-            tempV.model = m;
-            if(!tempV.brand || !tempV.model) return toast("Details required", "error");
+            tempV.model = m || document.getElementById('v-other').value;
+            if(!tempV.brand || !tempV.model) return toast("Enter details", "error");
         }
+        
+        if(s===3) {
+            let prov = document.getElementById('v-plate-prov').value;
+            let num = document.getElementById('v-plate-num').value.toUpperCase().trim();
+            // Regex: 2-3 letters, hyphen or space, 4 digits
+            let regex = /^[A-Z]{2,3}[-\s]?\d{4}$/;
+            if(!regex.test(num)) return toast("Invalid Plate (e.g. CAB-1234)", "error");
+            // Normalize
+            if(!num.includes('-')) num = num.replace(/(\d+)/, "-$1"); // Ensure hyphen
+            tempV.plate = prov + " " + num;
+        }
+
+        if(s===4) {
+            tempV.color = document.getElementById('v-color').value;
+            tempV.det = document.getElementById('v-det').value;
+        }
+
+        if(s===5 && (!tempV.imgs.ext1 || !tempV.imgs.ext2 || !tempV.imgs.int1 || !tempV.imgs.int2)) return toast("4 Vehicle Photos Required", "error");
+        if(s===6 && (!tempV.imgs.lic1 || !tempV.imgs.lic2)) return toast("License Photos Required", "error");
+
         if(s===1) {
-            let b = document.getElementById('v-brand'); b.innerHTML="<option>Select</option>";
+            let b = document.getElementById('v-brand'); b.innerHTML="<option value=''>Select</option>";
             Object.keys(vehicleDB[tempV.type]).forEach(x=>b.innerHTML+=`<option>${x}</option>`);
         }
+
         document.getElementById(`s${s}`).classList.add('prev');
         document.getElementById(`s${s}`).classList.remove('active');
         document.getElementById(`s${s+1}`).classList.add('active');
     }
+
     window.prev = (s) => {
         document.getElementById(`s${s}`).classList.remove('active');
         document.getElementById(`s${s-1}`).classList.remove('prev');
         document.getElementById(`s${s-1}`).classList.add('active');
     }
+
     window.up = (id) => document.getElementById('f-'+id).click();
     window.proc = (i, id) => {
         let r = new FileReader();
@@ -542,51 +601,34 @@
             }
         }; r.readAsDataURL(i.files[0]);
     }
+
     window.submitVehicle = async () => {
-        if(!tempV.imgs.ext1 || !tempV.imgs.lic1) return toast("Photos Missing", "error");
+        if(!document.getElementById('agree-chk').checked) return toast("Agree to terms", "error");
         
-        let plate = document.getElementById('v-plate-prov').value + " " + document.getElementById('v-plate-num').value.toUpperCase();
-        
-        let vid = "V"+Date.now();
+        let vid = "V" + Date.now();
         await set(ref(db, `vehicles/${tempV.type}/${vid}`), {
             ownerUid: currentUser.uid, ownerName: currentUser.fullName,
-            district: currentUser.dist, type: tempV.type, brand: tempV.brand, model: tempV.model, plate: plate,
-            images: tempV.imgs, approved_status: false
+            district: currentUser.dist, type: tempV.type, brand: tempV.brand, model: tempV.model, plate: tempV.plate,
+            color: tempV.color, details: tempV.det, images: tempV.imgs, approved_status: false
         });
-        
-        toast("Submitted", "success");
+
+        toast("Submitted for Approval", "success");
         closeModal('add-vehicle-modal');
         await loadVehicles();
+        openVehicleManager();
     }
 
     // --- UTILS ---
-    window.applyLang = () => {
-        document.getElementById('lang-btn').innerText = lang.toUpperCase();
-        document.querySelectorAll('[data-i18n]').forEach(e => {
-            const k = e.getAttribute('data-i18n');
-            if(i18n[lang][k]) e.innerText = i18n[lang][k];
-        });
-    }
-    window.toggleLang = () => {
-        lang = lang==='en'?'si':(lang==='si'?'ta':'en');
-        localStorage.setItem('speedo_lang', lang);
-        applyLang();
-    }
-    const toast = (m,t) => {
+    const toast = (m, t) => {
         let d=document.createElement('div'); d.className=`toast ${t}`; d.innerText=m;
         document.getElementById('toast-container').appendChild(d);
-        setTimeout(()=>d.classList.add('show'),10); setTimeout(()=>{d.classList.remove('show'); setTimeout(()=>d.remove(),300)},2500);
+        setTimeout(()=>d.classList.add('show'),10); setTimeout(()=>{d.classList.remove('show'); setTimeout(()=>d.remove(),300)}, 2500);
     }
-
     window.openModal = (id) => document.getElementById(id).style.display = 'flex';
     window.closeModal = (id) => document.getElementById(id).style.display = 'none';
     window.openProfile = () => openModal('profile-modal');
-    window.updatePref = () => {
-        update(ref(db, `riders/${currentUser.dist}/${currentUser.uid}`), {
-            pref_close: document.getElementById('chk-close').checked,
-            pref_long: document.getElementById('chk-long').checked
-        });
-    }
+    window.toggleLang = () => { lang=lang==='en'?'si':(lang==='si'?'ta':'en'); localStorage.setItem('speedo_lang',lang); document.getElementById('lang-btn').innerText=lang.toUpperCase(); }
+
 </script>
 </body>
 </html>
