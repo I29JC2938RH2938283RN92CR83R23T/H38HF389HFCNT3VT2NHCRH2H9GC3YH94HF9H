@@ -6,508 +6,234 @@
     <title>AP Speedo - Rider App</title>
     
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- General Styles --- */
         :root {
-            --primary: #FFD700; /* Gold */
-            --primary-dark: #FFC107;
+            --primary: #FFD700;
             --dark: #1a1a1a;
             --light: #ffffff;
             --gray: #f8f9fa;
-            --border: #e9ecef;
             --error: #dc3545;
             --success: #28a745;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Poppins', sans-serif; }
+        
+        body { background-color: var(--light); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--light);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            color: var(--dark);
-        }
-
-        /* --- Buttons --- */
-        .btn-primary {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--dark);
-            color: var(--light);
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        .btn-link {
-            background: none;
-            border: none;
-            color: #666;
-            margin-top: 15px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        /* --- Splash Screen --- */
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-
-        #splash-screen img {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        /* --- Auth Container --- */
-        #auth-container {
-            display: none;
-            flex: 1;
-            padding: 24px;
-            flex-direction: column;
-            justify-content: center;
-            max-width: 480px;
-            width: 100%;
-            margin: 0 auto;
-            position: relative;
-            overflow-y: auto;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .auth-header img {
-            width: 80px;
-            margin-bottom: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .auth-header h2 {
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-
-        /* --- Forms --- */
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #444;
-        }
-
-        input[type="text"],
-        input[type="tel"],
-        input[type="password"] {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s;
-            background: var(--gray);
-        }
-
-        input:focus {
-            border-color: var(--primary);
-            background: #fff;
-        }
-
-        /* --- Custom File Upload UI --- */
-        .file-upload-box {
-            position: relative;
-            width: 100%;
-            height: 160px;
-            border: 2px dashed #ccc;
-            border-radius: 15px;
-            background: var(--gray);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .file-upload-box:hover {
-            border-color: var(--primary);
-            background: #fff8e1;
-        }
-
-        .file-upload-box i {
-            font-size: 2rem;
-            color: #888;
-            margin-bottom: 10px;
-        }
-
-        .file-upload-box p {
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .file-upload-box img.preview {
+        /* --- Screens --- */
+        .screen {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-            z-index: 2;
-        }
-
-        /* When preview is active */
-        .file-upload-box.has-image {
-            border-style: solid;
-            border-color: var(--success);
-        }
-
-        .hidden-input {
-            display: none;
-        }
-
-        /* --- Face Camera UI --- */
-        .camera-circle {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: var(--gray);
-            margin: 10px auto 20px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-            border: 4px solid var(--border);
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .camera-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        .camera-icon {
-            font-size: 2.5rem;
-            color: #aaa;
-        }
-
-        /* --- Carousel Steps --- */
-        .carousel-container {
-            position: relative;
-            min-height: 450px;
-        }
-
-        .step {
-            display: none;
-            animation: slideUp 0.4s ease-out;
-            text-align: center;
-        }
-
-        .step.active {
-            display: block;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .step h3 {
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        .step p {
-            color: #777;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        /* --- Keypad --- */
-        .keypad-wrapper {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .keypad-btn {
-            padding: 15px;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .keypad-btn:active {
-            background: var(--primary);
-            color: #000;
-        }
-
-        .keypad-btn.backspace {
-            color: var(--error);
-            background: #fff0f0;
-        }
-
-        /* --- Loader --- */
-        .loader {
-            display: none;
-            position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95);
-            z-index: 10000;
+            background: #fff;
+            display: none; /* Hidden by default */
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            overflow-y: auto;
+            z-index: 10;
         }
         
+        .screen.active { display: flex; }
+
+        /* --- Splash --- */
+        #splash-screen {
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        #splash-screen img { width: 150px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* --- Auth/Forms --- */
+        .auth-container { padding: 24px; max-width: 480px; margin: 0 auto; width: 100%; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header img { width: 70px; border-radius: 10px; margin-bottom: 10px; }
+        
+        input {
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            border: 2px solid #eee; border-radius: 12px;
+            font-size: 1rem; background: var(--gray); outline: none;
+        }
+        input:focus { border-color: var(--primary); background: #fff; }
+
+        .btn {
+            width: 100%; padding: 16px; border: none; border-radius: 12px;
+            background: var(--dark); color: #fff; font-weight: 600; font-size: 1rem;
+            cursor: pointer; margin-top: 10px;
+        }
+        .btn-link { background: none; color: #666; margin-top: 15px; font-size: 0.9rem; }
+
+        /* --- Carousel Steps --- */
+        .step { display: none; animation: fadeIn 0.4s; }
+        .step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Upload Boxes --- */
+        .upload-box {
+            border: 2px dashed #ccc; border-radius: 12px; height: 140px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            margin-bottom: 10px; background: var(--gray); position: relative; overflow: hidden;
+        }
+        .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+        .upload-box.done { border-color: var(--success); }
+
+        /* --- Status Screens (Pending/Declined) --- */
+        .status-content {
+            flex: 1; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            padding: 30px; text-align: center;
+        }
+        .status-icon { font-size: 4rem; margin-bottom: 20px; color: var(--primary); }
+        .status-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: var(--dark); }
+        .status-desc { color: #666; margin-bottom: 30px; line-height: 1.6; }
+        
+        .decline-list {
+            text-align: left; background: #fff5f5; padding: 15px; 
+            border-radius: 10px; border-left: 4px solid var(--error);
+            width: 100%; margin-bottom: 20px;
+        }
+        .decline-list li { list-style: none; margin-bottom: 5px; color: var(--error); font-weight: 500; }
+
+        /* --- Loader --- */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95); z-index: 10000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+        }
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            width: 40px; height: 40px; border: 4px solid #eee; 
+            border-top: 4px solid var(--dark); border-radius: 50%; 
+            animation: spin 1s linear infinite; margin-bottom: 10px;
         }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        #loader-text {
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .ai-log {
-            font-size: 0.85rem;
-            margin: 10px 0;
-            min-height: 20px;
-            font-weight: 500;
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
-    <!-- Splash Screen -->
-    <div id="splash-screen">
-        <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="AP Speedo Logo">
-    </div>
-
     <!-- Global Loader -->
-    <div class="loader" id="global-loader">
+    <div id="loader">
         <div class="spinner"></div>
-        <p id="loader-text">Processing...</p>
+        <p id="loader-text">Loading...</p>
     </div>
 
-    <!-- Auth Container -->
-    <div id="auth-container">
-        
-        <div class="auth-header">
-            <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="Logo">
-            <h2 id="page-title">Rider Login</h2>
-        </div>
+    <!-- 1. Splash Screen -->
+    <div id="splash-screen" class="screen active">
+        <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="Logo">
+    </div>
 
-        <!-- Login Form -->
-        <div id="login-form">
-            <div class="form-group">
-                <label>Mobile Number</label>
-                <input type="tel" id="login-phone" placeholder="07XXXXXXXX" maxlength="10">
+    <!-- 2. Auth Screen (Login) -->
+    <div id="login-screen" class="screen">
+        <div class="auth-container">
+            <div class="header">
+                <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg">
+                <h2>Rider Login</h2>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="login-pass" placeholder="Enter Password">
-            </div>
-            <button class="btn-primary" id="btn-login">LOGIN</button>
-            <button class="btn-link" id="goto-register">Create new account</button>
+            <input type="tel" id="login-phone" placeholder="Mobile Number">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn" onclick="handleLogin()">Login</button>
+            <button class="btn btn-link" onclick="showRegister()">Create Account</button>
         </div>
+    </div>
 
-        <!-- Register Form (Carousel) -->
-        <div id="register-form" style="display: none;">
-            <div class="carousel-container">
+    <!-- 3. Register Screen (Carousel) -->
+    <div id="register-screen" class="screen">
+        <div class="auth-container">
+            <div class="header">
+                <h2>Rider Registration</h2>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="step active" id="step-1">
+                <h3>Personal Info</h3>
+                <input type="text" id="reg-name" placeholder="Full Name (Capitalized)" style="text-transform: uppercase;">
+                <input type="tel" id="reg-phone" placeholder="Mobile (07XXXXXXXX)" maxlength="10">
+                <button class="btn" onclick="nextStep(1)">Next</button>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step" id="step-2">
+                <h3>NIC Details</h3>
+                <input type="text" id="reg-nic" placeholder="NIC Number">
+                <button class="btn" onclick="nextStep(2)">Next</button>
+                <button class="btn btn-link" onclick="prevStep(2)">Back</button>
+            </div>
+
+            <!-- Step 3 (Images) -->
+            <div class="step" id="step-3">
+                <h3>Documents & Face</h3>
                 
-                <!-- Step 1: Full Name -->
-                <div class="step active" id="step-1">
-                    <h3>Personal Details</h3>
-                    <p>Enter your legal name as on NIC</p>
-                    <div class="form-group">
-                        <input type="text" id="reg-name" placeholder="Full Name (e.g. Kasun Perera)" style="text-transform: capitalize;">
-                    </div>
-                    <button class="btn-primary" onclick="nextStep(1)">Next <i class="fas fa-arrow-right"></i></button>
+                <div class="upload-box" onclick="document.getElementById('img-front').click()">
+                    <p>NIC Front</p>
+                    <img id="prev-front">
                 </div>
+                <input type="file" id="img-front" hidden accept="image/*" onchange="processImage(this, 'prev-front')">
 
-                <!-- Step 2: Phone -->
-                <div class="step" id="step-2">
-                    <h3>Mobile Number</h3>
-                    <p>Enter valid Sri Lankan Number</p>
-                    <div class="form-group">
-                        <input type="text" id="reg-phone" readonly placeholder="07XXXXXXXX" style="text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
-                    </div>
-                    <div class="keypad-wrapper">
-                        <button class="keypad-btn" onclick="kpType('1')">1</button>
-                        <button class="keypad-btn" onclick="kpType('2')">2</button>
-                        <button class="keypad-btn" onclick="kpType('3')">3</button>
-                        <button class="keypad-btn" onclick="kpType('4')">4</button>
-                        <button class="keypad-btn" onclick="kpType('5')">5</button>
-                        <button class="keypad-btn" onclick="kpType('6')">6</button>
-                        <button class="keypad-btn" onclick="kpType('7')">7</button>
-                        <button class="keypad-btn" onclick="kpType('8')">8</button>
-                        <button class="keypad-btn" onclick="kpType('9')">9</button>
-                        <button class="keypad-btn" style="background:none; border:none;"></button>
-                        <button class="keypad-btn" onclick="kpType('0')">0</button>
-                        <button class="keypad-btn backspace" onclick="kpDel()"><i class="fas fa-backspace"></i></button>
-                    </div>
-                    <br>
-                    <button class="btn-primary" onclick="nextStep(2)">Next</button>
-                    <button class="btn-link" onclick="prevStep(2)">Back</button>
+                <div class="upload-box" onclick="document.getElementById('img-back').click()">
+                    <p>NIC Back</p>
+                    <img id="prev-back">
                 </div>
+                <input type="file" id="img-back" hidden accept="image/*" onchange="processImage(this, 'prev-back')">
 
-                <!-- Step 3: NIC Number -->
-                <div class="step" id="step-3">
-                    <h3>Identity Verification</h3>
-                    <p>Enter your NIC Number</p>
-                    <div class="form-group">
-                        <input type="text" id="reg-nic" placeholder="e.g. 1999xxxxxx or 99xxxxxxV">
-                    </div>
-                    <button class="btn-primary" onclick="nextStep(3)">Next</button>
-                    <button class="btn-link" onclick="prevStep(3)">Back</button>
+                <div class="upload-box" onclick="document.getElementById('img-face').click()" style="border-radius:50%; width:120px; height:120px; margin:10px auto;">
+                    <p>Selfie</p>
+                    <img id="prev-face" style="border-radius:50%;">
                 </div>
+                <input type="file" id="img-face" hidden accept="image/*" capture="user" onchange="processImage(this, 'prev-face')">
 
-                <!-- Step 4: NIC Images & AI -->
-                <div class="step" id="step-4">
-                    <h3>Scan ID Card</h3>
-                    <p>Upload clear photos of your NIC</p>
-                    
-                    <!-- Front Image Box -->
-                    <div class="file-upload-box" id="box-front" onclick="document.getElementById('nic-front').click()">
-                        <i class="fas fa-id-card"></i>
-                        <p>Tap to upload <b>Front Side</b></p>
-                        <img id="preview-front" class="preview">
-                    </div>
-                    <input type="file" id="nic-front" class="hidden-input" accept="image/*" onchange="handleFileSelect(this, 'preview-front', 'box-front')">
+                <button class="btn" onclick="nextStep(3)">Next</button>
+                <button class="btn btn-link" onclick="prevStep(3)">Back</button>
+            </div>
 
-                    <!-- Back Image Box -->
-                    <div class="file-upload-box" id="box-back" onclick="document.getElementById('nic-back').click()">
-                        <i class="fas fa-id-card" style="transform: scaleX(-1);"></i>
-                        <p>Tap to upload <b>Back Side</b></p>
-                        <img id="preview-back" class="preview">
-                    </div>
-                    <input type="file" id="nic-back" class="hidden-input" accept="image/*" onchange="handleFileSelect(this, 'preview-back', 'box-back')">
-                    
-                    <div class="ai-log" id="nic-ai-log"></div>
-                    
-                    <button class="btn-primary" onclick="verifyNicWithAI()">Verify NIC with AI</button>
-                    <button class="btn-link" onclick="prevStep(4)">Back</button>
-                </div>
-
-                <!-- Step 5: Face Image -->
-                <div class="step" id="step-5">
-                    <h3>Face Verification</h3>
-                    <p>Take a clear selfie</p>
-                    
-                    <div class="camera-circle" onclick="document.getElementById('face-input').click()">
-                        <i class="fas fa-camera camera-icon" id="face-icon"></i>
-                        <img id="face-preview">
-                    </div>
-                    <input type="file" id="face-input" class="hidden-input" accept="image/*" capture="user" onchange="handleFileSelect(this, 'face-preview', null, true)">
-                    
-                    <div class="ai-log" id="face-ai-log"></div>
-
-                    <button class="btn-primary" onclick="verifyFaceWithAI()">Verify Face</button>
-                    <button class="btn-link" onclick="prevStep(5)">Back</button>
-                </div>
-
-                <!-- Step 6: Password -->
-                <div class="step" id="step-6">
-                    <h3>Secure Account</h3>
-                    <p>Create a password</p>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="reg-pass" placeholder="******">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="reg-pass-confirm" placeholder="******">
-                    </div>
-                    <button class="btn-primary" id="btn-complete-reg">Register & Login</button>
-                    <button class="btn-link" onclick="prevStep(6)">Back</button>
-                </div>
-
+            <!-- Step 4 (Password) -->
+            <div class="step" id="step-4">
+                <h3>Security</h3>
+                <input type="password" id="reg-pass" placeholder="Create Password">
+                <input type="password" id="reg-pass-confirm" placeholder="Confirm Password">
+                <button class="btn" onclick="submitRegistration()">Submit Application</button>
+                <button class="btn btn-link" onclick="prevStep(4)">Back</button>
             </div>
             
-            <button class="btn-link" id="goto-login" style="margin-top:20px;">Already have an account? Login</button>
+            <button class="btn btn-link" onclick="showLogin()" style="margin-top:20px;">Back to Login</button>
         </div>
-
     </div>
 
-    <!-- Logic -->
-    <script type="module">
-        // Import Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+    <!-- 4. Review Pending Screen -->
+    <div id="pending-screen" class="screen">
+        <div class="status-content">
+            <i class="fas fa-file-contract status-icon"></i>
+            <div class="status-title">Application Under Review</div>
+            <div class="status-desc">
+                Your application is currently being reviewed by our team. We will notify you once the verification process is complete.
+            </div>
+            <button class="btn" onclick="logout()">Check Later (Logout)</button>
+        </div>
+    </div>
 
-        // Firebase Config
+    <!-- 5. Declined Screen -->
+    <div id="declined-screen" class="screen">
+        <div class="status-content">
+            <i class="fas fa-exclamation-circle status-icon" style="color: var(--error);"></i>
+            <div class="status-title" style="color: var(--error);">Application Declined</div>
+            <div class="status-desc">
+                Unfortunately, your application was not approved due to the following reasons:
+            </div>
+            
+            <ul class="decline-list" id="decline-reasons-list">
+                <!-- Reasons injected here -->
+            </ul>
+
+            <button class="btn" onclick="reUpload()">Re-Upload Documents</button>
+            <button class="btn btn-link" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
             authDomain: "speedo-acb7c.firebaseapp.com",
@@ -523,347 +249,230 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // --- App Variables ---
-        let userData = {
-            fullName: "",
-            phone: "",
-            nic: "",
-            nicVerified: false,
-            faceVerified: false
+        let currentUser = null;
+        let formData = {
+            name: '', phone: '', nic: '', 
+            imgFront: '', imgBack: '', imgFace: ''
         };
 
-        // --- Helper: Image Resizer (Crucial for API payloads) ---
-        function resizeImage(file, maxWidth = 600) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = function (event) {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = function () {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > maxWidth) {
-                            height *= maxWidth / width;
-                            width = maxWidth;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.8)); // Return compressed base64
-                    };
-                };
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // --- UI Logic: File Selection & Preview ---
-        window.handleFileSelect = async function(input, previewId, boxId, isFace = false) {
-            const file = input.files[0];
-            if (file) {
-                // Show loading state in preview
-                const previewImg = document.getElementById(previewId);
-                previewImg.style.display = 'block';
-                previewImg.style.opacity = '0.5'; 
-
-                // Resize and display
-                try {
-                    const resizedBase64 = await resizeImage(file);
-                    previewImg.src = resizedBase64;
-                    previewImg.style.opacity = '1';
-                    
-                    if(boxId) {
-                        document.getElementById(boxId).classList.add('has-image');
-                    }
-                    if(isFace) {
-                        document.getElementById('face-icon').style.display = 'none';
-                    }
-                } catch (e) {
-                    alert("Error processing image.");
-                }
-            }
-        };
-
-        // --- Splash Logic ---
+        // --- Splash & Auth State Check ---
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                    document.getElementById('auth-container').style.display = 'flex';
-                }, 500);
+                setTimeout(() => splash.style.display = 'none', 500);
             }, 2500);
         });
 
-        // --- Navigation ---
-        document.getElementById('goto-register').addEventListener('click', () => {
-            document.getElementById('login-form').style.display = 'none';
-            document.getElementById('register-form').style.display = 'block';
-            document.getElementById('page-title').innerText = "Rider Registration";
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                checkStatus(user.uid);
+            } else {
+                showScreen('login-screen');
+            }
         });
 
-        document.getElementById('goto-login').addEventListener('click', () => {
-            document.getElementById('register-form').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-            document.getElementById('page-title').innerText = "Rider Login";
-        });
+        // --- Status Logic ---
+        async function checkStatus(uid) {
+            toggleLoader(true);
+            try {
+                const snapshot = await get(ref(db, 'riders/' + uid));
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    if (data.approved_status === true) {
+                        window.location.href = "main.html"; // Redirect Approved
+                    } else if (data.approved_status === "declined") {
+                        showDeclined(data.declinereasons);
+                    } else {
+                        // approved_status is false or undefined
+                        showScreen('pending-screen');
+                    }
+                } else {
+                    // Auth exists but DB node missing? Show Register.
+                    showScreen('register-screen');
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Connection Error");
+            } finally {
+                toggleLoader(false);
+            }
+        }
 
-        window.nextStep = function(step) {
-            let isValid = false;
-            
-            // Validation
-            if(step === 1) {
-                const name = document.getElementById('reg-name').value;
-                if(name.length >= 5 && /^[a-zA-Z\s.]+$/.test(name)) {
-                    userData.fullName = name.toUpperCase();
-                    document.getElementById('reg-name').value = userData.fullName;
-                    isValid = true;
-                } else alert("Name must be 5+ letters.");
-            }
-            else if(step === 2) {
-                const phone = document.getElementById('reg-phone').value;
-                if(/^07[0-9]{8}$/.test(phone)) {
-                    userData.phone = phone;
-                    isValid = true;
-                } else alert("Invalid SL Number (07XXXXXXXX).");
-            }
-            else if(step === 3) {
-                const nic = document.getElementById('reg-nic').value;
-                if(/^([0-9]{9}[x|X|v|V]|[0-9]{12})$/.test(nic)) {
-                    userData.nic = nic;
-                    isValid = true;
-                } else alert("Invalid NIC Format.");
-            }
-            else if(step === 4) {
-                if(userData.nicVerified) isValid = true;
-                else alert("Please Verify NIC with AI.");
-            }
-            else if(step === 5) {
-                if(userData.faceVerified) isValid = true;
-                else alert("Please Verify Face.");
-            }
+        // --- Helper: Image Compression (~50KB) ---
+        window.processImage = function(input, previewId) {
+            const file = input.files[0];
+            if (!file) return;
 
-            if(isValid) {
-                document.getElementById(`step-${step}`).classList.remove('active');
-                document.getElementById(`step-${step+1}`).classList.add('active');
-            }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 500; // Small width for low size
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // High compression (0.5 quality)
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.5); 
+                    
+                    // Display preview
+                    document.getElementById(previewId).src = dataUrl;
+                    document.getElementById(previewId).style.opacity = '1';
+                    
+                    // Store to global
+                    if(previewId === 'prev-front') formData.imgFront = dataUrl;
+                    if(previewId === 'prev-back') formData.imgBack = dataUrl;
+                    if(previewId === 'prev-face') formData.imgFace = dataUrl;
+                };
+            };
         };
 
-        window.prevStep = function(step) {
+        // --- Registration Flow ---
+        window.nextStep = (step) => {
+            // Basic Validation
+            if(step === 1) {
+                const name = document.getElementById('reg-name').value;
+                const phone = document.getElementById('reg-phone').value;
+                if(name.length < 5) return alert("Valid Name Required");
+                if(!/^07[0-9]{8}$/.test(phone)) return alert("Invalid Phone");
+                formData.name = name.toUpperCase();
+                formData.phone = phone;
+            }
+            if(step === 2) {
+                const nic = document.getElementById('reg-nic').value;
+                if(nic.length < 9) return alert("Invalid NIC");
+                formData.nic = nic;
+            }
+            if(step === 3) {
+                if(!formData.imgFront || !formData.imgBack || !formData.imgFace) {
+                    return alert("Please upload all photos");
+                }
+            }
+
+            document.getElementById(`step-${step}`).classList.remove('active');
+            document.getElementById(`step-${step+1}`).classList.add('active');
+        };
+
+        window.prevStep = (step) => {
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step-1}`).classList.add('active');
         };
 
-        // --- Keypad ---
-        window.kpType = function(n) {
-            const el = document.getElementById('reg-phone');
-            if(el.value.length < 10) el.value += n;
-        };
-        window.kpDel = function() {
-            const el = document.getElementById('reg-phone');
-            el.value = el.value.slice(0, -1);
-        };
+        window.submitRegistration = async () => {
+            const pass = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-pass-confirm').value;
 
-        // --- REAL AI Logic (Pollinations/OpenAI Proxy) ---
-        // The user provided key. We will attempt to use it, or fallback to standard pollinations behavior.
-        const encodedKey = "c2tfT0Z1eXQ4RFRUdmV0VHNRb0VHY3NUODM3Z0ExMlY3RzE="; 
-        
-        async function callAI(promptText, base64Image) {
-            const apiKey = atob(encodedKey);
-            
-            // Construct payload for a Vision-capable model
-            // We use pollinations endpoint which proxies to OpenAI
-            const payload = {
-                model: "gpt-4o", 
-                messages: [
-                    {
-                        role: "user",
-                        content: [
-                            { type: "text", text: promptText },
-                            { type: "image_url", image_url: { url: base64Image } }
-                        ]
-                    }
-                ],
-                max_tokens: 300
-            };
+            if(pass.length < 6 || pass !== confirm) return alert("Check Password");
 
-            const response = await fetch("https://text.pollinations.ai/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    // Adding key if the proxy supports it, otherwise Pollinations might ignore it
-                    // or use their own pool.
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if(!response.ok) {
-                throw new Error("AI Service Error: " + response.statusText);
-            }
-            // Pollinations returns text directly usually
-            const text = await response.text();
-            return text;
-        }
-
-        // 1. Verify NIC
-        window.verifyNicWithAI = async function() {
-            const frontInput = document.getElementById('nic-front');
-            
-            if(!frontInput.files[0]) {
-                alert("Please upload NIC Front image.");
-                return;
-            }
-
-            toggleLoader(true, "AI Analyzing Document...");
-            const log = document.getElementById('nic-ai-log');
-            log.innerText = "";
+            toggleLoader(true, "Submitting...");
 
             try {
-                // Resize first to avoid payload errors
-                const b64 = await resizeImage(frontInput.files[0]);
-
-                // STRICT PROMPT
-                const prompt = `
-                    Analyze this image. 
-                    1. Is it a government issued ID card?
-                    2. If it is an apple, fruit, animal, or random object, return valid: false.
-                    3. Return ONLY valid JSON: {"valid": boolean, "reason": "short explanation"}
-                `;
-
-                const resultText = await callAI(prompt, b64);
-                console.log("AI Response:", resultText);
-
-                // Clean JSON
-                const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
-                const data = JSON.parse(cleanJson);
-
-                if(data.valid) {
-                    userData.nicVerified = true;
-                    log.innerText = "✅ ID Verified Successfully";
-                    log.style.color = "green";
-                    setTimeout(() => nextStep(4), 1000);
-                } else {
-                    userData.nicVerified = false;
-                    log.innerText = "❌ Verification Failed: " + (data.reason || "Not an ID card");
-                    log.style.color = "red";
-                    alert("Verification Failed: " + (data.reason || "Image is not a valid ID."));
-                }
-
-            } catch (e) {
-                console.error(e);
-                log.innerText = "⚠️ AI Error. Please try again with a clearer photo.";
-                log.style.color = "#d9534f";
-                // Don't auto-pass on error anymore, to fix the 'apple' issue.
-            } finally {
-                toggleLoader(false);
-            }
-        };
-
-        // 2. Verify Face
-        window.verifyFaceWithAI = async function() {
-            const faceInput = document.getElementById('face-input');
-            if(!faceInput.files[0]) {
-                alert("Take a photo first.");
-                return;
-            }
-
-            toggleLoader(true, "Verifying Face...");
-            const log = document.getElementById('face-ai-log');
-
-            try {
-                const b64 = await resizeImage(faceInput.files[0]);
+                let uid;
                 
-                const prompt = `
-                    Is this image a clear photo of a real human face? 
-                    If it is an object, fruit, or blurry, return valid: false.
-                    Return ONLY JSON: {"valid": boolean}
-                `;
-
-                const resultText = await callAI(prompt, b64);
-                const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
-                const data = JSON.parse(cleanJson);
-
-                if(data.valid) {
-                    userData.faceVerified = true;
-                    log.innerText = "✅ Face Verified";
-                    log.style.color = "green";
-                    setTimeout(() => nextStep(5), 1000);
+                // Check if updating existing declined user or creating new
+                if (currentUser) {
+                    uid = currentUser.uid;
                 } else {
-                    log.innerText = "❌ Not a valid face";
-                    log.style.color = "red";
+                    const email = `${formData.phone}@apspeedo.com`;
+                    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                    uid = cred.user.uid;
                 }
 
-            } catch (e) {
-                console.error(e);
-                alert("Face verification failed. Try again.");
-            } finally {
-                toggleLoader(false);
-            }
-        };
-
-        // --- Register ---
-        document.getElementById('btn-complete-reg').addEventListener('click', async () => {
-            const p1 = document.getElementById('reg-pass').value;
-            const p2 = document.getElementById('reg-pass-confirm').value;
-
-            if(p1.length < 6 || p1 !== p2) {
-                alert("Passwords must match and be 6+ chars.");
-                return;
-            }
-
-            toggleLoader(true, "Creating Account...");
-            const email = `${userData.phone}@apspeedo.com`;
-
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, p1);
-                const user = cred.user;
-
-                await set(ref(db, 'riders/' + user.uid), {
-                    fullName: userData.fullName,
-                    phone: userData.phone,
-                    nic: userData.nic,
+                // SAVE TO DB: Overwrite any existing node
+                await set(ref(db, 'riders/' + uid), {
+                    fullName: formData.name,
+                    phone: formData.phone,
+                    nic: formData.nic,
+                    nicFront: formData.imgFront,
+                    nicBack: formData.imgBack,
+                    faceImg: formData.imgFace,
+                    approved_status: false, // Default
+                    declinereasons: null, // Clear reasons
                     joined: new Date().toISOString()
                 });
 
-                localStorage.setItem('apSpeedoUser', JSON.stringify({uid:user.uid}));
-                alert("Success!");
-                window.location.href = "main.html";
+                // Check status (which will show pending)
+                checkStatus(uid);
+
             } catch (e) {
                 alert("Error: " + e.message);
-            } finally {
                 toggleLoader(false);
             }
-        });
+        };
 
-        // --- Login ---
-        document.getElementById('btn-login').addEventListener('click', async () => {
-            const ph = document.getElementById('login-phone').value;
-            const pw = document.getElementById('login-pass').value;
-            
-            toggleLoader(true, "Logging in...");
+        // --- Login Logic ---
+        window.handleLogin = async () => {
+            const phone = document.getElementById('login-phone').value;
+            const pass = document.getElementById('login-pass').value;
+            const email = `${phone}@apspeedo.com`;
+
+            toggleLoader(true);
             try {
-                const email = `${ph}@apspeedo.com`;
-                const cred = await signInWithEmailAndPassword(auth, email, pw);
-                localStorage.setItem('apSpeedoUser', JSON.stringify({uid:cred.user.uid}));
-                window.location.href = "main.html";
-            } catch(e) {
-                alert("Login Failed.");
-            } finally {
+                await signInWithEmailAndPassword(auth, email, pass);
+                // Listener will handle redirect
+            } catch (e) {
+                alert("Login Failed");
                 toggleLoader(false);
             }
-        });
+        };
 
-        function toggleLoader(show, text="Processing...") {
-            const l = document.getElementById('global-loader');
+        // --- Re-Upload Logic ---
+        window.reUpload = () => {
+            // Populate form if needed, or just show register screen
+            // For simplicity, we just reset the view to register step 1
+            showScreen('register-screen');
+            // Pre-fill logic could go here
+            document.getElementById('reg-name').value = formData.name || "";
+            document.getElementById('reg-phone').value = formData.phone || "";
+        };
+
+        window.logout = () => {
+            signOut(auth);
+            location.reload();
+        };
+
+        // --- Helpers ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => {
+                if(s.id !== 'splash-screen') s.classList.remove('active');
+            });
+            document.getElementById(id).classList.add('active');
+        }
+
+        function showDeclined(reasons) {
+            showScreen('declined-screen');
+            const list = document.getElementById('decline-reasons-list');
+            list.innerHTML = "";
+            if(reasons) {
+                reasons.forEach(r => {
+                    const li = document.createElement('li');
+                    li.innerText = "• " + r;
+                    list.appendChild(li);
+                });
+            }
+        }
+
+        function showRegister() { showScreen('register-screen'); }
+        function showLogin() { showScreen('login-screen'); }
+
+        function toggleLoader(show, text="Loading...") {
+            const l = document.getElementById('loader');
             document.getElementById('loader-text').innerText = text;
             l.style.display = show ? 'flex' : 'none';
         }
-
+        
+        // Export needed functions to window
+        window.showRegister = showRegister;
+        window.showLogin = showLogin;
     </script>
 </body>
 </html>
