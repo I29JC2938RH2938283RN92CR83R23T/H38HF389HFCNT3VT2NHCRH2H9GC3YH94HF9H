@@ -386,7 +386,18 @@
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         // --- CONFIG ---
-        const GEMINI_API_KEY = ""; // PASTE KEY HERE
+        // PASTE YOUR BASE64 ENCODED GEMINI API KEY HERE
+        // Example: b2F1dGhfdG9rZW5faGVyZQ==
+        const GEMINI_API_KEY_B64 = "QUl6YVN5Qm4wYTJLcnNSYXlNUmJoTkpvMVFPS0JqRXlxU0YxeVZB"; 
+
+        let GEMINI_API_KEY = "";
+        if(GEMINI_API_KEY_B64) {
+            try {
+                GEMINI_API_KEY = atob(GEMINI_API_KEY_B64.trim());
+            } catch (e) {
+                console.error("Invalid Base64 API Key");
+            }
+        }
 
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
@@ -474,7 +485,7 @@
             const input = document.getElementById('reg-phone');
             if (key === 'DEL') input.value = input.value.slice(0, -1);
             else if (key === 'CLR') input.value = '';
-            else if (input.value.length < 10) input.value += key; // STOP AFTER 10 DIGITS
+            else if (input.value.length < 10) input.value += key;
         };
 
         window.goToStep = (step) => {
@@ -500,7 +511,6 @@
                 if (index + 1 === step) dot.classList.add('active');
                 else dot.classList.remove('active');
             });
-            // Scroll to top of container when changing steps
             authContainer.scrollTop = 0;
         };
 
