@@ -8,12 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #D32F2F; /* Red */
+            --primary: #D32F2F;
             --primary-dark: #B71C1C;
             --dark: #212121;
             --light: #ffffff;
             --gray: #f5f5f5;
             --text-gray: #757575;
+            --toast-bg: #333;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -26,7 +27,7 @@
             color: var(--dark);
         }
 
-        /* --- Centering --- */
+        /* --- Screens --- */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -37,144 +38,16 @@
             align-items: center;
             padding: 30px;
             z-index: 10;
-            transition: opacity 0.3s ease;
         }
 
         .screen.active { display: flex; }
-        
-        .container {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        /* --- Splash --- */
-        #splash-screen { z-index: 9999; }
-        #splash-screen img { width: 140px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-        /* --- UI Components --- */
-        .header { margin-bottom: 30px; width: 100%; }
-        .header img { width: 70px; margin-bottom: 15px; border-radius: 12px; }
-        .header h2 { font-weight: 700; color: var(--primary); font-size: 1.6rem; margin-bottom: 5px; }
-        .header p { color: var(--text-gray); font-size: 0.95rem; }
-
-        .form-group { margin-bottom: 20px; width: 100%; }
-        
-        input {
-            width: 100%;
-            padding: 18px;
-            border: 2px solid var(--gray);
-            background-color: var(--gray);
-            border-radius: 16px;
-            font-size: 1.1rem;
-            outline: none;
-            transition: all 0.3s;
-            text-align: center;
-            font-weight: 500;
-            color: var(--dark);
-        }
-        input:focus { background-color: #fff; border-color: var(--primary); box-shadow: 0 4px 15px rgba(211, 47, 47, 0.1); }
-
-        .btn {
-            width: 100%;
-            padding: 18px;
-            border: none;
-            border-radius: 16px;
-            background: var(--primary);
-            color: #fff;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
-            margin-top: 10px;
-        }
-        .btn:active { background: var(--primary-dark); transform: scale(0.98); }
-        .btn-link { background: none; color: var(--text-gray); box-shadow: none; margin-top: 20px; font-weight: 400; font-size: 0.9rem; }
-        .btn-link:hover { color: var(--primary); }
-
-        /* --- Keypad (Register Only) --- */
-        .keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .key-btn {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 14px;
-            padding: 15px;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--dark);
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .key-btn:active { background: var(--gray); }
-        .key-btn.backspace { color: var(--primary); background: #FFEBEE; border-color: #FFCDD2; }
-
-        /* --- Upload Boxes --- */
-        .upload-row { display: flex; gap: 15px; width: 100%; margin-bottom: 20px; }
-        .upload-box {
-            flex: 1;
-            background: var(--gray);
-            border-radius: 14px;
-            height: 140px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px dashed #bdbdbd;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        .upload-box.done { border-color: #4CAF50; background: #E8F5E9; }
-        .upload-box i { font-size: 24px; color: var(--primary); margin-bottom: 8px; }
-        .upload-box p { font-size: 12px; color: var(--text-gray); font-weight: 500; }
-        .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
-
-        /* --- Camera UI --- */
-        .camera-circle {
-            width: 280px;
-            height: 280px;
-            background: #000;
-            border-radius: 50%;
-            margin: 0 auto 25px auto;
-            overflow: hidden;
-            position: relative;
-            border: 5px solid var(--primary);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        video, canvas { width: 100%; height: 100%; object-fit: cover; }
-        
-        .cam-controls { display: flex; justify-content: center; gap: 20px; width: 100%; }
-        .cam-btn {
-            width: 70px; height: 70px;
-            border-radius: 50%;
-            background: #fff;
-            border: 5px solid #e0e0e0;
-            cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 24px; color: var(--primary);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        /* --- Steps Animation --- */
-        .step { display: none; width: 100%; animation: fadeIn 0.4s ease; flex-direction: column; align-items: center; }
-        .step.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .container { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 
         /* --- Toast Notification --- */
         #toast {
             visibility: hidden;
             min-width: 250px;
-            background-color: #323232;
+            background-color: #333;
             color: #fff;
             text-align: center;
             border-radius: 50px;
@@ -185,11 +58,84 @@
             bottom: 30px;
             transform: translateX(-50%);
             font-size: 14px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             opacity: 0;
             transition: opacity 0.3s, bottom 0.3s;
         }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+        #toast.error { background-color: #D32F2F; }
+        #toast.success { background-color: #2E7D32; }
+
+        /* --- UI Elements --- */
+        .header { margin-bottom: 25px; width: 100%; }
+        .header img { width: 70px; margin-bottom: 15px; border-radius: 12px; }
+        .header h2 { font-weight: 700; color: var(--primary); font-size: 1.5rem; margin-bottom: 5px; }
+        .header p { color: var(--text-gray); font-size: 0.9rem; }
+
+        .form-group { margin-bottom: 15px; width: 100%; }
+        
+        input, select {
+            width: 100%; padding: 16px;
+            border: 2px solid var(--gray); background-color: var(--gray);
+            border-radius: 14px; font-size: 1.1rem; outline: none;
+            text-align: center; font-weight: 500; color: var(--dark);
+            appearance: none; /* remove default arrow */
+        }
+        input:focus, select:focus { background-color: #fff; border-color: var(--primary); }
+        
+        /* Custom Arrow for select */
+        .select-wrapper { position: relative; width: 100%; }
+        .select-wrapper::after {
+            content: '\f107'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+            position: absolute; right: 15px; top: 18px; color: #999; pointer-events: none;
+        }
+
+        .btn {
+            width: 100%; padding: 16px; border: none; border-radius: 14px;
+            background: var(--primary); color: #fff; font-weight: 600; font-size: 1rem;
+            cursor: pointer; box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2); margin-top: 10px;
+        }
+        .btn:active { background: var(--primary-dark); transform: scale(0.98); }
+        .btn-link { background: none; color: var(--text-gray); box-shadow: none; margin-top: 20px; font-size: 0.9rem; }
+
+        /* --- Keypad --- */
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-bottom: 15px; }
+        .key-btn {
+            background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+            padding: 12px; font-size: 1.4rem; font-weight: 600; color: var(--dark);
+            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .key-btn:active { background: var(--gray); }
+        .key-btn.backspace { color: var(--primary); background: #FFEBEE; border-color: #FFCDD2; }
+
+        /* --- Upload & Camera --- */
+        .upload-row { display: flex; gap: 10px; width: 100%; margin-bottom: 15px; }
+        .upload-box {
+            flex: 1; background: var(--gray); border-radius: 12px; height: 130px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border: 2px dashed #bdbdbd; position: relative; overflow: hidden;
+        }
+        .upload-box.done { border-color: #2E7D32; background: #E8F5E9; }
+        .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+
+        .camera-circle {
+            width: 250px; height: 250px; background: #000; border-radius: 50%;
+            margin: 0 auto 20px auto; overflow: hidden; position: relative;
+            border: 4px solid var(--primary);
+        }
+        video, canvas { width: 100%; height: 100%; object-fit: cover; }
+        
+        .cam-controls { display: flex; justify-content: center; gap: 20px; width: 100%; }
+        .cam-btn {
+            width: 60px; height: 60px; border-radius: 50%; background: #fff;
+            border: 4px solid #e0e0e0; cursor: pointer; display: flex;
+            justify-content: center; align-items: center; font-size: 22px; color: var(--primary);
+        }
+
+        /* --- Steps --- */
+        .step { display: none; width: 100%; animation: fadeIn 0.4s ease; flex-direction: column; align-items: center; }
+        .step.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Loader --- */
         #loader {
@@ -197,10 +143,9 @@
             background: rgba(255,255,255,0.95); z-index: 20000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
-        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* --- Declined List --- */
+        
         .decline-box { background: #FFEBEE; border: 1px solid #FFCDD2; padding: 15px; border-radius: 12px; margin: 20px 0; width: 100%; text-align: left; }
         .decline-box li { color: #D32F2F; margin-bottom: 5px; list-style-position: inside; }
 
@@ -208,53 +153,43 @@
 </head>
 <body>
 
-    <!-- Global Loader -->
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <!-- Loader -->
     <div id="loader">
         <div class="spinner"></div>
         <p style="margin-top:15px; font-weight:600; color:var(--dark);">Processing...</p>
     </div>
 
-    <!-- Toast -->
-    <div id="toast">Message here</div>
-
-    <!-- 1. Splash Screen -->
+    <!-- 1. Splash -->
     <div id="splash-screen" class="screen active">
         <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="Logo">
     </div>
 
-    <!-- 2. Login Screen (Typeable Inputs) -->
+    <!-- 2. Login -->
     <div id="login-screen" class="screen">
         <div class="container">
             <div class="header">
                 <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg">
-                <h2>Welcome Back</h2>
-                <p>Login to your Rider Account</p>
+                <h2>Rider Login</h2>
             </div>
-            
-            <div class="form-group">
-                <input type="tel" id="login-phone" placeholder="Mobile Number" maxlength="10">
-            </div>
-            <div class="form-group">
-                <input type="password" id="login-pass" placeholder="Password">
-            </div>
-
+            <div class="form-group"><input type="tel" id="login-phone" placeholder="Mobile Number" maxlength="10"></div>
+            <div class="form-group"><input type="password" id="login-pass" placeholder="Password"></div>
             <button class="btn" onclick="handleLogin()">Login</button>
             <button class="btn btn-link" onclick="goToRegister()">Create New Account</button>
         </div>
     </div>
 
-    <!-- 3. Register Screen (Sectioned Carousel) -->
+    <!-- 3. Register -->
     <div id="register-screen" class="screen">
         <div class="container">
             
             <!-- Step 1: Name -->
             <div class="step active" id="step-1">
-                <div class="header">
-                    <h2>What's your name?</h2>
-                    <p>Enter your full legal name</p>
-                </div>
+                <div class="header"><h2>Full Name</h2><p>As per your NIC</p></div>
                 <div class="form-group">
-                    <input type="text" id="reg-name" placeholder="Full Name (e.g. Kasun Perera)" style="text-transform: capitalize;">
+                    <input type="text" id="reg-name" placeholder="Full Name" style="text-transform: capitalize;">
                 </div>
                 <button class="btn" onclick="nextStep(1)">Next</button>
                 <button class="btn btn-link" onclick="goToLogin()">Back to Login</button>
@@ -262,133 +197,119 @@
 
             <!-- Step 2: Phone (Dialpad) -->
             <div class="step" id="step-2">
-                <div class="header">
-                    <h2>Mobile Number</h2>
-                    <p>Tap numbers to enter</p>
-                </div>
+                <div class="header"><h2>Mobile Number</h2><p>Tap to enter</p></div>
                 <div class="form-group">
                     <input type="tel" id="reg-phone" placeholder="07XXXXXXXX" readonly style="font-size: 1.4rem; letter-spacing: 2px;">
                 </div>
-                <!-- On-Screen Dialpad -->
                 <div class="keypad">
-                    <button class="key-btn" onclick="kpPress('1')">1</button>
-                    <button class="key-btn" onclick="kpPress('2')">2</button>
-                    <button class="key-btn" onclick="kpPress('3')">3</button>
-                    <button class="key-btn" onclick="kpPress('4')">4</button>
-                    <button class="key-btn" onclick="kpPress('5')">5</button>
-                    <button class="key-btn" onclick="kpPress('6')">6</button>
-                    <button class="key-btn" onclick="kpPress('7')">7</button>
-                    <button class="key-btn" onclick="kpPress('8')">8</button>
-                    <button class="key-btn" onclick="kpPress('9')">9</button>
-                    <button class="key-btn" style="visibility:hidden"></button>
-                    <button class="key-btn" onclick="kpPress('0')">0</button>
+                    <button class="key-btn" onclick="kpPress('1')">1</button><button class="key-btn" onclick="kpPress('2')">2</button><button class="key-btn" onclick="kpPress('3')">3</button>
+                    <button class="key-btn" onclick="kpPress('4')">4</button><button class="key-btn" onclick="kpPress('5')">5</button><button class="key-btn" onclick="kpPress('6')">6</button>
+                    <button class="key-btn" onclick="kpPress('7')">7</button><button class="key-btn" onclick="kpPress('8')">8</button><button class="key-btn" onclick="kpPress('9')">9</button>
+                    <button class="key-btn" style="visibility:hidden"></button><button class="key-btn" onclick="kpPress('0')">0</button>
                     <button class="key-btn backspace" onclick="kpDel()"><i class="fas fa-backspace"></i></button>
                 </div>
                 <button class="btn" onclick="nextStep(2)">Next</button>
                 <button class="btn btn-link" onclick="prevStep(2)">Back</button>
             </div>
 
-            <!-- Step 3: NIC Number -->
+            <!-- Step 3: Email -->
             <div class="step" id="step-3">
-                <div class="header">
-                    <h2>NIC Number</h2>
-                    <p>Enter your ID Number</p>
-                </div>
+                <div class="header"><h2>Email Address</h2><p>For official updates</p></div>
                 <div class="form-group">
-                    <input type="text" id="reg-nic" placeholder="e.g. 199512345678">
+                    <input type="email" id="reg-email" placeholder="example@mail.com">
                 </div>
                 <button class="btn" onclick="nextStep(3)">Next</button>
                 <button class="btn btn-link" onclick="prevStep(3)">Back</button>
             </div>
 
-            <!-- Step 4: NIC Images -->
+            <!-- Step 4: Location -->
             <div class="step" id="step-4">
-                <div class="header">
-                    <h2>Scan ID</h2>
-                    <p>Upload Front & Back Photos</p>
+                <div class="header"><h2>Your Location</h2><p>Province & District</p></div>
+                <div class="form-group select-wrapper">
+                    <select id="reg-province" onchange="loadDistricts()">
+                        <option value="">Select Province</option>
+                    </select>
                 </div>
-                <div class="upload-row">
-                    <div class="upload-box" id="box-front" onclick="document.getElementById('file-front').click()">
-                        <i class="fas fa-id-card"></i>
-                        <p>Front</p>
-                        <img id="prev-front" style="display:none;">
-                    </div>
-                    <div class="upload-box" id="box-back" onclick="document.getElementById('file-back').click()">
-                        <i class="fas fa-id-card" style="transform: scaleX(-1);"></i>
-                        <p>Back</p>
-                        <img id="prev-back" style="display:none;">
-                    </div>
+                <div class="form-group select-wrapper">
+                    <select id="reg-district" disabled>
+                        <option value="">Select District</option>
+                    </select>
                 </div>
-                <input type="file" id="file-front" hidden accept="image/*" onchange="processFile(this, 'prev-front', 'box-front')">
-                <input type="file" id="file-back" hidden accept="image/*" onchange="processFile(this, 'prev-back', 'box-back')">
-
                 <button class="btn" onclick="nextStep(4)">Next</button>
                 <button class="btn btn-link" onclick="prevStep(4)">Back</button>
             </div>
 
-            <!-- Step 5: Selfie -->
+            <!-- Step 5: NIC Number -->
             <div class="step" id="step-5">
-                <div class="header">
-                    <h2>Face Verify</h2>
-                    <p>Take a clear selfie</p>
+                <div class="header"><h2>NIC Number</h2><p>Verification</p></div>
+                <div class="form-group">
+                    <input type="text" id="reg-nic" placeholder="e.g. 1999xxxxxx">
                 </div>
-                
+                <button class="btn" onclick="nextStep(5)">Next</button>
+                <button class="btn btn-link" onclick="prevStep(5)">Back</button>
+            </div>
+
+            <!-- Step 6: NIC Images -->
+            <div class="step" id="step-6">
+                <div class="header"><h2>Scan ID</h2><p>Front & Back</p></div>
+                <div class="upload-row">
+                    <div class="upload-box" id="box-front" onclick="document.getElementById('file-front').click()">
+                        <i class="fas fa-id-card"></i><p>Front</p><img id="prev-front" style="display:none;">
+                    </div>
+                    <div class="upload-box" id="box-back" onclick="document.getElementById('file-back').click()">
+                        <i class="fas fa-id-card" style="transform: scaleX(-1);"></i><p>Back</p><img id="prev-back" style="display:none;">
+                    </div>
+                </div>
+                <input type="file" id="file-front" hidden accept="image/*" onchange="processFile(this, 'prev-front', 'box-front')">
+                <input type="file" id="file-back" hidden accept="image/*" onchange="processFile(this, 'prev-back', 'box-back')">
+                <button class="btn" onclick="nextStep(6)">Next</button>
+                <button class="btn btn-link" onclick="prevStep(6)">Back</button>
+            </div>
+
+            <!-- Step 7: Selfie -->
+            <div class="step" id="step-7">
+                <div class="header"><h2>Face Verify</h2><p>Take a selfie</p></div>
                 <div class="camera-circle">
                     <video id="webcam" autoplay playsinline muted></video>
                     <canvas id="canvas" style="display:none;"></canvas>
                 </div>
-
                 <div class="cam-controls">
                     <div class="cam-btn" id="snap-btn" onclick="takeSnapshot()"><i class="fas fa-camera"></i></div>
                     <div class="cam-btn" id="retake-btn" onclick="startCamera()" style="display:none;"><i class="fas fa-redo"></i></div>
                 </div>
-
                 <div style="width:100%; margin-top:20px;">
-                    <button class="btn" onclick="nextStep(5)">Next</button>
-                    <button class="btn btn-link" onclick="prevStep(5)">Back</button>
+                    <button class="btn" onclick="nextStep(7)">Next</button>
+                    <button class="btn btn-link" onclick="prevStep(7)">Back</button>
                 </div>
             </div>
 
-            <!-- Step 6: Password -->
-            <div class="step" id="step-6">
-                <div class="header">
-                    <h2>Secure Account</h2>
-                    <p>Create a password</p>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="reg-pass" placeholder="Password">
-                </div>
-                <div class="form-group">
-                    <input type="password" id="reg-pass-confirm" placeholder="Confirm Password">
-                </div>
+            <!-- Step 8: Password -->
+            <div class="step" id="step-8">
+                <div class="header"><h2>Secure Account</h2><p>Create Password</p></div>
+                <div class="form-group"><input type="password" id="reg-pass" placeholder="Password"></div>
+                <div class="form-group"><input type="password" id="reg-pass-confirm" placeholder="Confirm Password"></div>
                 <button class="btn" onclick="submitRegistration()">Register</button>
-                <button class="btn btn-link" onclick="prevStep(6)">Back</button>
+                <button class="btn btn-link" onclick="prevStep(8)">Back</button>
             </div>
-
         </div>
     </div>
 
-    <!-- 4. Pending Screen -->
+    <!-- 4. Pending -->
     <div id="pending-screen" class="screen">
         <div class="container">
             <i class="fas fa-hourglass-half" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-            <h2 style="color:var(--dark); margin-bottom:10px;">Under Review</h2>
-            <p style="color:var(--text-gray); margin-bottom:20px;">We are checking your documents. Please check back later.</p>
+            <h2>Under Review</h2>
+            <p style="margin-bottom:20px;">We are verifying your documents.</p>
             <button class="btn btn-link" onclick="logout()">Logout</button>
         </div>
     </div>
 
-    <!-- 5. Declined Screen -->
+    <!-- 5. Declined -->
     <div id="declined-screen" class="screen">
         <div class="container">
             <i class="fas fa-times-circle" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-            <h2 style="color: var(--primary); margin-bottom:10px;">Application Declined</h2>
-            <p style="color:var(--text-gray);">Please correct the following:</p>
-            
-            <div class="decline-box">
-                <ul id="decline-list"></ul>
-            </div>
-
+            <h2>Application Declined</h2>
+            <div class="decline-box"><ul id="decline-list"></ul></div>
             <button class="btn" onclick="reUpload()">Try Again</button>
             <button class="btn btn-link" onclick="logout()">Logout</button>
         </div>
@@ -397,7 +318,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, set, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
         // Firebase Config
         const firebaseConfig = {
@@ -415,198 +336,217 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // State
-        let formData = { name: '', phone: '', nic: '', imgFront: '', imgBack: '', imgFace: '' };
+        // SL Locations
+        const slData = {
+            "Western": ["Colombo", "Gampaha", "Kalutara"],
+            "Central": ["Kandy", "Matale", "Nuwara Eliya"],
+            "Southern": ["Galle", "Matara", "Hambantota"],
+            "Northern": ["Jaffna", "Kilinochchi", "Mannar", "Vavuniya", "Mullaitivu"],
+            "Eastern": ["Batticaloa", "Ampara", "Trincomalee"],
+            "North Western": ["Kurunegala", "Puttalam"],
+            "North Central": ["Anuradhapura", "Polonnaruwa"],
+            "Uva": ["Badulla", "Monaragala"],
+            "Sabaragamuwa": ["Ratnapura", "Kegalle"]
+        };
+
+        let formData = { name: '', phone: '', email: '', province: '', district: '', nic: '', imgFront: '', imgBack: '', imgFace: '' };
         let stream = null;
 
-        // --- Helper: Toast ---
-        window.showToast = (msg) => {
-            const t = document.getElementById("toast");
-            t.innerText = msg;
-            t.className = "show";
-            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        // Populate Provinces
+        const pSelect = document.getElementById('reg-province');
+        for(let p in slData) {
+            let opt = document.createElement('option');
+            opt.value = p; opt.innerText = p;
+            pSelect.appendChild(opt);
         }
+
+        window.loadDistricts = () => {
+            const p = document.getElementById('reg-province').value;
+            const dSelect = document.getElementById('reg-district');
+            dSelect.innerHTML = '<option value="">Select District</option>';
+            if(p && slData[p]) {
+                slData[p].forEach(d => {
+                    let opt = document.createElement('option');
+                    opt.value = d; opt.innerText = d;
+                    dSelect.appendChild(opt);
+                });
+                dSelect.disabled = false;
+            } else {
+                dSelect.disabled = true;
+            }
+        };
+
+        // --- Toast ---
+        window.showToast = (msg, type = 'error') => {
+            const t = document.getElementById('toast');
+            t.className = `show ${type}`;
+            t.innerText = msg;
+            setTimeout(() => { t.className = t.className.replace('show', ''); }, 3000);
+        };
 
         // --- Init ---
         window.addEventListener('load', () => {
-            const savedUser = localStorage.getItem('aps_user');
+            const user = localStorage.getItem('aps_user');
             setTimeout(() => {
                 document.getElementById('splash-screen').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('splash-screen').style.display = 'none';
-                    if(savedUser) {
-                        checkStatus(JSON.parse(savedUser).uid);
-                    } else {
-                        showScreen('login-screen');
-                    }
+                    if(user) checkStatus(JSON.parse(user).uid);
+                    else showScreen('login-screen');
                 }, 500);
             }, 2000);
         });
 
-        // --- Status Logic ---
         async function checkStatus(uid) {
             toggleLoader(true);
             try {
                 const snap = await get(ref(db, 'riders/' + uid));
                 if(snap.exists()) {
                     const data = snap.val();
-                    if(data.approved_status === true) {
-                        window.location.href = "main.html";
-                    } else if(data.approved_status === "declined") {
+                    if(data.approved_status === true) window.location.href = "main.html";
+                    else if(data.approved_status === "declined") {
                         showScreen('declined-screen');
-                        const list = document.getElementById('decline-list');
-                        list.innerHTML = "";
-                        if(data.declinereasons) {
-                            data.declinereasons.forEach(r => {
-                                const li = document.createElement('li');
-                                li.innerText = r;
-                                list.appendChild(li);
-                            });
-                        }
-                    } else {
-                        showScreen('pending-screen');
-                    }
+                        document.getElementById('decline-list').innerHTML = (data.declinereasons || []).map(r => `<li>${r}</li>`).join('');
+                    } else showScreen('pending-screen');
                 } else {
                     localStorage.removeItem('aps_user');
                     showScreen('login-screen');
                 }
-            } catch (e) {
-                showToast("Connection Error");
+            } catch(e) {
+                showToast("Network Error");
                 showScreen('login-screen');
             } finally {
                 toggleLoader(false);
             }
         }
 
-        // --- Keypad Logic (Register Phone Only) ---
-        window.kpPress = (n) => {
-            const el = document.getElementById('reg-phone');
-            if(el.value.length < 10) el.value += n;
-        };
-        window.kpDel = () => {
-            const el = document.getElementById('reg-phone');
-            el.value = el.value.slice(0, -1);
-        };
+        // --- Keypad ---
+        window.kpPress = (n) => { const el = document.getElementById('reg-phone'); if(el.value.length < 10) el.value += n; };
+        window.kpDel = () => { const el = document.getElementById('reg-phone'); el.value = el.value.slice(0, -1); };
 
-        // --- Carousel Navigation ---
-        window.nextStep = (step) => {
-            // Validation
+        // --- Steps ---
+        window.nextStep = async (step) => {
             if(step === 1) {
-                const n = document.getElementById('reg-name').value;
-                if(n.length < 3) return showToast("Please enter a valid name (3+ chars)");
+                const n = document.getElementById('reg-name').value.trim();
+                if(n.length < 3) return showToast("Name is too short");
+                
+                // Check Duplicate Name
+                toggleLoader(true);
+                const q = query(ref(db, 'riders'), orderByChild('fullName'), equalTo(n.toUpperCase()));
+                const snap = await get(q);
+                toggleLoader(false);
+                if(snap.exists()) return showToast("Name already registered", "error");
+                
                 formData.name = n.toUpperCase();
             }
             if(step === 2) {
                 const p = document.getElementById('reg-phone').value;
-                if(!/^07[0-9]{8}$/.test(p)) return showToast("Enter valid SL Mobile (07XXXXXXXX)");
+                if(!/^07[0-9]{8}$/.test(p)) return showToast("Invalid SL Mobile");
                 formData.phone = p;
             }
             if(step === 3) {
-                const nic = document.getElementById('reg-nic').value;
-                if(nic.length < 9) return showToast("Please enter a valid NIC");
-                formData.nic = nic;
+                const e = document.getElementById('reg-email').value;
+                if(!/\S+@\S+\.\S+/.test(e)) return showToast("Invalid Email");
+                formData.email = e;
             }
             if(step === 4) {
-                if(!formData.imgFront || !formData.imgBack) return showToast("Please upload both ID photos");
+                const pr = document.getElementById('reg-province').value;
+                const ds = document.getElementById('reg-district').value;
+                if(!pr || !ds) return showToast("Select Location");
+                formData.province = pr; formData.district = ds;
             }
             if(step === 5) {
-                if(!formData.imgFace) return showToast("Please take a selfie");
+                const nic = document.getElementById('reg-nic').value;
+                if(nic.length < 9) return showToast("Invalid NIC");
+                formData.nic = nic;
+            }
+            if(step === 6) {
+                if(!formData.imgFront || !formData.imgBack) return showToast("Upload ID photos");
+            }
+            if(step === 7) {
+                if(!formData.imgFace) return showToast("Take a selfie");
                 stopCamera();
             }
 
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step+1}`).classList.add('active');
-
-            // If entering step 5 (Selfie), start cam
-            if(step+1 === 5) startCamera();
+            if(step+1 === 7) startCamera();
         };
 
         window.prevStep = (step) => {
-            if(step === 5) stopCamera();
+            if(step === 7) stopCamera();
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step-1}`).classList.add('active');
         };
 
         // --- Camera ---
         window.startCamera = async () => {
-            const video = document.getElementById('webcam');
-            const canvas = document.getElementById('canvas');
-            video.style.display = 'block';
-            canvas.style.display = 'none';
+            const vid = document.getElementById('webcam');
+            const can = document.getElementById('canvas');
+            vid.style.display = 'block'; can.style.display = 'none';
             document.getElementById('snap-btn').style.display = 'flex';
             document.getElementById('retake-btn').style.display = 'none';
-
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-                video.srcObject = stream;
-            } catch(e) { showToast("Camera Access Denied or Unavailable"); }
+            try { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}, audio:false}); vid.srcObject = stream; } 
+            catch { showToast("Camera access required"); }
         };
-
-        window.stopCamera = () => {
-            if(stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
-        };
-
+        window.stopCamera = () => { if(stream) { stream.getTracks().forEach(t=>t.stop()); stream=null; } };
         window.takeSnapshot = () => {
-            const video = document.getElementById('webcam');
-            const canvas = document.getElementById('canvas');
-            canvas.width = 400; canvas.height = 400;
-            const ctx = canvas.getContext('2d');
-
-            // Crop center square & mirror
-            const size = Math.min(video.videoWidth, video.videoHeight);
-            const x = (video.videoWidth - size) / 2;
-            const y = (video.videoHeight - size) / 2;
-            
-            ctx.translate(400, 0); ctx.scale(-1, 1);
-            ctx.drawImage(video, x, y, size, size, 0, 0, 400, 400);
-
-            formData.imgFace = canvas.toDataURL('image/jpeg', 0.6);
-            video.style.display = 'none'; canvas.style.display = 'block';
-            document.getElementById('snap-btn').style.display = 'none';
-            document.getElementById('retake-btn').style.display = 'flex';
+            const vid = document.getElementById('webcam');
+            const can = document.getElementById('canvas');
+            can.width = 400; can.height = 400;
+            const ctx = can.getContext('2d');
+            const s = Math.min(vid.videoWidth, vid.videoHeight);
+            ctx.translate(400,0); ctx.scale(-1,1);
+            ctx.drawImage(vid, (vid.videoWidth-s)/2, (vid.videoHeight-s)/2, s, s, 0, 0, 400, 400);
+            formData.imgFace = can.toDataURL('image/jpeg', 0.6);
+            vid.style.display='none'; can.style.display='block';
+            document.getElementById('snap-btn').style.display='none';
+            document.getElementById('retake-btn').style.display='flex';
         };
 
-        // --- Image Compression ---
-        window.processFile = (input, prevId, boxId) => {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const w = 500;
-                    const scale = w / img.width;
-                    canvas.width = w; canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, canvas.height);
-                    const data = canvas.toDataURL('image/jpeg', 0.6);
-                    document.getElementById(prevId).src = data;
+        // --- File ---
+        window.processFile = (inp, prevId, boxId) => {
+            const f = inp.files[0];
+            if(!f) return;
+            const r = new FileReader();
+            r.onload = (e) => {
+                const i = new Image(); i.src = e.target.result;
+                i.onload = () => {
+                    const c = document.createElement('canvas');
+                    const w = 500; const sc = w/i.width;
+                    c.width = w; c.height = i.height*sc;
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(i,0,0,w,c.height);
+                    const d = c.toDataURL('image/jpeg', 0.6);
+                    document.getElementById(prevId).src = d;
                     document.getElementById(prevId).style.display = 'block';
                     document.getElementById(boxId).classList.add('done');
-                    if(prevId === 'prev-front') formData.imgFront = data;
-                    if(prevId === 'prev-back') formData.imgBack = data;
+                    if(prevId.includes('front')) formData.imgFront = d;
+                    else formData.imgBack = d;
                 };
             };
-            reader.readAsDataURL(file);
+            r.readAsDataURL(f);
         };
 
-        // --- Registration ---
+        // --- Submit ---
         window.submitRegistration = async () => {
             const p1 = document.getElementById('reg-pass').value;
             const p2 = document.getElementById('reg-pass-confirm').value;
-            if(p1.length < 6) return showToast("Password must be 6+ chars");
+            if(p1.length < 6) return showToast("Password too short");
             if(p1 !== p2) return showToast("Passwords do not match");
 
             toggleLoader(true);
             try {
+                // Firebase checks duplicate phone automatically (mapped to email)
                 const cred = await createUserWithEmailAndPassword(auth, `${formData.phone}@apspeedo.com`, p1);
                 const uid = cred.user.uid;
 
                 await set(ref(db, 'riders/' + uid), {
                     fullName: formData.name,
                     phone: formData.phone,
+                    email: formData.email,
+                    province: formData.province,
+                    district: formData.district,
                     nic: formData.nic,
                     nicFront: formData.imgFront,
                     nicBack: formData.imgBack,
@@ -617,8 +557,10 @@
 
                 localStorage.setItem('aps_user', JSON.stringify({ uid: uid }));
                 checkStatus(uid);
+
             } catch(e) {
-                showToast("Registration Error: " + e.message);
+                if(e.code === 'auth/email-already-in-use') showToast("Phone number already registered", "error");
+                else showToast("Error: " + e.message);
                 toggleLoader(false);
             }
         };
@@ -627,7 +569,7 @@
         window.handleLogin = async () => {
             const ph = document.getElementById('login-phone').value;
             const pw = document.getElementById('login-pass').value;
-            if(!ph || !pw) return showToast("Please enter phone and password");
+            if(!ph || !pw) return showToast("Enter credentials");
 
             toggleLoader(true);
             try {
@@ -635,27 +577,17 @@
                 localStorage.setItem('aps_user', JSON.stringify({ uid: cred.user.uid }));
                 checkStatus(cred.user.uid);
             } catch(e) {
-                showToast("Login Failed: Invalid Credentials");
+                showToast("Invalid credentials");
                 toggleLoader(false);
             }
         };
 
-        // --- Nav Helpers ---
-        window.goToRegister = () => {
-            showScreen('register-screen');
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step-1').classList.add('active');
-        };
+        window.goToRegister = () => { showScreen('register-screen'); document.querySelectorAll('.step').forEach(s=>s.classList.remove('active')); document.getElementById('step-1').classList.add('active'); };
         window.goToLogin = () => showScreen('login-screen');
         window.logout = () => { signOut(auth); localStorage.removeItem('aps_user'); location.reload(); };
         window.reUpload = () => window.goToRegister();
-
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => {
-                if(s.id !== 'splash-screen') s.classList.remove('active');
-            });
-            document.getElementById(id).classList.add('active');
-        }
+        
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>{if(s.id!=='splash-screen')s.classList.remove('active')}); document.getElementById(id).classList.add('active'); }
         function toggleLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
     </script>
 </body>
