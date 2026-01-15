@@ -383,7 +383,10 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-        import { GoogleGenAI } from "https://esm.run/@google/genai";
+        
+        // --- CORRECTED IMPORT ---
+        // Using the official @google/generative-ai package
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
         // --- CONFIG ---
         // API Key: AIzaSyBn0a2KrsRayMRbhNJo1QOKBjEyqSF1yVA
@@ -393,8 +396,8 @@
         // Decode immediately at top level
         const GEMINI_API_KEY = atob(GEMINI_API_KEY_B64);
         
-        // Initialize Client globally to avoid scope errors
-        const genAI = new GoogleGenAI(GEMINI_API_KEY);
+        // Initialize Client globally
+        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
@@ -532,25 +535,21 @@
 
         // --- GOOGLE GENAI SDK IMPLEMENTATION ---
         async function callGemini(prompt, imagesBase64) {
-            // We use the global 'genAI' object initialized at the top
-            // No need to re-instantiate inside this function
-            
             try {
                 // Prepare content parts
                 const parts = [{ text: prompt }];
                 imagesBase64.forEach(img => {
-                    // SDK needs just the base64 data (without data:image/jpeg;base64,)
+                    // SDK needs just base64 data (without data:image/jpeg;base64,)
                     const base64Data = img.split(',')[1];
                     parts.push({ inlineData: { mimeType: "image/jpeg", data: base64Data } });
                 });
 
-                // Using the latest model (2.5 Preview / 2.0 Experimental)
-                const response = await genAI.models.generateContent({
-                    model: "gemini-2.0-flash-exp",
-                    contents: parts
-                });
+                // Get the model using the global client
+                const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+                
+                const response = await model.generateContent(parts);
+                const text = response.response.text();
 
-                const text = response.text;
                 return { success: true, raw: text };
 
             } catch (error) {
@@ -601,7 +600,7 @@
             resultBox.classList.add('hidden');
             btn.disabled = true;
 
-            const prompt = `Compare the Selfie face with the ID Card face. Return JSON: { "isMatch": boolean, "feedback": string }`;
+            const prompt = `Compare Selfie face with the ID Card face. Return JSON: { "isMatch": boolean, "feedback": string }`;
 
             const res = await callGemini(prompt, [registrationData.nicFrontBase64, registrationData.profileBase64]);
             loading.classList.add('hidden');
