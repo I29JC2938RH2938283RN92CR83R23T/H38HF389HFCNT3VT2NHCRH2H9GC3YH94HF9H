@@ -8,14 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #D32F2F; /* Red Theme */
+            --primary: #D32F2F; /* Red */
             --primary-dark: #B71C1C;
             --dark: #212121;
             --light: #ffffff;
             --gray: #f5f5f5;
             --text-gray: #757575;
-            --border: #e0e0e0;
-            --shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -23,52 +21,56 @@
         body {
             background-color: var(--light);
             height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow: hidden;
             position: relative;
             color: var(--dark);
         }
 
-        /* --- Screens --- */
+        /* --- Full Screen Centering --- */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #fff;
             display: none;
             flex-direction: column;
-            padding: 24px;
-            overflow-y: auto;
+            justify-content: center; /* Vertical Center */
+            align-items: center;     /* Horizontal Center */
+            padding: 30px;
             z-index: 10;
-            transition: transform 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .screen.active { display: flex; }
         
-        /* --- Splash --- */
-        #splash-screen {
-            z-index: 9999;
-            justify-content: center;
+        /* --- Content Container --- */
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            background: #fff;
+            text-align: center;
         }
+
+        /* --- Splash --- */
+        #splash-screen { z-index: 9999; }
         #splash-screen img { width: 140px; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- UI Elements --- */
-        .header { text-align: center; margin-bottom: 25px; margin-top: 10px; }
-        .header img { width: 70px; margin-bottom: 10px; border-radius: 12px; }
-        .header h2 { font-weight: 700; color: var(--primary); font-size: 1.6rem; }
-        .header p { color: var(--text-gray); font-size: 0.9rem; }
+        /* --- Typography & Inputs --- */
+        .header { margin-bottom: 30px; width: 100%; }
+        .header img { width: 70px; margin-bottom: 15px; border-radius: 12px; }
+        .header h2 { font-weight: 700; color: var(--primary); font-size: 1.6rem; margin-bottom: 5px; }
+        .header p { color: var(--text-gray); font-size: 0.95rem; }
 
-        .form-group { margin-bottom: 15px; width: 100%; }
+        .form-group { margin-bottom: 20px; width: 100%; }
         
         input {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             border: 2px solid var(--gray);
             background-color: var(--gray);
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 1.1rem;
             outline: none;
             transition: all 0.3s;
@@ -76,50 +78,49 @@
             font-weight: 500;
             color: var(--dark);
         }
-        input:focus { background-color: #fff; border-color: var(--primary); }
-        input::placeholder { color: #bdbdbd; }
+        input:focus { background-color: #fff; border-color: var(--primary); box-shadow: 0 4px 15px rgba(211, 47, 47, 0.1); }
 
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             border: none;
-            border-radius: 14px;
+            border-radius: 16px;
             background: var(--primary);
             color: #fff;
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
             margin-top: 10px;
         }
         .btn:active { background: var(--primary-dark); transform: scale(0.98); }
-        .btn-link { background: none; color: var(--text-gray); box-shadow: none; margin-top: 15px; font-weight: 400; font-size: 0.9rem; }
+        .btn-link { background: none; color: var(--text-gray); box-shadow: none; margin-top: 20px; font-weight: 400; font-size: 0.9rem; }
         .btn-link:hover { color: var(--primary); }
 
-        /* --- Keypad --- */
+        /* --- Keypad (Register Only) --- */
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 10px;
+            gap: 12px;
+            width: 100%;
             margin-bottom: 20px;
         }
         .key-btn {
             background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 14px;
             padding: 15px;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: var(--dark);
             cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .key-btn:active { background: var(--gray); }
-        .key-btn.backspace { color: var(--primary); }
+        .key-btn.backspace { color: var(--primary); background: #FFEBEE; border-color: #FFCDD2; }
 
         /* --- Upload Boxes --- */
-        .upload-row { display: flex; gap: 15px; margin-bottom: 20px; }
+        .upload-row { display: flex; gap: 15px; width: 100%; margin-bottom: 20px; }
         .upload-box {
             flex: 1;
             background: var(--gray);
@@ -139,24 +140,21 @@
         .upload-box p { font-size: 12px; color: var(--text-gray); font-weight: 500; }
         .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- Live Camera UI --- */
-        .camera-container {
-            width: 100%;
-            max-width: 320px;
-            height: 320px;
+        /* --- Camera UI --- */
+        .camera-circle {
+            width: 280px;
+            height: 280px;
             background: #000;
-            border-radius: 50%; /* Circular */
-            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            margin: 0 auto 25px auto;
             overflow: hidden;
             position: relative;
-            border: 4px solid var(--primary);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border: 5px solid var(--primary);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
         video, canvas { width: 100%; height: 100%; object-fit: cover; }
         
-        .cam-controls {
-            display: flex; justify-content: center; align-items: center; gap: 20px;
-        }
+        .cam-controls { display: flex; justify-content: center; gap: 20px; width: 100%; }
         .cam-btn {
             width: 70px; height: 70px;
             border-radius: 50%;
@@ -164,15 +162,14 @@
             border: 5px solid #e0e0e0;
             cursor: pointer;
             display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        .cam-btn i { color: var(--primary); font-size: 24px; }
-        .cam-btn:active { border-color: var(--primary); }
 
-        /* --- Status --- */
-        .status-page { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; }
-        .status-icon { font-size: 60px; color: var(--primary); margin-bottom: 20px; }
-        .decline-box { background: #FFEBEE; border: 1px solid #FFCDD2; padding: 15px; border-radius: 12px; margin: 20px 0; width: 100%; text-align: left; }
-        .decline-box li { color: #D32F2F; font-size: 0.9rem; list-style-position: inside; margin-bottom: 5px; }
+        /* --- Steps Animation --- */
+        .step { display: none; width: 100%; animation: fadeIn 0.4s ease; flex-direction: column; align-items: center; }
+        .step.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Loader --- */
         #loader {
@@ -180,14 +177,12 @@
             background: rgba(255,255,255,0.95); z-index: 20000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
-        .spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Carousel Steps */
-        .carousel { flex: 1; display: flex; flex-direction: column; }
-        .step { display: none; animation: fadeIn 0.4s ease; text-align: center; flex: 1; flex-direction: column; }
-        .step.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- Declined List --- */
+        .decline-box { background: #FFEBEE; border: 1px solid #FFCDD2; padding: 15px; border-radius: 12px; margin: 20px 0; width: 100%; text-align: left; }
+        .decline-box li { color: #D32F2F; margin-bottom: 5px; list-style-position: inside; }
 
     </style>
 </head>
@@ -204,97 +199,90 @@
         <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="Logo">
     </div>
 
-    <!-- 2. Login Screen -->
+    <!-- 2. Login Screen (Typeable Inputs) -->
     <div id="login-screen" class="screen">
-        <div class="header">
-            <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg">
-            <h2>Welcome Back</h2>
-            <p>Enter your details to login</p>
-        </div>
-        
-        <div class="form-group">
-            <input type="tel" id="login-phone" placeholder="Phone Number" readonly onclick="setupKeypad('login-phone')">
-        </div>
-        <div class="form-group">
-            <input type="password" id="login-pass" placeholder="Password">
-        </div>
+        <div class="container">
+            <div class="header">
+                <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg">
+                <h2>Welcome Back</h2>
+                <p>Login to your Rider Account</p>
+            </div>
+            
+            <div class="form-group">
+                <input type="tel" id="login-phone" placeholder="Mobile Number" maxlength="10">
+            </div>
+            <div class="form-group">
+                <input type="password" id="login-pass" placeholder="Password">
+            </div>
 
-        <!-- Keypad for Login (Initially Hidden/Shown via JS if needed, but we put it inline for simplicity) -->
-        <div class="keypad" id="login-keypad">
-            <button class="key-btn" onclick="kpPress('1', 'login-phone')">1</button>
-            <button class="key-btn" onclick="kpPress('2', 'login-phone')">2</button>
-            <button class="key-btn" onclick="kpPress('3', 'login-phone')">3</button>
-            <button class="key-btn" onclick="kpPress('4', 'login-phone')">4</button>
-            <button class="key-btn" onclick="kpPress('5', 'login-phone')">5</button>
-            <button class="key-btn" onclick="kpPress('6', 'login-phone')">6</button>
-            <button class="key-btn" onclick="kpPress('7', 'login-phone')">7</button>
-            <button class="key-btn" onclick="kpPress('8', 'login-phone')">8</button>
-            <button class="key-btn" onclick="kpPress('9', 'login-phone')">9</button>
-            <button class="key-btn" style="visibility:hidden"></button>
-            <button class="key-btn" onclick="kpPress('0', 'login-phone')">0</button>
-            <button class="key-btn backspace" onclick="kpDel('login-phone')"><i class="fas fa-backspace"></i></button>
+            <button class="btn" onclick="handleLogin()">Login</button>
+            <button class="btn btn-link" onclick="goToRegister()">Create New Account</button>
         </div>
-
-        <button class="btn" onclick="handleLogin()">Login</button>
-        <button class="btn btn-link" onclick="goToRegister()">New Rider? Register Here</button>
     </div>
 
-    <!-- 3. Register Screen (Carousel) -->
+    <!-- 3. Register Screen (Sectioned Carousel) -->
     <div id="register-screen" class="screen">
-        <div class="carousel">
+        <div class="container">
             
-            <!-- Step 1: Info + Keypad -->
+            <!-- Step 1: Name -->
             <div class="step active" id="step-1">
                 <div class="header">
-                    <h2>Details</h2>
-                    <p>Enter your personal information</p>
+                    <h2>What's your name?</h2>
+                    <p>Enter your full legal name</p>
                 </div>
                 <div class="form-group">
-                    <input type="text" id="reg-name" placeholder="Full Name (Capitalized)" style="text-transform: capitalize;">
+                    <input type="text" id="reg-name" placeholder="Full Name (e.g. Kasun Perera)" style="text-transform: capitalize;">
                 </div>
-                <div class="form-group">
-                    <input type="tel" id="reg-phone" placeholder="07XXXXXXXX" readonly>
-                </div>
-
-                <!-- Keypad -->
-                <div class="keypad">
-                    <button class="key-btn" onclick="kpPress('1', 'reg-phone')">1</button>
-                    <button class="key-btn" onclick="kpPress('2', 'reg-phone')">2</button>
-                    <button class="key-btn" onclick="kpPress('3', 'reg-phone')">3</button>
-                    <button class="key-btn" onclick="kpPress('4', 'reg-phone')">4</button>
-                    <button class="key-btn" onclick="kpPress('5', 'reg-phone')">5</button>
-                    <button class="key-btn" onclick="kpPress('6', 'reg-phone')">6</button>
-                    <button class="key-btn" onclick="kpPress('7', 'reg-phone')">7</button>
-                    <button class="key-btn" onclick="kpPress('8', 'reg-phone')">8</button>
-                    <button class="key-btn" onclick="kpPress('9', 'reg-phone')">9</button>
-                    <button class="key-btn" style="visibility:hidden"></button>
-                    <button class="key-btn" onclick="kpPress('0', 'reg-phone')">0</button>
-                    <button class="key-btn backspace" onclick="kpDel('reg-phone')"><i class="fas fa-backspace"></i></button>
-                </div>
-
-                <button class="btn" onclick="nextStep(1)">Next Step</button>
+                <button class="btn" onclick="nextStep(1)">Next</button>
                 <button class="btn btn-link" onclick="goToLogin()">Back to Login</button>
             </div>
 
-            <!-- Step 2: NIC -->
+            <!-- Step 2: Phone (Dialpad) -->
             <div class="step" id="step-2">
                 <div class="header">
-                    <h2>Identify</h2>
-                    <p>Enter your NIC Number</p>
+                    <h2>Mobile Number</h2>
+                    <p>Tap numbers to enter</p>
                 </div>
-                <div class="form-group" style="margin-top:20px;">
-                    <input type="text" id="reg-nic" placeholder="e.g., 199912345678">
+                <div class="form-group">
+                    <input type="tel" id="reg-phone" placeholder="07XXXXXXXX" readonly style="font-size: 1.4rem; letter-spacing: 2px;">
                 </div>
-                <div style="flex:1;"></div>
-                <button class="btn" onclick="nextStep(2)">Next Step</button>
+                <!-- On-Screen Dialpad -->
+                <div class="keypad">
+                    <button class="key-btn" onclick="kpPress('1')">1</button>
+                    <button class="key-btn" onclick="kpPress('2')">2</button>
+                    <button class="key-btn" onclick="kpPress('3')">3</button>
+                    <button class="key-btn" onclick="kpPress('4')">4</button>
+                    <button class="key-btn" onclick="kpPress('5')">5</button>
+                    <button class="key-btn" onclick="kpPress('6')">6</button>
+                    <button class="key-btn" onclick="kpPress('7')">7</button>
+                    <button class="key-btn" onclick="kpPress('8')">8</button>
+                    <button class="key-btn" onclick="kpPress('9')">9</button>
+                    <button class="key-btn" style="visibility:hidden"></button>
+                    <button class="key-btn" onclick="kpPress('0')">0</button>
+                    <button class="key-btn backspace" onclick="kpDel()"><i class="fas fa-backspace"></i></button>
+                </div>
+                <button class="btn" onclick="nextStep(2)">Next</button>
                 <button class="btn btn-link" onclick="prevStep(2)">Back</button>
             </div>
 
-            <!-- Step 3: NIC Images -->
+            <!-- Step 3: NIC Number -->
             <div class="step" id="step-3">
                 <div class="header">
-                    <h2>Documents</h2>
-                    <p>Upload Front & Back of NIC</p>
+                    <h2>NIC Number</h2>
+                    <p>Enter your ID Number</p>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="reg-nic" placeholder="e.g. 199512345678">
+                </div>
+                <button class="btn" onclick="nextStep(3)">Next</button>
+                <button class="btn btn-link" onclick="prevStep(3)">Back</button>
+            </div>
+
+            <!-- Step 4: NIC Images -->
+            <div class="step" id="step-4">
+                <div class="header">
+                    <h2>Scan ID</h2>
+                    <p>Upload Front & Back Photos</p>
                 </div>
                 <div class="upload-row">
                     <div class="upload-box" id="box-front" onclick="document.getElementById('file-front').click()">
@@ -311,18 +299,18 @@
                 <input type="file" id="file-front" hidden accept="image/*" onchange="processFile(this, 'prev-front', 'box-front')">
                 <input type="file" id="file-back" hidden accept="image/*" onchange="processFile(this, 'prev-back', 'box-back')">
 
-                <button class="btn" onclick="nextStep(3)">Next Step</button>
-                <button class="btn btn-link" onclick="prevStep(3)">Back</button>
+                <button class="btn" onclick="nextStep(4)">Next</button>
+                <button class="btn btn-link" onclick="prevStep(4)">Back</button>
             </div>
 
-            <!-- Step 4: Selfie Camera -->
-            <div class="step" id="step-4">
+            <!-- Step 5: Selfie -->
+            <div class="step" id="step-5">
                 <div class="header">
-                    <h2>Selfie</h2>
-                    <p>Take a clear photo of your face</p>
+                    <h2>Face Verify</h2>
+                    <p>Take a clear selfie</p>
                 </div>
                 
-                <div class="camera-container">
+                <div class="camera-circle">
                     <video id="webcam" autoplay playsinline muted></video>
                     <canvas id="canvas" style="display:none;"></canvas>
                 </div>
@@ -332,16 +320,16 @@
                     <div class="cam-btn" id="retake-btn" onclick="startCamera()" style="display:none;"><i class="fas fa-redo"></i></div>
                 </div>
 
-                <div style="margin-top:20px;">
-                    <button class="btn" onclick="nextStep(4)">Next Step</button>
-                    <button class="btn btn-link" onclick="prevStep(4)">Back</button>
+                <div style="width:100%; margin-top:20px;">
+                    <button class="btn" onclick="nextStep(5)">Next</button>
+                    <button class="btn btn-link" onclick="prevStep(5)">Back</button>
                 </div>
             </div>
 
-            <!-- Step 5: Password -->
-            <div class="step" id="step-5">
+            <!-- Step 6: Password -->
+            <div class="step" id="step-6">
                 <div class="header">
-                    <h2>Secure</h2>
+                    <h2>Secure Account</h2>
                     <p>Create a password</p>
                 </div>
                 <div class="form-group">
@@ -351,30 +339,33 @@
                     <input type="password" id="reg-pass-confirm" placeholder="Confirm Password">
                 </div>
                 <button class="btn" onclick="submitRegistration()">Register</button>
-                <button class="btn btn-link" onclick="prevStep(5)">Back</button>
+                <button class="btn btn-link" onclick="prevStep(6)">Back</button>
             </div>
+
         </div>
     </div>
 
-    <!-- 4. Pending -->
+    <!-- 4. Pending Screen -->
     <div id="pending-screen" class="screen">
-        <div class="status-page">
-            <i class="fas fa-clock status-icon"></i>
-            <h2>Reviewing</h2>
-            <p>Your application is under review. We will notify you once approved.</p>
-            <button class="btn btn-link" onclick="logout()">Check Later (Logout)</button>
+        <div class="container">
+            <i class="fas fa-hourglass-half" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="color:var(--dark); margin-bottom:10px;">Under Review</h2>
+            <p style="color:var(--text-gray); margin-bottom:20px;">We are checking your documents. Please check back later.</p>
+            <button class="btn btn-link" onclick="logout()">Logout</button>
         </div>
     </div>
 
-    <!-- 5. Declined -->
+    <!-- 5. Declined Screen -->
     <div id="declined-screen" class="screen">
-        <div class="status-page">
-            <i class="fas fa-times-circle status-icon" style="color: #D32F2F;"></i>
-            <h2 style="color: #D32F2F;">Declined</h2>
-            <p>Your application was not approved.</p>
+        <div class="container">
+            <i class="fas fa-times-circle" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+            <h2 style="color: var(--primary); margin-bottom:10px;">Application Declined</h2>
+            <p style="color:var(--text-gray);">Please correct the following:</p>
+            
             <div class="decline-box">
                 <ul id="decline-list"></ul>
             </div>
+
             <button class="btn" onclick="reUpload()">Try Again</button>
             <button class="btn btn-link" onclick="logout()">Logout</button>
         </div>
@@ -383,9 +374,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // Firebase Setup
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
             authDomain: "speedo-acb7c.firebaseapp.com",
@@ -405,22 +396,16 @@
         let formData = { name: '', phone: '', nic: '', imgFront: '', imgBack: '', imgFace: '' };
         let stream = null;
 
-        // --- Init & LocalStorage Check ---
-        window.addEventListener('load', async () => {
-            // Check LocalStorage first
+        // --- Init ---
+        window.addEventListener('load', () => {
             const savedUser = localStorage.getItem('aps_user');
-            
             setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.style.opacity = '0';
+                document.getElementById('splash-screen').style.opacity = '0';
                 setTimeout(() => {
-                    splash.style.display = 'none';
+                    document.getElementById('splash-screen').style.display = 'none';
                     if(savedUser) {
-                        const user = JSON.parse(savedUser);
-                        // User exists locally, check status directly without login
-                        checkStatus(user.uid);
+                        checkStatus(JSON.parse(savedUser).uid);
                     } else {
-                        // No local user, show login
                         showScreen('login-screen');
                     }
                 }, 500);
@@ -435,7 +420,7 @@
                 if(snap.exists()) {
                     const data = snap.val();
                     if(data.approved_status === true) {
-                        window.location.href = "main.html"; // Approved -> Main
+                        window.location.href = "main.html";
                     } else if(data.approved_status === "declined") {
                         showScreen('declined-screen');
                         const list = document.getElementById('decline-list');
@@ -448,73 +433,73 @@
                             });
                         }
                     } else {
-                        showScreen('pending-screen'); // False or undefined -> Pending
+                        showScreen('pending-screen');
                     }
                 } else {
-                    // UID in local storage but not in DB (deleted user?)
                     localStorage.removeItem('aps_user');
                     showScreen('login-screen');
                 }
             } catch (e) {
-                console.error(e);
-                alert("Connection Failed");
+                alert("Connection Error");
                 showScreen('login-screen');
             } finally {
                 toggleLoader(false);
             }
         }
 
-        // --- Keypad Functions ---
-        window.kpPress = (num, inputId) => {
-            const input = document.getElementById(inputId);
-            if(input.value.length < 10) input.value += num;
+        // --- Keypad Logic (Register Phone Only) ---
+        window.kpPress = (n) => {
+            const el = document.getElementById('reg-phone');
+            if(el.value.length < 10) el.value += n;
+        };
+        window.kpDel = () => {
+            const el = document.getElementById('reg-phone');
+            el.value = el.value.slice(0, -1);
         };
 
-        window.kpDel = (inputId) => {
-            const input = document.getElementById(inputId);
-            input.value = input.value.slice(0, -1);
-        };
-
-        // --- Register Flow ---
+        // --- Carousel Navigation ---
         window.nextStep = (step) => {
             // Validation
             if(step === 1) {
                 const n = document.getElementById('reg-name').value;
-                const p = document.getElementById('reg-phone').value;
-                if(n.length < 3 || !/^07[0-9]{8}$/.test(p)) return alert("Check Name & Phone (07XXXXXXXX)");
+                if(n.length < 3) return alert("Enter valid name");
                 formData.name = n.toUpperCase();
-                formData.phone = p;
             }
             if(step === 2) {
-                const nic = document.getElementById('reg-nic').value;
-                if(nic.length < 9) return alert("Invalid NIC");
-                formData.nic = nic;
+                const p = document.getElementById('reg-phone').value;
+                if(!/^07[0-9]{8}$/.test(p)) return alert("Enter valid SL Mobile (07XXXXXXXX)");
+                formData.phone = p;
             }
             if(step === 3) {
-                if(!formData.imgFront || !formData.imgBack) return alert("Upload NIC Photos");
+                const nic = document.getElementById('reg-nic').value;
+                if(nic.length < 9) return alert("Enter valid NIC");
+                formData.nic = nic;
             }
             if(step === 4) {
-                if(!formData.imgFace) return alert("Take a Selfie");
+                if(!formData.imgFront || !formData.imgBack) return alert("Upload both ID photos");
+            }
+            if(step === 5) {
+                if(!formData.imgFace) return alert("Take a selfie");
                 stopCamera();
             }
 
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step+1}`).classList.add('active');
 
-            if(step+1 === 4) startCamera();
+            // If entering step 5 (Selfie), start cam
+            if(step+1 === 5) startCamera();
         };
 
         window.prevStep = (step) => {
-            if(step === 4) stopCamera();
+            if(step === 5) stopCamera();
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step-1}`).classList.add('active');
         };
 
-        // --- Camera Logic ---
+        // --- Camera ---
         window.startCamera = async () => {
             const video = document.getElementById('webcam');
             const canvas = document.getElementById('canvas');
-            
             video.style.display = 'block';
             canvas.style.display = 'none';
             document.getElementById('snap-btn').style.display = 'flex';
@@ -523,51 +508,38 @@
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
                 video.srcObject = stream;
-            } catch (e) {
-                alert("Camera permission denied.");
-            }
+            } catch(e) { alert("Cam error"); }
         };
 
         window.stopCamera = () => {
-            if(stream) {
-                stream.getTracks().forEach(t => t.stop());
-                stream = null;
-            }
+            if(stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
         };
 
         window.takeSnapshot = () => {
             const video = document.getElementById('webcam');
             const canvas = document.getElementById('canvas');
+            canvas.width = 400; canvas.height = 400;
             const ctx = canvas.getContext('2d');
 
-            canvas.width = 400; 
-            canvas.height = 400; // Square aspect
-            
-            // Draw cropped center
+            // Crop center square & mirror
             const size = Math.min(video.videoWidth, video.videoHeight);
             const x = (video.videoWidth - size) / 2;
             const y = (video.videoHeight - size) / 2;
             
-            ctx.translate(400, 0);
-            ctx.scale(-1, 1);
+            ctx.translate(400, 0); ctx.scale(-1, 1);
             ctx.drawImage(video, x, y, size, size, 0, 0, 400, 400);
 
-            // Compress
             formData.imgFace = canvas.toDataURL('image/jpeg', 0.6);
-
-            video.style.display = 'none';
-            canvas.style.display = 'block';
+            video.style.display = 'none'; canvas.style.display = 'block';
             document.getElementById('snap-btn').style.display = 'none';
             document.getElementById('retake-btn').style.display = 'flex';
         };
 
-        // --- Image Compression (File Input) ---
+        // --- Image Compression ---
         window.processFile = (input, prevId, boxId) => {
             const file = input.files[0];
             if(!file) return;
-
             const reader = new FileReader();
-            reader.readAsDataURL(file);
             reader.onload = (e) => {
                 const img = new Image();
                 img.src = e.target.result;
@@ -575,38 +547,31 @@
                     const canvas = document.createElement('canvas');
                     const w = 500;
                     const scale = w / img.width;
-                    canvas.width = w;
-                    canvas.height = img.height * scale;
+                    canvas.width = w; canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, canvas.height);
-                    
                     const data = canvas.toDataURL('image/jpeg', 0.6);
                     document.getElementById(prevId).src = data;
                     document.getElementById(prevId).style.display = 'block';
                     document.getElementById(boxId).classList.add('done');
-
                     if(prevId === 'prev-front') formData.imgFront = data;
                     if(prevId === 'prev-back') formData.imgBack = data;
                 };
             };
+            reader.readAsDataURL(file);
         };
 
-        // --- Submit ---
+        // --- Registration ---
         window.submitRegistration = async () => {
             const p1 = document.getElementById('reg-pass').value;
             const p2 = document.getElementById('reg-pass-confirm').value;
-            
             if(p1.length < 6 || p1 !== p2) return alert("Check Password");
 
             toggleLoader(true);
-            const email = `${formData.phone}@apspeedo.com`;
-
             try {
-                // Register in Auth
-                const cred = await createUserWithEmailAndPassword(auth, email, p1);
+                const cred = await createUserWithEmailAndPassword(auth, `${formData.phone}@apspeedo.com`, p1);
                 const uid = cred.user.uid;
 
-                // Save to DB
                 await set(ref(db, 'riders/' + uid), {
                     fullName: formData.name,
                     phone: formData.phone,
@@ -618,12 +583,9 @@
                     joined: new Date().toISOString()
                 });
 
-                // Save to LocalStorage
-                localStorage.setItem('aps_user', JSON.stringify({ uid: uid, phone: formData.phone }));
-
+                localStorage.setItem('aps_user', JSON.stringify({ uid: uid }));
                 checkStatus(uid);
-
-            } catch (e) {
+            } catch(e) {
                 alert("Error: " + e.message);
                 toggleLoader(false);
             }
@@ -633,44 +595,28 @@
         window.handleLogin = async () => {
             const ph = document.getElementById('login-phone').value;
             const pw = document.getElementById('login-pass').value;
-
-            if(!ph || !pw) return alert("Enter credentials");
+            if(!ph || !pw) return alert("Enter details");
 
             toggleLoader(true);
             try {
                 const cred = await signInWithEmailAndPassword(auth, `${ph}@apspeedo.com`, pw);
-                const uid = cred.user.uid;
-
-                // Save to LocalStorage
-                localStorage.setItem('aps_user', JSON.stringify({ uid: uid, phone: ph }));
-                
-                checkStatus(uid);
-            } catch (e) {
-                alert("Login Failed: " + e.message);
+                localStorage.setItem('aps_user', JSON.stringify({ uid: cred.user.uid }));
+                checkStatus(cred.user.uid);
+            } catch(e) {
+                alert("Login Failed");
                 toggleLoader(false);
             }
         };
 
-        // --- Misc ---
-        window.reUpload = () => {
-            showScreen('register-screen');
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step-1').classList.add('active');
-        };
-
-        window.logout = () => {
-            signOut(auth);
-            localStorage.removeItem('aps_user');
-            location.reload();
-        };
-
+        // --- Nav Helpers ---
         window.goToRegister = () => {
             showScreen('register-screen');
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-1').classList.add('active');
         };
-
         window.goToLogin = () => showScreen('login-screen');
+        window.logout = () => { signOut(auth); localStorage.removeItem('aps_user'); location.reload(); };
+        window.reUpload = () => window.goToRegister();
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => {
@@ -678,11 +624,7 @@
             });
             document.getElementById(id).classList.add('active');
         }
-
-        function toggleLoader(show) {
-            document.getElementById('loader').style.display = show ? 'flex' : 'none';
-        }
-
+        function toggleLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
     </script>
 </body>
 </html>
