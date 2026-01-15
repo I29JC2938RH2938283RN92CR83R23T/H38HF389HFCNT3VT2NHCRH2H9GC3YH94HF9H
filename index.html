@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #FFD700;
-            --dark: #1e1e1e;
+            --primary: #D32F2F; /* Red Theme */
+            --primary-dark: #B71C1C;
+            --dark: #212121;
             --light: #ffffff;
-            --gray: #f3f4f6;
-            --text-gray: #6b7280;
-            --danger: #ef4444;
+            --gray: #f5f5f5;
+            --text-gray: #757575;
+            --border: #e0e0e0;
+            --shadow: 0 4px 12px rgba(211, 47, 47, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -25,6 +27,7 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            color: var(--dark);
         }
 
         /* --- Screens --- */
@@ -37,7 +40,7 @@
             padding: 24px;
             overflow-y: auto;
             z-index: 10;
-            transition: opacity 0.3s ease;
+            transition: transform 0.3s ease;
         }
 
         .screen.active { display: flex; }
@@ -53,13 +56,9 @@
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         /* --- UI Elements --- */
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            margin-top: 20px;
-        }
-        .header img { width: 60px; border-radius: 12px; margin-bottom: 10px; }
-        .header h2 { font-weight: 700; color: var(--dark); font-size: 1.5rem; }
+        .header { text-align: center; margin-bottom: 25px; margin-top: 10px; }
+        .header img { width: 70px; margin-bottom: 10px; border-radius: 12px; }
+        .header h2 { font-weight: 700; color: var(--primary); font-size: 1.6rem; }
         .header p { color: var(--text-gray); font-size: 0.9rem; }
 
         .form-group { margin-bottom: 15px; width: 100%; }
@@ -67,68 +66,86 @@
         input {
             width: 100%;
             padding: 16px;
-            border: 1px solid transparent;
+            border: 2px solid var(--gray);
             background-color: var(--gray);
-            border-radius: 16px;
-            font-size: 1rem;
+            border-radius: 14px;
+            font-size: 1.1rem;
             outline: none;
             transition: all 0.3s;
             text-align: center;
+            font-weight: 500;
+            color: var(--dark);
         }
-        input:focus { background-color: #fff; border-color: var(--primary); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.15); }
+        input:focus { background-color: #fff; border-color: var(--primary); }
+        input::placeholder { color: #bdbdbd; }
 
         .btn {
             width: 100%;
-            padding: 18px;
+            padding: 16px;
             border: none;
-            border-radius: 16px;
-            background: var(--dark);
+            border-radius: 14px;
+            background: var(--primary);
             color: #fff;
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             margin-top: 10px;
-            position: relative;
-            overflow: hidden;
         }
-        .btn:active { transform: scale(0.98); }
+        .btn:active { background: var(--primary-dark); transform: scale(0.98); }
         .btn-link { background: none; color: var(--text-gray); box-shadow: none; margin-top: 15px; font-weight: 400; font-size: 0.9rem; }
+        .btn-link:hover { color: var(--primary); }
 
-        /* --- Carousel Steps --- */
-        .carousel-container { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .step { display: none; animation: slideUp 0.4s ease-out; text-align: center; }
-        .step.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- Keypad --- */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .key-btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .key-btn:active { background: var(--gray); }
+        .key-btn.backspace { color: var(--primary); }
 
         /* --- Upload Boxes --- */
         .upload-row { display: flex; gap: 15px; margin-bottom: 20px; }
         .upload-box {
             flex: 1;
             background: var(--gray);
-            border-radius: 16px;
+            border-radius: 14px;
             height: 140px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border: 2px dashed #d1d5db;
+            border: 2px dashed #bdbdbd;
             position: relative;
             overflow: hidden;
             cursor: pointer;
         }
-        .upload-box.done { border-color: #10b981; background: #ecfdf5; }
-        .upload-box i { font-size: 24px; color: var(--text-gray); margin-bottom: 8px; }
+        .upload-box.done { border-color: #4CAF50; background: #E8F5E9; }
+        .upload-box i { font-size: 24px; color: var(--primary); margin-bottom: 8px; }
         .upload-box p { font-size: 12px; color: var(--text-gray); font-weight: 500; }
         .upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
 
         /* --- Live Camera UI --- */
         .camera-container {
             width: 100%;
-            max-width: 350px;
-            height: 350px;
+            max-width: 320px;
+            height: 320px;
             background: #000;
-            border-radius: 50%; /* Circle View */
+            border-radius: 50%; /* Circular */
             margin: 0 auto 20px auto;
             overflow: hidden;
             position: relative;
@@ -136,204 +153,239 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
         video, canvas { width: 100%; height: 100%; object-fit: cover; }
-        .camera-overlay {
-            position: absolute; bottom: 20px; left: 0; width: 100%;
-            display: flex; justify-content: center;
+        
+        .cam-controls {
+            display: flex; justify-content: center; align-items: center; gap: 20px;
         }
         .cam-btn {
-            width: 60px; height: 60px;
+            width: 70px; height: 70px;
             border-radius: 50%;
             background: #fff;
-            border: 4px solid rgba(0,0,0,0.1);
+            border: 5px solid #e0e0e0;
             cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
         }
-        .cam-btn:active { background: var(--primary); }
-        .retake-btn {
-            position: absolute; top: 10px; right: 20px;
-            background: rgba(0,0,0,0.6); color: #fff;
-            padding: 5px 10px; border-radius: 20px; font-size: 12px; cursor: pointer;
-            z-index: 5; display: none;
-        }
+        .cam-btn i { color: var(--primary); font-size: 24px; }
+        .cam-btn:active { border-color: var(--primary); }
 
         /* --- Status --- */
         .status-page { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; }
         .status-icon { font-size: 60px; color: var(--primary); margin-bottom: 20px; }
-        .decline-box { background: #fee2e2; border: 1px solid #fca5a5; padding: 15px; border-radius: 12px; margin: 20px 0; width: 100%; text-align: left; }
-        .decline-box li { color: var(--danger); font-size: 0.9rem; list-style-position: inside; }
+        .decline-box { background: #FFEBEE; border: 1px solid #FFCDD2; padding: 15px; border-radius: 12px; margin: 20px 0; width: 100%; text-align: left; }
+        .decline-box li { color: #D32F2F; font-size: 0.9rem; list-style-position: inside; margin-bottom: 5px; }
 
         /* --- Loader --- */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 20000;
+            background: rgba(255,255,255,0.95); z-index: 20000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
-        .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid var(--dark); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .spinner { width: 45px; height: 45px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Carousel Steps */
+        .carousel { flex: 1; display: flex; flex-direction: column; }
+        .step { display: none; animation: fadeIn 0.4s ease; text-align: center; flex: 1; flex-direction: column; }
+        .step.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     </style>
 </head>
 <body>
 
-    <!-- Loader -->
+    <!-- Global Loader -->
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-size:0.9rem; font-weight:500;">Processing...</p>
+        <p style="margin-top:15px; font-weight:600; color:var(--dark);">Processing...</p>
     </div>
 
-    <!-- 1. Splash -->
+    <!-- 1. Splash Screen -->
     <div id="splash-screen" class="screen active">
         <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="Logo">
     </div>
 
-    <!-- 2. Login -->
+    <!-- 2. Login Screen -->
     <div id="login-screen" class="screen">
-        <div class="carousel-container">
-            <div class="header">
-                <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg">
-                <h2>Welcome Back</h2>
-                <p>Login to continue</p>
-            </div>
-            <div class="form-group">
-                <input type="tel" id="login-phone" placeholder="Mobile Number">
-            </div>
-            <div class="form-group">
-                <input type="password" id="login-pass" placeholder="Password">
-            </div>
-            <button class="btn" onclick="handleLogin()">Login</button>
-            <button class="btn btn-link" onclick="goToRegister()">Create New Account</button>
+        <div class="header">
+            <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg">
+            <h2>Welcome Back</h2>
+            <p>Enter your details to login</p>
         </div>
+        
+        <div class="form-group">
+            <input type="tel" id="login-phone" placeholder="Phone Number" readonly onclick="setupKeypad('login-phone')">
+        </div>
+        <div class="form-group">
+            <input type="password" id="login-pass" placeholder="Password">
+        </div>
+
+        <!-- Keypad for Login (Initially Hidden/Shown via JS if needed, but we put it inline for simplicity) -->
+        <div class="keypad" id="login-keypad">
+            <button class="key-btn" onclick="kpPress('1', 'login-phone')">1</button>
+            <button class="key-btn" onclick="kpPress('2', 'login-phone')">2</button>
+            <button class="key-btn" onclick="kpPress('3', 'login-phone')">3</button>
+            <button class="key-btn" onclick="kpPress('4', 'login-phone')">4</button>
+            <button class="key-btn" onclick="kpPress('5', 'login-phone')">5</button>
+            <button class="key-btn" onclick="kpPress('6', 'login-phone')">6</button>
+            <button class="key-btn" onclick="kpPress('7', 'login-phone')">7</button>
+            <button class="key-btn" onclick="kpPress('8', 'login-phone')">8</button>
+            <button class="key-btn" onclick="kpPress('9', 'login-phone')">9</button>
+            <button class="key-btn" style="visibility:hidden"></button>
+            <button class="key-btn" onclick="kpPress('0', 'login-phone')">0</button>
+            <button class="key-btn backspace" onclick="kpDel('login-phone')"><i class="fas fa-backspace"></i></button>
+        </div>
+
+        <button class="btn" onclick="handleLogin()">Login</button>
+        <button class="btn btn-link" onclick="goToRegister()">New Rider? Register Here</button>
     </div>
 
-    <!-- 3. Register (Carousel) -->
+    <!-- 3. Register Screen (Carousel) -->
     <div id="register-screen" class="screen">
-        <div class="carousel-container">
+        <div class="carousel">
             
-            <!-- Step 1: Info -->
+            <!-- Step 1: Info + Keypad -->
             <div class="step active" id="step-1">
                 <div class="header">
-                    <h2>Rider Details</h2>
-                    <p>Let's start with the basics</p>
+                    <h2>Details</h2>
+                    <p>Enter your personal information</p>
                 </div>
                 <div class="form-group">
-                    <input type="text" id="reg-name" placeholder="Full Name" style="text-transform: capitalize;">
+                    <input type="text" id="reg-name" placeholder="Full Name (Capitalized)" style="text-transform: capitalize;">
                 </div>
                 <div class="form-group">
-                    <input type="tel" id="reg-phone" placeholder="07XXXXXXXX" maxlength="10">
+                    <input type="tel" id="reg-phone" placeholder="07XXXXXXXX" readonly>
                 </div>
-                <button class="btn" onclick="nextStep(1)">Next</button>
+
+                <!-- Keypad -->
+                <div class="keypad">
+                    <button class="key-btn" onclick="kpPress('1', 'reg-phone')">1</button>
+                    <button class="key-btn" onclick="kpPress('2', 'reg-phone')">2</button>
+                    <button class="key-btn" onclick="kpPress('3', 'reg-phone')">3</button>
+                    <button class="key-btn" onclick="kpPress('4', 'reg-phone')">4</button>
+                    <button class="key-btn" onclick="kpPress('5', 'reg-phone')">5</button>
+                    <button class="key-btn" onclick="kpPress('6', 'reg-phone')">6</button>
+                    <button class="key-btn" onclick="kpPress('7', 'reg-phone')">7</button>
+                    <button class="key-btn" onclick="kpPress('8', 'reg-phone')">8</button>
+                    <button class="key-btn" onclick="kpPress('9', 'reg-phone')">9</button>
+                    <button class="key-btn" style="visibility:hidden"></button>
+                    <button class="key-btn" onclick="kpPress('0', 'reg-phone')">0</button>
+                    <button class="key-btn backspace" onclick="kpDel('reg-phone')"><i class="fas fa-backspace"></i></button>
+                </div>
+
+                <button class="btn" onclick="nextStep(1)">Next Step</button>
                 <button class="btn btn-link" onclick="goToLogin()">Back to Login</button>
             </div>
 
             <!-- Step 2: NIC -->
             <div class="step" id="step-2">
                 <div class="header">
-                    <h2>Identity</h2>
-                    <p>Enter your NIC number</p>
+                    <h2>Identify</h2>
+                    <p>Enter your NIC Number</p>
                 </div>
-                <div class="form-group">
-                    <input type="text" id="reg-nic" placeholder="NIC Number">
+                <div class="form-group" style="margin-top:20px;">
+                    <input type="text" id="reg-nic" placeholder="e.g., 199912345678">
                 </div>
-                <button class="btn" onclick="nextStep(2)">Next</button>
+                <div style="flex:1;"></div>
+                <button class="btn" onclick="nextStep(2)">Next Step</button>
                 <button class="btn btn-link" onclick="prevStep(2)">Back</button>
             </div>
 
-            <!-- Step 3: NIC Photos -->
+            <!-- Step 3: NIC Images -->
             <div class="step" id="step-3">
                 <div class="header">
-                    <h2>Scan ID</h2>
-                    <p>Upload clear photos of your NIC</p>
+                    <h2>Documents</h2>
+                    <p>Upload Front & Back of NIC</p>
                 </div>
                 <div class="upload-row">
                     <div class="upload-box" id="box-front" onclick="document.getElementById('file-front').click()">
                         <i class="fas fa-id-card"></i>
-                        <p>Front Side</p>
+                        <p>Front</p>
                         <img id="prev-front" style="display:none;">
                     </div>
                     <div class="upload-box" id="box-back" onclick="document.getElementById('file-back').click()">
                         <i class="fas fa-id-card" style="transform: scaleX(-1);"></i>
-                        <p>Back Side</p>
+                        <p>Back</p>
                         <img id="prev-back" style="display:none;">
                     </div>
                 </div>
-                <!-- Hidden Inputs -->
                 <input type="file" id="file-front" hidden accept="image/*" onchange="processFile(this, 'prev-front', 'box-front')">
                 <input type="file" id="file-back" hidden accept="image/*" onchange="processFile(this, 'prev-back', 'box-back')">
 
-                <button class="btn" onclick="nextStep(3)">Next</button>
+                <button class="btn" onclick="nextStep(3)">Next Step</button>
                 <button class="btn btn-link" onclick="prevStep(3)">Back</button>
             </div>
 
-            <!-- Step 4: Selfie (Live Camera) -->
+            <!-- Step 4: Selfie Camera -->
             <div class="step" id="step-4">
                 <div class="header">
                     <h2>Selfie</h2>
-                    <p>Position your face in the circle</p>
+                    <p>Take a clear photo of your face</p>
                 </div>
                 
                 <div class="camera-container">
                     <video id="webcam" autoplay playsinline muted></video>
                     <canvas id="canvas" style="display:none;"></canvas>
-                    <div class="retake-btn" id="retake-btn" onclick="startCamera()">Retake</div>
-                    <div class="camera-overlay">
-                        <button class="cam-btn" id="snap-btn" onclick="takeSnapshot()"></button>
-                    </div>
                 </div>
 
-                <button class="btn" onclick="nextStep(4)">Next</button>
-                <button class="btn btn-link" onclick="prevStep(4)">Back</button>
+                <div class="cam-controls">
+                    <div class="cam-btn" id="snap-btn" onclick="takeSnapshot()"><i class="fas fa-camera"></i></div>
+                    <div class="cam-btn" id="retake-btn" onclick="startCamera()" style="display:none;"><i class="fas fa-redo"></i></div>
+                </div>
+
+                <div style="margin-top:20px;">
+                    <button class="btn" onclick="nextStep(4)">Next Step</button>
+                    <button class="btn btn-link" onclick="prevStep(4)">Back</button>
+                </div>
             </div>
 
             <!-- Step 5: Password -->
             <div class="step" id="step-5">
                 <div class="header">
-                    <h2>Security</h2>
-                    <p>Create a secure password</p>
+                    <h2>Secure</h2>
+                    <p>Create a password</p>
                 </div>
                 <div class="form-group">
-                    <input type="password" id="reg-pass" placeholder="Create Password">
+                    <input type="password" id="reg-pass" placeholder="Password">
                 </div>
                 <div class="form-group">
                     <input type="password" id="reg-pass-confirm" placeholder="Confirm Password">
                 </div>
-                <button class="btn" onclick="submitRegistration()">Submit Application</button>
+                <button class="btn" onclick="submitRegistration()">Register</button>
                 <button class="btn btn-link" onclick="prevStep(5)">Back</button>
             </div>
-
         </div>
     </div>
 
-    <!-- 4. Pending Screen -->
+    <!-- 4. Pending -->
     <div id="pending-screen" class="screen">
         <div class="status-page">
-            <i class="fas fa-hourglass-half status-icon"></i>
-            <h2>Under Review</h2>
-            <p style="color:#666; margin-top:10px;">Your application is being processed by our team. We will notify you shortly.</p>
-            <button class="btn btn-link" onclick="doLogout()">Check Later (Logout)</button>
+            <i class="fas fa-clock status-icon"></i>
+            <h2>Reviewing</h2>
+            <p>Your application is under review. We will notify you once approved.</p>
+            <button class="btn btn-link" onclick="logout()">Check Later (Logout)</button>
         </div>
     </div>
 
-    <!-- 5. Declined Screen -->
+    <!-- 5. Declined -->
     <div id="declined-screen" class="screen">
         <div class="status-page">
-            <i class="fas fa-times-circle status-icon" style="color: var(--danger);"></i>
-            <h2 style="color: var(--danger);">Application Declined</h2>
-            <p>Please fix the issues below and resubmit.</p>
-            
+            <i class="fas fa-times-circle status-icon" style="color: #D32F2F;"></i>
+            <h2 style="color: #D32F2F;">Declined</h2>
+            <p>Your application was not approved.</p>
             <div class="decline-box">
                 <ul id="decline-list"></ul>
             </div>
-
-            <button class="btn" onclick="goToRegister()">Re-Upload Documents</button>
-            <button class="btn btn-link" onclick="doLogout()">Logout</button>
+            <button class="btn" onclick="reUpload()">Try Again</button>
+            <button class="btn btn-link" onclick="logout()">Logout</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // Firebase Config
+        // Firebase Setup
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
             authDomain: "speedo-acb7c.firebaseapp.com",
@@ -350,106 +402,135 @@
         const db = getDatabase(app);
 
         // State
-        let currentUser = null;
-        let formData = {
-            name: '', phone: '', nic: '',
-            imgFront: '', imgBack: '', imgFace: ''
-        };
+        let formData = { name: '', phone: '', nic: '', imgFront: '', imgBack: '', imgFace: '' };
         let stream = null;
 
-        // --- Splash & Auth Listener ---
-        window.addEventListener('load', () => {
+        // --- Init & LocalStorage Check ---
+        window.addEventListener('load', async () => {
+            // Check LocalStorage first
+            const savedUser = localStorage.getItem('aps_user');
+            
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 splash.style.opacity = '0';
-                setTimeout(() => splash.style.display = 'none', 500);
-            }, 2500);
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    if(savedUser) {
+                        const user = JSON.parse(savedUser);
+                        // User exists locally, check status directly without login
+                        checkStatus(user.uid);
+                    } else {
+                        // No local user, show login
+                        showScreen('login-screen');
+                    }
+                }, 500);
+            }, 2000);
         });
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                checkStatus(user.uid);
-            } else {
+        // --- Status Logic ---
+        async function checkStatus(uid) {
+            toggleLoader(true);
+            try {
+                const snap = await get(ref(db, 'riders/' + uid));
+                if(snap.exists()) {
+                    const data = snap.val();
+                    if(data.approved_status === true) {
+                        window.location.href = "main.html"; // Approved -> Main
+                    } else if(data.approved_status === "declined") {
+                        showScreen('declined-screen');
+                        const list = document.getElementById('decline-list');
+                        list.innerHTML = "";
+                        if(data.declinereasons) {
+                            data.declinereasons.forEach(r => {
+                                const li = document.createElement('li');
+                                li.innerText = r;
+                                list.appendChild(li);
+                            });
+                        }
+                    } else {
+                        showScreen('pending-screen'); // False or undefined -> Pending
+                    }
+                } else {
+                    // UID in local storage but not in DB (deleted user?)
+                    localStorage.removeItem('aps_user');
+                    showScreen('login-screen');
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Connection Failed");
                 showScreen('login-screen');
+            } finally {
+                toggleLoader(false);
             }
-        });
+        }
 
-        // --- Navigation Logic ---
-        window.goToRegister = () => {
-            showScreen('register-screen');
-            resetSteps();
+        // --- Keypad Functions ---
+        window.kpPress = (num, inputId) => {
+            const input = document.getElementById(inputId);
+            if(input.value.length < 10) input.value += num;
         };
 
-        window.goToLogin = () => {
-            showScreen('login-screen');
+        window.kpDel = (inputId) => {
+            const input = document.getElementById(inputId);
+            input.value = input.value.slice(0, -1);
         };
 
+        // --- Register Flow ---
         window.nextStep = (step) => {
-            if(!validateStep(step)) return;
-
-            // Stop Camera if leaving step 4
-            if(step === 4) stopCamera();
+            // Validation
+            if(step === 1) {
+                const n = document.getElementById('reg-name').value;
+                const p = document.getElementById('reg-phone').value;
+                if(n.length < 3 || !/^07[0-9]{8}$/.test(p)) return alert("Check Name & Phone (07XXXXXXXX)");
+                formData.name = n.toUpperCase();
+                formData.phone = p;
+            }
+            if(step === 2) {
+                const nic = document.getElementById('reg-nic').value;
+                if(nic.length < 9) return alert("Invalid NIC");
+                formData.nic = nic;
+            }
+            if(step === 3) {
+                if(!formData.imgFront || !formData.imgBack) return alert("Upload NIC Photos");
+            }
+            if(step === 4) {
+                if(!formData.imgFace) return alert("Take a Selfie");
+                stopCamera();
+            }
 
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step+1}`).classList.add('active');
 
-            // Start Camera if entering step 4
-            if(step + 1 === 4) startCamera();
+            if(step+1 === 4) startCamera();
         };
 
         window.prevStep = (step) => {
-            if(step === 4) stopCamera(); // Stop if leaving step 4 backwards
+            if(step === 4) stopCamera();
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step-1}`).classList.add('active');
         };
 
-        function validateStep(step) {
-            if(step === 1) {
-                const name = document.getElementById('reg-name').value;
-                const phone = document.getElementById('reg-phone').value;
-                if(name.length < 3) { alert("Name too short"); return false; }
-                if(!/^07[0-9]{8}$/.test(phone)) { alert("Invalid SL Number"); return false; }
-                formData.name = name;
-                formData.phone = phone;
-            }
-            if(step === 2) {
-                const nic = document.getElementById('reg-nic').value;
-                if(nic.length < 9) { alert("Invalid NIC"); return false; }
-                formData.nic = nic;
-            }
-            if(step === 3) {
-                if(!formData.imgFront || !formData.imgBack) { alert("Upload both NIC photos"); return false; }
-            }
-            if(step === 4) {
-                if(!formData.imgFace) { alert("Please take a selfie"); return false; }
-            }
-            return true;
-        }
-
-        // --- Camera Logic (Step 4) ---
+        // --- Camera Logic ---
         window.startCamera = async () => {
             const video = document.getElementById('webcam');
             const canvas = document.getElementById('canvas');
-            const snapBtn = document.getElementById('snap-btn');
-            const retakeBtn = document.getElementById('retake-btn');
-
-            video.style.display = "block";
-            canvas.style.display = "none";
-            snapBtn.style.display = "block";
-            retakeBtn.style.display = "none";
+            
+            video.style.display = 'block';
+            canvas.style.display = 'none';
+            document.getElementById('snap-btn').style.display = 'flex';
+            document.getElementById('retake-btn').style.display = 'none';
 
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
                 video.srcObject = stream;
-            } catch (err) {
-                alert("Camera access needed! Check permissions or use HTTPS.");
+            } catch (e) {
+                alert("Camera permission denied.");
             }
         };
 
         window.stopCamera = () => {
             if(stream) {
-                stream.getTracks().forEach(track => track.stop());
+                stream.getTracks().forEach(t => t.stop());
                 stream = null;
             }
         };
@@ -457,37 +538,31 @@
         window.takeSnapshot = () => {
             const video = document.getElementById('webcam');
             const canvas = document.getElementById('canvas');
-            
-            // Set canvas dimensions
-            canvas.width = 400; // Resize target width
-            const ratio = video.videoHeight / video.videoWidth;
-            canvas.height = canvas.width * ratio;
-
             const ctx = canvas.getContext('2d');
+
+            canvas.width = 400; 
+            canvas.height = 400; // Square aspect
             
-            // Flip horizontal for selfie mirror effect
-            ctx.translate(canvas.width, 0);
+            // Draw cropped center
+            const size = Math.min(video.videoWidth, video.videoHeight);
+            const x = (video.videoWidth - size) / 2;
+            const y = (video.videoHeight - size) / 2;
+            
+            ctx.translate(400, 0);
             ctx.scale(-1, 1);
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(video, x, y, size, size, 0, 0, 400, 400);
 
             // Compress
-            const dataURL = canvas.toDataURL('image/jpeg', 0.6);
-            formData.imgFace = dataURL;
+            formData.imgFace = canvas.toDataURL('image/jpeg', 0.6);
 
-            // UI Update
-            video.style.display = "none";
-            canvas.style.display = "block"; // Show freeze frame
-            document.getElementById('snap-btn').style.display = "none";
-            document.getElementById('retake-btn').style.display = "block";
-            
-            // We keep the stream running in background or stop it? 
-            // Better to stop to save battery, but if user hits retake we need it back.
-            // Let's keep it running for simplicity, or stop it here:
-            // stopCamera(); 
+            video.style.display = 'none';
+            canvas.style.display = 'block';
+            document.getElementById('snap-btn').style.display = 'none';
+            document.getElementById('retake-btn').style.display = 'flex';
         };
 
-        // --- Image Compression for NIC (File Input) ---
-        window.processFile = (input, previewId, boxId) => {
+        // --- Image Compression (File Input) ---
+        window.processFile = (input, prevId, boxId) => {
             const file = input.files[0];
             if(!file) return;
 
@@ -498,23 +573,20 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 500;
-                    const scaleSize = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = img.height * scaleSize;
+                    const w = 500;
+                    const scale = w / img.width;
+                    canvas.width = w;
+                    canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, w, canvas.height);
                     
-                    const compressedData = canvas.toDataURL('image/jpeg', 0.6);
-                    
-                    // Show preview
-                    const prevImg = document.getElementById(previewId);
-                    prevImg.src = compressedData;
-                    prevImg.style.display = 'block';
+                    const data = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById(prevId).src = data;
+                    document.getElementById(prevId).style.display = 'block';
                     document.getElementById(boxId).classList.add('done');
 
-                    if(previewId === 'prev-front') formData.imgFront = compressedData;
-                    if(previewId === 'prev-back') formData.imgBack = compressedData;
+                    if(prevId === 'prev-front') formData.imgFront = data;
+                    if(prevId === 'prev-back') formData.imgBack = data;
                 };
             };
         };
@@ -523,21 +595,18 @@
         window.submitRegistration = async () => {
             const p1 = document.getElementById('reg-pass').value;
             const p2 = document.getElementById('reg-pass-confirm').value;
-
-            if(p1.length < 6 || p1 !== p2) return alert("Passwords issue");
+            
+            if(p1.length < 6 || p1 !== p2) return alert("Check Password");
 
             toggleLoader(true);
+            const email = `${formData.phone}@apspeedo.com`;
 
             try {
-                let uid;
-                if(currentUser) {
-                    uid = currentUser.uid;
-                } else {
-                    const email = `${formData.phone}@apspeedo.com`;
-                    const cred = await createUserWithEmailAndPassword(auth, email, p1);
-                    uid = cred.user.uid;
-                }
+                // Register in Auth
+                const cred = await createUserWithEmailAndPassword(auth, email, p1);
+                const uid = cred.user.uid;
 
+                // Save to DB
                 await set(ref(db, 'riders/' + uid), {
                     fullName: formData.name,
                     phone: formData.phone,
@@ -549,12 +618,13 @@
                     joined: new Date().toISOString()
                 });
 
+                // Save to LocalStorage
+                localStorage.setItem('aps_user', JSON.stringify({ uid: uid, phone: formData.phone }));
+
                 checkStatus(uid);
 
             } catch (e) {
-                console.error(e);
-                alert("Error: " + e.message + " (Check if Email/Pass auth is enabled in Console)");
-            } finally {
+                alert("Error: " + e.message);
                 toggleLoader(false);
             }
         };
@@ -563,58 +633,50 @@
         window.handleLogin = async () => {
             const ph = document.getElementById('login-phone').value;
             const pw = document.getElementById('login-pass').value;
+
+            if(!ph || !pw) return alert("Enter credentials");
+
             toggleLoader(true);
             try {
-                await signInWithEmailAndPassword(auth, `${ph}@apspeedo.com`, pw);
+                const cred = await signInWithEmailAndPassword(auth, `${ph}@apspeedo.com`, pw);
+                const uid = cred.user.uid;
+
+                // Save to LocalStorage
+                localStorage.setItem('aps_user', JSON.stringify({ uid: uid, phone: ph }));
+                
+                checkStatus(uid);
             } catch (e) {
                 alert("Login Failed: " + e.message);
                 toggleLoader(false);
             }
         };
 
-        window.doLogout = () => {
+        // --- Misc ---
+        window.reUpload = () => {
+            showScreen('register-screen');
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-1').classList.add('active');
+        };
+
+        window.logout = () => {
             signOut(auth);
+            localStorage.removeItem('aps_user');
             location.reload();
         };
 
-        // --- Helpers ---
+        window.goToRegister = () => {
+            showScreen('register-screen');
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-1').classList.add('active');
+        };
+
+        window.goToLogin = () => showScreen('login-screen');
+
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => {
                 if(s.id !== 'splash-screen') s.classList.remove('active');
             });
             document.getElementById(id).classList.add('active');
-        }
-
-        function resetSteps() {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('step-1').classList.add('active');
-        }
-
-        async function checkStatus(uid) {
-            const snap = await get(ref(db, 'riders/' + uid));
-            toggleLoader(false);
-            
-            if(snap.exists()) {
-                const val = snap.val();
-                if(val.approved_status === true) {
-                    window.location.href = "main.html";
-                } else if(val.approved_status === "declined") {
-                    showScreen('declined-screen');
-                    const list = document.getElementById('decline-list');
-                    list.innerHTML = "";
-                    if(val.declinereasons) {
-                        val.declinereasons.forEach(r => {
-                            const li = document.createElement('li');
-                            li.innerText = r;
-                            list.appendChild(li);
-                        });
-                    }
-                } else {
-                    showScreen('pending-screen');
-                }
-            } else {
-                showScreen('register-screen');
-            }
         }
 
         function toggleLoader(show) {
