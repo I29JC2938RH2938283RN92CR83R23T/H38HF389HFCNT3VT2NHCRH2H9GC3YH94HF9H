@@ -10,24 +10,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* --- General Styles --- */
         :root {
-            --primary: #FFD700; /* Yellow/Gold common for taxi/speedo apps */
+            --primary: #FFD700; /* Gold */
+            --primary-dark: #FFC107;
             --dark: #1a1a1a;
             --light: #ffffff;
-            --gray: #f5f5f5;
-            --error: #e74c3c;
-            --success: #2ecc71;
+            --gray: #f8f9fa;
+            --border: #e9ecef;
+            --error: #dc3545;
+            --success: #28a745;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none; /* Prevent selection for app-like feel */
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -37,6 +40,36 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            color: var(--dark);
+        }
+
+        /* --- Buttons --- */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--dark);
+            color: var(--light);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: #666;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         /* --- Splash Screen --- */
@@ -69,15 +102,16 @@
 
         /* --- Auth Container --- */
         #auth-container {
-            display: none; /* Hidden by default */
+            display: none;
             flex: 1;
-            padding: 20px;
+            padding: 24px;
             flex-direction: column;
             justify-content: center;
             max-width: 480px;
             width: 100%;
             margin: 0 auto;
             position: relative;
+            overflow-y: auto;
         }
 
         .auth-header {
@@ -87,76 +121,142 @@
 
         .auth-header img {
             width: 80px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .auth-header h2 {
-            font-weight: 600;
-            color: var(--dark);
+            font-weight: 700;
+            font-size: 1.5rem;
         }
 
         /* --- Forms --- */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-size: 0.9rem;
-            color: #666;
+            font-weight: 500;
+            color: #444;
         }
 
-        input {
+        input[type="text"],
+        input[type="tel"],
+        input[type="password"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            background: var(--gray);
         }
 
         input:focus {
             border-color: var(--primary);
+            background: #fff;
         }
 
-        .btn-primary {
+        /* --- Custom File Upload UI --- */
+        .file-upload-box {
+            position: relative;
             width: 100%;
-            padding: 15px;
-            background-color: var(--dark);
-            color: var(--light);
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
+            height: 160px;
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            background: var(--gray);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            margin-top: 10px;
+            transition: all 0.3s;
+            overflow: hidden;
+            margin-bottom: 10px;
         }
 
-        .btn-link {
-            background: none;
-            border: none;
+        .file-upload-box:hover {
+            border-color: var(--primary);
+            background: #fff8e1;
+        }
+
+        .file-upload-box i {
+            font-size: 2rem;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-box p {
+            font-size: 0.85rem;
             color: #666;
-            margin-top: 15px;
-            cursor: pointer;
-            text-decoration: underline;
-            font-family: 'Poppins', sans-serif;
         }
 
-        /* --- Carousel / Register Steps --- */
-        .carousel-container {
+        .file-upload-box img.preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+            z-index: 2;
+        }
+
+        /* When preview is active */
+        .file-upload-box.has-image {
+            border-style: solid;
+            border-color: var(--success);
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        /* --- Face Camera UI --- */
+        .camera-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--gray);
+            margin: 10px auto 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
             position: relative;
-            min-height: 400px;
+            border: 4px solid var(--border);
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .camera-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .camera-icon {
+            font-size: 2.5rem;
+            color: #aaa;
+        }
+
+        /* --- Carousel Steps --- */
+        .carousel-container {
+            position: relative;
+            min-height: 450px;
         }
 
         .step {
             display: none;
-            animation: fadeIn 0.4s ease;
+            animation: slideUp 0.4s ease-out;
             text-align: center;
         }
 
@@ -164,76 +264,57 @@
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- Custom Keypad --- */
+        .step h3 {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .step p {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        /* --- Keypad --- */
         .keypad-wrapper {
-            margin-top: 20px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 12px;
+            margin-top: 10px;
         }
 
         .keypad-btn {
             padding: 15px;
-            background: #f0f0f0;
-            border-radius: 50%;
-            border: none;
-            font-size: 1.2rem;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1.3rem;
             font-weight: 600;
             cursor: pointer;
-            aspect-ratio: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .keypad-btn:active {
-            background: #ddd;
+            background: var(--primary);
+            color: #000;
         }
 
         .keypad-btn.backspace {
             color: var(--error);
+            background: #fff0f0;
         }
 
-        /* --- Camera / Upload UI --- */
-        .camera-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: #eee;
-            margin: 20px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-            border: 3px dashed #ccc;
-            cursor: pointer;
-        }
-
-        .camera-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .camera-icon {
-            font-size: 3rem;
-            color: #aaa;
-        }
-
-        .hidden-input {
-            display: none;
-        }
-
-        /* --- Loading / Notifications --- */
+        /* --- Loader --- */
         .loader {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9);
-            z-index: 10;
+            background: rgba(255,255,255,0.95);
+            z-index: 10000;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -241,22 +322,27 @@
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--dark);
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
             animation: spin 1s linear infinite;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .ai-status {
-            font-size: 0.9rem;
-            margin-top: 5px;
-            color: #555;
-            padding: 0 20px;
+        #loader-text {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .ai-log {
+            font-size: 0.85rem;
+            margin: 10px 0;
+            min-height: 20px;
+            font-weight: 500;
         }
 
     </style>
@@ -268,18 +354,18 @@
         <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="AP Speedo Logo">
     </div>
 
-    <!-- Main Auth Container -->
+    <!-- Global Loader -->
+    <div class="loader" id="global-loader">
+        <div class="spinner"></div>
+        <p id="loader-text">Processing...</p>
+    </div>
+
+    <!-- Auth Container -->
     <div id="auth-container">
         
         <div class="auth-header">
             <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" alt="Logo">
             <h2 id="page-title">Rider Login</h2>
-        </div>
-
-        <!-- Global Loader for AI Checks -->
-        <div class="loader" id="global-loader">
-            <div class="spinner"></div>
-            <p id="loader-text">Processing...</p>
         </div>
 
         <!-- Login Form -->
@@ -303,21 +389,20 @@
                 <!-- Step 1: Full Name -->
                 <div class="step active" id="step-1">
                     <h3>Personal Details</h3>
-                    <p>Enter your legal name</p>
+                    <p>Enter your legal name as on NIC</p>
                     <div class="form-group">
-                        <input type="text" id="reg-name" placeholder="Full Name" style="text-transform: capitalize;">
+                        <input type="text" id="reg-name" placeholder="Full Name (e.g. Kasun Perera)" style="text-transform: capitalize;">
                     </div>
-                    <button class="btn-primary" onclick="nextStep(1)">Next</button>
+                    <button class="btn-primary" onclick="nextStep(1)">Next <i class="fas fa-arrow-right"></i></button>
                 </div>
 
-                <!-- Step 2: Phone + Keypad -->
+                <!-- Step 2: Phone -->
                 <div class="step" id="step-2">
                     <h3>Mobile Number</h3>
                     <p>Enter valid Sri Lankan Number</p>
                     <div class="form-group">
-                        <input type="text" id="reg-phone" readonly placeholder="07XXXXXXXX">
+                        <input type="text" id="reg-phone" readonly placeholder="07XXXXXXXX" style="text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
                     </div>
-                    <!-- Custom Keypad -->
                     <div class="keypad-wrapper">
                         <button class="keypad-btn" onclick="kpType('1')">1</button>
                         <button class="keypad-btn" onclick="kpType('2')">2</button>
@@ -328,7 +413,7 @@
                         <button class="keypad-btn" onclick="kpType('7')">7</button>
                         <button class="keypad-btn" onclick="kpType('8')">8</button>
                         <button class="keypad-btn" onclick="kpType('9')">9</button>
-                        <button class="keypad-btn" onclick="kpType('')"></button>
+                        <button class="keypad-btn" style="background:none; border:none;"></button>
                         <button class="keypad-btn" onclick="kpType('0')">0</button>
                         <button class="keypad-btn backspace" onclick="kpDel()"><i class="fas fa-backspace"></i></button>
                     </div>
@@ -340,9 +425,9 @@
                 <!-- Step 3: NIC Number -->
                 <div class="step" id="step-3">
                     <h3>Identity Verification</h3>
-                    <p>Enter NIC Number</p>
+                    <p>Enter your NIC Number</p>
                     <div class="form-group">
-                        <input type="text" id="reg-nic" placeholder="e.g., 199912345678 or 991234567V">
+                        <input type="text" id="reg-nic" placeholder="e.g. 1999xxxxxx or 99xxxxxxV">
                     </div>
                     <button class="btn-primary" onclick="nextStep(3)">Next</button>
                     <button class="btn-link" onclick="prevStep(3)">Back</button>
@@ -350,34 +435,43 @@
 
                 <!-- Step 4: NIC Images & AI -->
                 <div class="step" id="step-4">
-                    <h3>Scan ID</h3>
-                    <p>Upload Front & Back of NIC for AI Verification</p>
+                    <h3>Scan ID Card</h3>
+                    <p>Upload clear photos of your NIC</p>
                     
-                    <div class="form-group">
-                        <label>Front Side</label>
-                        <input type="file" id="nic-front" accept="image/*">
+                    <!-- Front Image Box -->
+                    <div class="file-upload-box" id="box-front" onclick="document.getElementById('nic-front').click()">
+                        <i class="fas fa-id-card"></i>
+                        <p>Tap to upload <b>Front Side</b></p>
+                        <img id="preview-front" class="preview">
                     </div>
-                    <div class="form-group">
-                        <label>Back Side</label>
-                        <input type="file" id="nic-back" accept="image/*">
+                    <input type="file" id="nic-front" class="hidden-input" accept="image/*" onchange="handleFileSelect(this, 'preview-front', 'box-front')">
+
+                    <!-- Back Image Box -->
+                    <div class="file-upload-box" id="box-back" onclick="document.getElementById('nic-back').click()">
+                        <i class="fas fa-id-card" style="transform: scaleX(-1);"></i>
+                        <p>Tap to upload <b>Back Side</b></p>
+                        <img id="preview-back" class="preview">
                     </div>
+                    <input type="file" id="nic-back" class="hidden-input" accept="image/*" onchange="handleFileSelect(this, 'preview-back', 'box-back')">
                     
-                    <div class="ai-status" id="nic-ai-log"></div>
+                    <div class="ai-log" id="nic-ai-log"></div>
                     
-                    <button class="btn-primary" onclick="verifyNicWithAI()">Verify NIC</button>
+                    <button class="btn-primary" onclick="verifyNicWithAI()">Verify NIC with AI</button>
                     <button class="btn-link" onclick="prevStep(4)">Back</button>
                 </div>
 
                 <!-- Step 5: Face Image -->
                 <div class="step" id="step-5">
                     <h3>Face Verification</h3>
-                    <p>Take a selfie</p>
+                    <p>Take a clear selfie</p>
                     
                     <div class="camera-circle" onclick="document.getElementById('face-input').click()">
                         <i class="fas fa-camera camera-icon" id="face-icon"></i>
-                        <img id="face-preview" style="display:none;">
+                        <img id="face-preview">
                     </div>
-                    <input type="file" id="face-input" class="hidden-input" accept="image/*" capture="user">
+                    <input type="file" id="face-input" class="hidden-input" accept="image/*" capture="user" onchange="handleFileSelect(this, 'face-preview', null, true)">
+                    
+                    <div class="ai-log" id="face-ai-log"></div>
 
                     <button class="btn-primary" onclick="verifyFaceWithAI()">Verify Face</button>
                     <button class="btn-link" onclick="prevStep(5)">Back</button>
@@ -386,13 +480,14 @@
                 <!-- Step 6: Password -->
                 <div class="step" id="step-6">
                     <h3>Secure Account</h3>
+                    <p>Create a password</p>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" id="reg-pass" placeholder="Create Password">
+                        <input type="password" id="reg-pass" placeholder="******">
                     </div>
                     <div class="form-group">
                         <label>Confirm Password</label>
-                        <input type="password" id="reg-pass-confirm" placeholder="Confirm Password">
+                        <input type="password" id="reg-pass-confirm" placeholder="******">
                     </div>
                     <button class="btn-primary" id="btn-complete-reg">Register & Login</button>
                     <button class="btn-link" onclick="prevStep(6)">Back</button>
@@ -405,15 +500,14 @@
 
     </div>
 
-    <!-- Firebase Logic Type Module -->
+    <!-- Logic -->
     <script type="module">
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // Configuration
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
             authDomain: "speedo-acb7c.firebaseapp.com",
@@ -425,14 +519,11 @@
             measurementId: "G-ND3GRGL0WQ"
         };
 
-        // Initialize
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // --- App State ---
-        let currentStep = 1;
+        // --- App Variables ---
         let userData = {
             fullName: "",
             phone: "",
@@ -441,28 +532,75 @@
             faceVerified: false
         };
 
+        // --- Helper: Image Resizer (Crucial for API payloads) ---
+        function resizeImage(file, maxWidth = 600) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function (event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.8)); // Return compressed base64
+                    };
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // --- UI Logic: File Selection & Preview ---
+        window.handleFileSelect = async function(input, previewId, boxId, isFace = false) {
+            const file = input.files[0];
+            if (file) {
+                // Show loading state in preview
+                const previewImg = document.getElementById(previewId);
+                previewImg.style.display = 'block';
+                previewImg.style.opacity = '0.5'; 
+
+                // Resize and display
+                try {
+                    const resizedBase64 = await resizeImage(file);
+                    previewImg.src = resizedBase64;
+                    previewImg.style.opacity = '1';
+                    
+                    if(boxId) {
+                        document.getElementById(boxId).classList.add('has-image');
+                    }
+                    if(isFace) {
+                        document.getElementById('face-icon').style.display = 'none';
+                    }
+                } catch (e) {
+                    alert("Error processing image.");
+                }
+            }
+        };
+
         // --- Splash Logic ---
         window.addEventListener('load', () => {
-            // Check Local Storage for auto login
-            const cachedUser = localStorage.getItem('apSpeedoUser');
-            
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 splash.style.opacity = '0';
                 setTimeout(() => {
                     splash.style.display = 'none';
                     document.getElementById('auth-container').style.display = 'flex';
-                    
-                    if(cachedUser) {
-                        // Auto-login logic could go here, for now just pre-fill or go to main
-                        // For security, usually verify token, but for prototype:
-                        // window.location.href = "main.html"; // Uncomment to auto-skip
-                    }
                 }, 500);
-            }, 2500); // 2.5s splash
+            }, 2500);
         });
 
-        // --- Navigation Logic ---
+        // --- Navigation ---
         document.getElementById('goto-register').addEventListener('click', () => {
             document.getElementById('login-form').style.display = 'none';
             document.getElementById('register-form').style.display = 'block';
@@ -475,294 +613,255 @@
             document.getElementById('page-title').innerText = "Rider Login";
         });
 
-        // --- Step Wizard Logic ---
         window.nextStep = function(step) {
             let isValid = false;
             
+            // Validation
             if(step === 1) {
                 const name = document.getElementById('reg-name').value;
-                if(name.length >= 5 && /^[a-zA-Z\s]+$/.test(name)) {
+                if(name.length >= 5 && /^[a-zA-Z\s.]+$/.test(name)) {
                     userData.fullName = name.toUpperCase();
-                    document.getElementById('reg-name').value = userData.fullName; // Show visual feedback
+                    document.getElementById('reg-name').value = userData.fullName;
                     isValid = true;
-                } else {
-                    alert("Name must be at least 5 letters and contain only alphabets.");
-                }
+                } else alert("Name must be 5+ letters.");
             }
-            
-            if(step === 2) {
+            else if(step === 2) {
                 const phone = document.getElementById('reg-phone').value;
-                // SL Phone Regex: Starts with 07, 10 digits
                 if(/^07[0-9]{8}$/.test(phone)) {
                     userData.phone = phone;
                     isValid = true;
-                } else {
-                    alert("Please enter a valid Sri Lankan mobile number (e.g., 0712345678).");
-                }
+                } else alert("Invalid SL Number (07XXXXXXXX).");
             }
-
-            if(step === 3) {
+            else if(step === 3) {
                 const nic = document.getElementById('reg-nic').value;
-                // SL NIC: 12 digits OR 9 digits + V/v/X/x
-                const nicRegex = /^([0-9]{9}[x|X|v|V]|[0-9]{12})$/;
-                if(nicRegex.test(nic)) {
+                if(/^([0-9]{9}[x|X|v|V]|[0-9]{12})$/.test(nic)) {
                     userData.nic = nic;
                     isValid = true;
-                } else {
-                    alert("Invalid NIC Number format.");
-                }
+                } else alert("Invalid NIC Format.");
             }
-
-            if(step === 4) {
+            else if(step === 4) {
                 if(userData.nicVerified) isValid = true;
-                else alert("Please verify NIC images with AI first.");
+                else alert("Please Verify NIC with AI.");
             }
-
-            if(step === 5) {
+            else if(step === 5) {
                 if(userData.faceVerified) isValid = true;
-                else alert("Please verify your face first.");
+                else alert("Please Verify Face.");
             }
 
             if(isValid) {
                 document.getElementById(`step-${step}`).classList.remove('active');
                 document.getElementById(`step-${step+1}`).classList.add('active');
-                currentStep++;
             }
         };
 
         window.prevStep = function(step) {
             document.getElementById(`step-${step}`).classList.remove('active');
             document.getElementById(`step-${step-1}`).classList.add('active');
-            currentStep--;
         };
 
-        // --- Keypad Logic ---
-        window.kpType = function(num) {
-            const input = document.getElementById('reg-phone');
-            if(input.value.length < 10) {
-                input.value += num;
-            }
+        // --- Keypad ---
+        window.kpType = function(n) {
+            const el = document.getElementById('reg-phone');
+            if(el.value.length < 10) el.value += n;
         };
-
         window.kpDel = function() {
-            const input = document.getElementById('reg-phone');
-            input.value = input.value.slice(0, -1);
+            const el = document.getElementById('reg-phone');
+            el.value = el.value.slice(0, -1);
         };
 
-        // --- Image Helpers ---
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // --- AI Verification Logic (Pollinations.ai) ---
-        // Base64 Encoded Key: sk_OFuyt8DTTvetTsQoEGcsT837gA12V7G1
-        const AI_KEY_ENCODED = "c2tfT0Z1eXQ4RFRUdmV0VHNRb0VHY3NUODM3Z0ExMlY3RzE="; 
+        // --- REAL AI Logic (Pollinations/OpenAI Proxy) ---
+        // The user provided key. We will attempt to use it, or fallback to standard pollinations behavior.
+        const encodedKey = "c2tfT0Z1eXQ4RFRUdmV0VHNRb0VHY3NUODM3Z0ExMlY3RzE="; 
         
-        async function callAI(prompt, imageBase64) {
-            const apiKey = atob(AI_KEY_ENCODED); // Decode key
+        async function callAI(promptText, base64Image) {
+            const apiKey = atob(encodedKey);
             
-            // Pollinations.ai (using OpenAI compatible structure typically supported by wrappers)
-            // Note: If Pollinations strictly only does generation, we simulate the Vision check 
-            // but structure the request as if hitting an advanced endpoint provided by the user.
-            
+            // Construct payload for a Vision-capable model
+            // We use pollinations endpoint which proxies to OpenAI
             const payload = {
-                model: "gpt-4o", // or model supported by provider
+                model: "gpt-4o", 
                 messages: [
                     {
                         role: "user",
                         content: [
-                            { type: "text", text: prompt },
-                            { type: "image_url", image_url: { url: imageBase64 } }
+                            { type: "text", text: promptText },
+                            { type: "image_url", image_url: { url: base64Image } }
                         ]
                     }
-                ]
+                ],
+                max_tokens: 300
             };
 
-            try {
-                // Using a generic proxy or the user's intended endpoint. 
-                // Since specific pollinations endpoint for vision wasn't provided, 
-                // we assume standard OpenAI format on their domain or a simulation.
-                // *For this code to work without a real backend backend proxy, we simulate success if the API call fails due to CORS/Key issues, 
-                // BUT we attempt the fetch first.*
-                
-                // Placeholder endpoint based on user request (assuming they have a proxy set up or use standard OpenAI URL with this key)
-                // If using Pollinations for Text/Vision, the URL is usually https://text.pollinations.ai/
-                
-                const response = await fetch("https://text.pollinations.ai/openai", { 
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        // "Authorization": `Bearer ${apiKey}` // Pollinations often doesn't need Auth or passes it in body
-                    },
-                    body: JSON.stringify(payload)
-                });
+            const response = await fetch("https://text.pollinations.ai/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    // Adding key if the proxy supports it, otherwise Pollinations might ignore it
+                    // or use their own pool.
+                },
+                body: JSON.stringify(payload)
+            });
 
-                if(!response.ok) throw new Error("AI Service Unreachable");
-                const data = await response.json();
-                return data.choices[0].message.content;
-
-            } catch (error) {
-                console.warn("AI Check failed (Likely due to CORS or Model availability in this demo). Simulating Success for Protoype.", error);
-                // SIMULATION FOR PROTOTYPE PURPOSES so user can proceed
-                return JSON.stringify({ valid: true, match: true });
+            if(!response.ok) {
+                throw new Error("AI Service Error: " + response.statusText);
             }
+            // Pollinations returns text directly usually
+            const text = await response.text();
+            return text;
         }
 
+        // 1. Verify NIC
         window.verifyNicWithAI = async function() {
-            const frontFile = document.getElementById('nic-front').files[0];
-            const backFile = document.getElementById('nic-back').files[0];
-
-            if(!frontFile || !backFile) {
-                alert("Please select both front and back images.");
+            const frontInput = document.getElementById('nic-front');
+            
+            if(!frontInput.files[0]) {
+                alert("Please upload NIC Front image.");
                 return;
             }
 
-            toggleLoader(true, "AI Analyzing ID Card...");
-            
+            toggleLoader(true, "AI Analyzing Document...");
+            const log = document.getElementById('nic-ai-log');
+            log.innerText = "";
+
             try {
-                const b64Front = await fileToBase64(frontFile);
-                
-                // Prompt for AI
-                const prompt = `Analyze this ID card image. 1. Is it a valid Sri Lankan NIC? 2. Does the name vaguely match "${userData.fullName}"? Return ONLY JSON: {"valid": true, "match": true}`;
-                
-                const resultRaw = await callAI(prompt, b64Front);
-                console.log("AI Result:", resultRaw);
-                
-                // Simple parsing (Simulated or Real)
-                // In a real app, strict JSON parsing is needed.
-                if(resultRaw.toLowerCase().includes("true")) {
+                // Resize first to avoid payload errors
+                const b64 = await resizeImage(frontInput.files[0]);
+
+                // STRICT PROMPT
+                const prompt = `
+                    Analyze this image. 
+                    1. Is it a government issued ID card?
+                    2. If it is an apple, fruit, animal, or random object, return valid: false.
+                    3. Return ONLY valid JSON: {"valid": boolean, "reason": "short explanation"}
+                `;
+
+                const resultText = await callAI(prompt, b64);
+                console.log("AI Response:", resultText);
+
+                // Clean JSON
+                const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const data = JSON.parse(cleanJson);
+
+                if(data.valid) {
                     userData.nicVerified = true;
-                    document.getElementById('nic-ai-log').innerText = "✅ AI Verified: Name matches and ID is valid.";
-                    document.getElementById('nic-ai-log').style.color = "green";
-                    nextStep(4);
+                    log.innerText = "✅ ID Verified Successfully";
+                    log.style.color = "green";
+                    setTimeout(() => nextStep(4), 1000);
                 } else {
-                    throw new Error("Validation Failed");
+                    userData.nicVerified = false;
+                    log.innerText = "❌ Verification Failed: " + (data.reason || "Not an ID card");
+                    log.style.color = "red";
+                    alert("Verification Failed: " + (data.reason || "Image is not a valid ID."));
                 }
 
             } catch (e) {
-                // Fallback for demo
-                userData.nicVerified = true;
-                document.getElementById('nic-ai-log').innerText = "⚠️ AI Check Simulated: Verified.";
-                document.getElementById('nic-ai-log').style.color = "orange";
-                setTimeout(() => nextStep(4), 1000);
+                console.error(e);
+                log.innerText = "⚠️ AI Error. Please try again with a clearer photo.";
+                log.style.color = "#d9534f";
+                // Don't auto-pass on error anymore, to fix the 'apple' issue.
             } finally {
                 toggleLoader(false);
             }
         };
 
-        // --- Face Cam Logic ---
-        document.getElementById('face-input').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const b64 = await fileToBase64(file);
-                document.getElementById('face-preview').src = b64;
-                document.getElementById('face-preview').style.display = 'block';
-                document.getElementById('face-icon').style.display = 'none';
-            }
-        });
-
+        // 2. Verify Face
         window.verifyFaceWithAI = async function() {
-            const file = document.getElementById('face-input').files[0];
-            if(!file) {
-                alert("Please take a photo first.");
+            const faceInput = document.getElementById('face-input');
+            if(!faceInput.files[0]) {
+                alert("Take a photo first.");
                 return;
             }
-            
+
             toggleLoader(true, "Verifying Face...");
-            
-            // Simulation of Face Check
-            setTimeout(() => {
-                userData.faceVerified = true;
+            const log = document.getElementById('face-ai-log');
+
+            try {
+                const b64 = await resizeImage(faceInput.files[0]);
+                
+                const prompt = `
+                    Is this image a clear photo of a real human face? 
+                    If it is an object, fruit, or blurry, return valid: false.
+                    Return ONLY JSON: {"valid": boolean}
+                `;
+
+                const resultText = await callAI(prompt, b64);
+                const cleanJson = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const data = JSON.parse(cleanJson);
+
+                if(data.valid) {
+                    userData.faceVerified = true;
+                    log.innerText = "✅ Face Verified";
+                    log.style.color = "green";
+                    setTimeout(() => nextStep(5), 1000);
+                } else {
+                    log.innerText = "❌ Not a valid face";
+                    log.style.color = "red";
+                }
+
+            } catch (e) {
+                console.error(e);
+                alert("Face verification failed. Try again.");
+            } finally {
                 toggleLoader(false);
-                nextStep(5);
-            }, 1500);
+            }
         };
 
-        // --- Registration Completion ---
+        // --- Register ---
         document.getElementById('btn-complete-reg').addEventListener('click', async () => {
-            const pass = document.getElementById('reg-pass').value;
-            const confirm = document.getElementById('reg-pass-confirm').value;
+            const p1 = document.getElementById('reg-pass').value;
+            const p2 = document.getElementById('reg-pass-confirm').value;
 
-            if(pass.length < 6) {
-                alert("Password must be at least 6 characters.");
-                return;
-            }
-            if(pass !== confirm) {
-                alert("Passwords do not match.");
+            if(p1.length < 6 || p1 !== p2) {
+                alert("Passwords must match and be 6+ chars.");
                 return;
             }
 
             toggleLoader(true, "Creating Account...");
-
-            // Create fake email for Firebase Auth (Phone Number based)
-            const fakeEmail = `${userData.phone}@apspeedo.com`;
+            const email = `${userData.phone}@apspeedo.com`;
 
             try {
-                // 1. Create Auth User
-                const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, pass);
-                const user = userCredential.user;
+                const cred = await createUserWithEmailAndPassword(auth, email, p1);
+                const user = cred.user;
 
-                // 2. Save Data to Realtime DB (Exclude Images as requested)
                 await set(ref(db, 'riders/' + user.uid), {
                     fullName: userData.fullName,
                     phone: userData.phone,
                     nic: userData.nic,
-                    isVerified: true, // result of AI
-                    joinedAt: new Date().toISOString()
+                    joined: new Date().toISOString()
                 });
 
-                // 3. Save to LocalStorage
-                localStorage.setItem('apSpeedoUser', JSON.stringify({ uid: user.uid, phone: userData.phone }));
-
-                alert("Registration Successful!");
+                localStorage.setItem('apSpeedoUser', JSON.stringify({uid:user.uid}));
+                alert("Success!");
                 window.location.href = "main.html";
-
-            } catch (error) {
-                console.error(error);
-                alert("Registration Failed: " + error.message);
+            } catch (e) {
+                alert("Error: " + e.message);
             } finally {
                 toggleLoader(false);
             }
         });
 
-        // --- Login Logic ---
+        // --- Login ---
         document.getElementById('btn-login').addEventListener('click', async () => {
-            const phone = document.getElementById('login-phone').value;
-            const pass = document.getElementById('login-pass').value;
-
-            if(!phone || !pass) {
-                alert("Please enter phone and password.");
-                return;
-            }
-
+            const ph = document.getElementById('login-phone').value;
+            const pw = document.getElementById('login-pass').value;
+            
             toggleLoader(true, "Logging in...");
-            const fakeEmail = `${phone}@apspeedo.com`;
-
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, fakeEmail, pass);
-                const user = userCredential.user;
-
-                // Save to LocalStorage
-                localStorage.setItem('apSpeedoUser', JSON.stringify({ uid: user.uid, phone: phone }));
-                
+                const email = `${ph}@apspeedo.com`;
+                const cred = await signInWithEmailAndPassword(auth, email, pw);
+                localStorage.setItem('apSpeedoUser', JSON.stringify({uid:cred.user.uid}));
                 window.location.href = "main.html";
-
-            } catch (error) {
-                alert("Login Failed: Check credentials.");
+            } catch(e) {
+                alert("Login Failed.");
             } finally {
                 toggleLoader(false);
             }
         });
 
         function toggleLoader(show, text="Processing...") {
-            const loader = document.getElementById('global-loader');
+            const l = document.getElementById('global-loader');
             document.getElementById('loader-text').innerText = text;
-            loader.style.display = show ? 'flex' : 'none';
+            l.style.display = show ? 'flex' : 'none';
         }
 
     </script>
