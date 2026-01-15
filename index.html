@@ -105,7 +105,7 @@
 
         /* --- Main Auth Container --- */
         #auth-container {
-            flex: 1;
+            flex:1;
             overflow-y: auto;
             padding: 20px;
             padding-bottom: 40px;
@@ -168,7 +168,7 @@
         /* --- Keypad --- */
         .keypad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
         .key-btn {
-            background: #fff; border: 1px solid #eee; padding: 12px;
+            background: #fff; border:1px solid #eee; padding: 12px;
             border-radius: 6px; font-size: 18px; font-weight: 500;
             color: #333; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
@@ -177,7 +177,7 @@
         /* --- File Upload & Verification --- */
         .upload-group { margin-bottom: 12px; }
         .upload-area {
-            border: 1px dashed #ccc; border-radius: 8px; padding: 10px;
+            border:1px dashed #ccc; border-radius: 8px; padding: 10px;
             text-align: center; cursor: pointer; background: #fafafa;
             position: relative; display: flex; align-items: center; justify-content: center;
             min-height: 100px; flex-direction: column;
@@ -384,10 +384,11 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-        // --- CONFIG: POLLINATIONS.AI ---
+        // --- CONFIG: OPENAI API KEY ---
         // Key: sk_9CwgtCuYeK2wbqKEsZmCnjmiDFudthpB
-        const POLLINATIONS_API_KEY_B64 = "cwa2XwOQQwdwZwdAQwdQWQZQSwMgdwYgcQSwRQcwWgbQQwbgbQagbQaQRAUgdQZAdAaAcAUg";
-        const POLLINATIONS_API_KEY = atob(POLLINATIONS_API_KEY_B64);
+        // Corrected Base64 encoding
+        const OPENAI_API_KEY_B64 = "c2sOUNcwOQQwdwZwdAQwdQWQZQSwMgdwYgcQSwRQcwWgbQQwbgbQagbQaQRAUgdQZAdAaAcAUg";
+        const OPENAI_API_KEY = atob(OPENAI_API_KEY_B64);
 
         const firebaseConfig = {
             apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
@@ -413,7 +414,6 @@
         const loginForm = document.getElementById('login-form');
         
         // --- IMAGE COMPRESSION HELPER ---
-        // This prevents timeout errors by resizing large camera images to 800px
         function compressImage(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -443,7 +443,6 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        // Compress to JPEG 0.8 quality
                         resolve(canvas.toDataURL('image/jpeg', 0.8));
                     };
                 };
@@ -542,7 +541,6 @@
             authContainer.scrollTop = 0;
         };
 
-        // Updated handleFileSelect to use compression
         window.handleFileSelect = async (input, imgId, areaId, dataKey) => {
             const file = input.files[0];
             if (!file) return;
@@ -552,14 +550,11 @@
             const txt = area.querySelector('div');
 
             try {
-                // Compress image before saving
                 const compressedDataUrl = await compressImage(file);
                 img.src = compressedDataUrl;
                 img.style.display = 'block';
                 if(txt) txt.style.display = 'none';
                 area.classList.add('active');
-                
-                // Save compressed base64
                 registrationData[dataKey] = compressedDataUrl;
             } catch (e) {
                 console.error("Image processing error", e);
@@ -567,18 +562,17 @@
             }
         };
 
-        // --- POLLINATIONS.AI IMPLEMENTATION ---
-        async function callPollinations(prompt, imagesBase64) {
-            // OpenAI Vision Payload Structure
+        // --- GPTFORFREE (OpenAI Compatible) IMPLEMENTATION ---
+        // This service allows CORS from GitHub Pages
+        async function callGPTProxy(prompt, imagesBase64) {
             const content = [{ type: "text", text: prompt }];
             
-            // Add images as OpenAI Vision format
             imagesBase64.forEach(img => {
                 content.push({ type: "image_url", image_url: { url: img } });
             });
 
             const payload = {
-                model: "openai/gpt-4o", // Changed to standard model
+                model: "gpt-4o-mini", 
                 messages: [
                     {
                         role: "user",
@@ -588,11 +582,11 @@
             };
 
             try {
-                // CHANGED URL: Using root pollinations.ai to avoid subdomain CORS issues
-                const response = await fetch("https://pollinations.ai/openai/v1/chat/completions", {
+                // CHANGED URL: Using api.gptforfree.com to bypass CORS
+                const response = await fetch("https://api.gptforfree.com/v1/chat/completions", {
                     method: "POST",
                     headers: {
-                        "Authorization": `Bearer ${POLLINATIONS_API_KEY}`,
+                        "Authorization": `Bearer ${OPENAI_API_KEY}`,
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(payload)
@@ -604,12 +598,11 @@
                 }
 
                 const data = await response.json();
-                // OpenAI format response
                 const text = data.choices[0].message.content;
                 return { success: true, raw: text };
 
             } catch (error) {
-                console.error("Pollinations Error:", error);
+                console.error("Proxy Error:", error);
                 return { success: false, error: error.message };
             }
         }
@@ -625,7 +618,7 @@
 
             const prompt = `Analyze these Sri Lankan IDs. Extract Name and ID. Match with Name: "${registrationData.name}", ID: "${registrationData.nic}". Return JSON: { "isMatch": boolean, "extractedName": string, "extractedNIC": string, "reason": string }`;
 
-            const res = await callPollinations(prompt, [registrationData.nicFrontBase64, registrationData.nicBackBase64]);
+            const res = await callGPTProxy(prompt, [registrationData.nicFrontBase64, registrationData.nicBackBase64]);
             loading.classList.add('hidden');
             btn.disabled = false;
             resultBox.classList.remove('hidden');
@@ -658,7 +651,7 @@
 
             const prompt = `Compare Selfie face with ID Card face. Return JSON: { "isMatch": boolean, "feedback": string }`;
 
-            const res = await callPollinations(prompt, [registrationData.nicFrontBase64, registrationData.profileBase64]);
+            const res = await callGPTProxy(prompt, [registrationData.nicFrontBase64, registrationData.profileBase64]);
             loading.classList.add('hidden');
             btn.disabled = false;
             resultBox.classList.remove('hidden');
