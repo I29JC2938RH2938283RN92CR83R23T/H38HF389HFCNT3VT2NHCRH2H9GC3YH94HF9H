@@ -16,7 +16,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
         body { margin: 0; padding: 0; font-family: 'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif; overflow: hidden; background: #eee; height: 100vh; width: 100vw; }
 
-        /* GLOBAL LOADING SCREEN (Fixes white screen) */
+        /* GLOBAL LOADING SCREEN */
         #global-loader-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 9999;
@@ -37,16 +37,38 @@
         .gps-pulse { position: absolute; width: 50px; height: 50px; background: rgba(33, 150, 243, 0.4); border-radius: 50%; z-index: 1; animation: pulse-ring 2s infinite; }
         @keyframes pulse-ring { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
-        /* TOP CARD */
-        .top-card { position: fixed; top: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-radius: 15px; padding: 10px 15px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 100; }
-        .profile-sec { display: flex; align-items: center; gap: 10px; }
-        .p-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        .p-name { font-weight: 700; font-size: 14px; color: var(--text); }
-        .lang-btn { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; color: #555; position: absolute; left: 50%; transform: translateX(-50%); cursor: pointer; border:1px solid #ccc; }
+        /* --- UPDATED TOP CARD --- */
+        .top-ui {
+            position: fixed; top: 15px; left: 15px; right: 15px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(5px);
+            border-radius: 15px; padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 100; height: 60px;
+        }
         
-        /* EARNINGS PILL (Always Visible) */
-        .earnings-pill { background: var(--white); border: 2px solid #ddd; padding: 5px 15px; border-radius: 30px; font-weight: 700; font-size: 13px; color: var(--online); display: flex; align-items: center; gap: 5px; transition: 0.3s; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .earnings-pill i { color: #FFD700; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
+        /* Left Section: Profile */
+        .profile-sec { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0; }
+        .p-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); flex-shrink: 0; }
+        .p-name { font-weight: 700; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Center Section: Lang */
+        .lang-btn { 
+            background: #f0f0f0; border: none; padding: 8px 16px; 
+            border-radius: 20px; font-weight: 600; font-size: 12px; color: #555; 
+            cursor: pointer; border: 1px solid #ccc; position: static; transform: none;
+            flex-shrink: 0; margin: 0 10px;
+        }
+        
+        /* Right Section: Revenue Pill */
+        .earnings-pill { 
+            background: var(--white); border: 2px solid #ddd; 
+            padding: 6px 15px; border-radius: 30px; font-weight: 700; font-size: 13px; 
+            color: var(--online); display: flex; align-items: center; gap: 8px; 
+            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            flex-shrink: 0; transition: transform 0.1s;
+        }
+        .earnings-pill:active { transform: scale(0.95); }
+        .earnings-pill i { color: #FFD700; text-shadow: 0 1px 1px rgba(0,0,0,0.2); font-size: 14px; }
 
         /* BOTTOM CARDS */
         .bottom-card { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); border-radius: 25px 25px 0 0; padding: 25px 20px 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); z-index: 100; display: flex; flex-direction: column; transition: transform 0.3s ease; }
@@ -140,6 +162,22 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         .msg-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px; margin: 15px 0; }
+
+        /* REVENUE MODAL STYLES */
+        .revenue-header { font-size: 24px; font-weight: 700; color: #333; text-align: center; margin-bottom: 20px; }
+        .revenue-today-box { background: #E8F5E9; border: 1px solid #C8E6C9; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,200,83,0.1); }
+        .revenue-label { font-size: 13px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .revenue-big-total { font-size: 36px; font-weight: 800; color: #00C853; line-height: 1; }
+        .revenue-month-row { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 20px; font-size: 16px; font-weight: 600; color: #444; }
+        .revenue-month-val { color: var(--online); }
+        
+        .history-list { flex: 1; overflow-y: auto; background: #f9f9f9; border-radius: 10px; padding: 10px; margin-bottom: 15px; border: 1px solid #eee; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .h-left { display: flex; flex-direction: column; }
+        .h-date { font-size: 11px; color: #888; margin-bottom: 2px; }
+        .h-type { font-size: 12px; font-weight: 700; color: var(--text); }
+        .h-price { font-size: 16px; font-weight: 700; color: #333; }
+
     </style>
 </head>
 <body>
@@ -177,15 +215,19 @@
     <div id="user-msg-text">Message from Customer</div>
 </div>
 
-<!-- TOP UI -->
-<div class="top-card" id="top-ui" style="display:none;">
+<!-- TOP UI (Redesigned) -->
+<div class="top-ui" id="top-ui" style="display:none;">
+    <!-- Left: Profile -->
     <div class="profile-sec" onclick="openProfile()">
         <img src="" id="user-pic" class="p-img">
         <div class="p-name"><span id="user-name">Rider</span></div>
     </div>
+    
+    <!-- Center: Language -->
     <button class="lang-btn" onclick="toggleLang()" id="lang-btn">EN</button>
-    <!-- Always visible earnings -->
-    <div class="earnings-pill" id="earn-pill" onclick="showEarnings()">
+    
+    <!-- Right: Revenue Pill -->
+    <div class="earnings-pill" id="earn-pill" onclick="showRevenueModal()">
         <i class="fas fa-coins"></i> <span id="earn-txt">0.00</span>
     </div>
 </div>
@@ -299,8 +341,48 @@
     </div>
 </div>
 
-<!-- EARNINGS MODAL -->
-<div id="earnings-modal" class="modal-overlay">
+<!-- REVENUE POPUP (New) -->
+<div id="revenue-modal" class="modal-overlay full-screen-modal">
+    <div class="modal-card">
+        <h3 class="revenue-header" data-i18n="earnings_title">My Earnings</h3>
+        
+        <!-- Today's Earnings -->
+        <div class="revenue-today-box">
+            <div class="revenue-label" data-i18n="today_label">Today's Earnings</div>
+            <div class="revenue-big-total" id="revenue-today-total">LKR 0.00</div>
+        </div>
+
+        <!-- This Month -->
+        <div class="revenue-month-row">
+            <span data-i18n="month_label">This Month</span>
+            <span class="revenue-month-val" id="revenue-month-total">LKR 0.00</span>
+        </div>
+
+        <!-- Recent Rides List -->
+        <div class="history-list" id="revenue-list">
+            <div style="text-align:center; padding:20px; color:#999;">No rides today.</div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button class="vehicles-strip" style="flex:1; background:#eee;" onclick="closeModal('revenue-modal')" data-i18n="btn_close">Close</button>
+            <button class="go-online-btn" style="flex:1; font-size:14px; margin:0;" onclick="showFullHistoryModal()" data-i18n="btn_more_history">More</button>
+        </div>
+    </div>
+</div>
+
+<!-- FULL HISTORY MODAL (New) -->
+<div id="full-history-modal" class="modal-overlay full-screen-modal">
+    <div class="modal-card">
+        <h3 class="revenue-header" data-i18n="history_title">Full History</h3>
+        <div class="history-list" id="full-history-list" style="max-height:60vh;">
+            <!-- Full list injected -->
+        </div>
+        <button class="vehicles-strip" onclick="closeModal('full-history-modal')" data-i18n="btn_close">Close</button>
+    </div>
+</div>
+
+<!-- EARNINGS MODAL (Legacy - Hidden) -->
+<div id="earnings-modal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
         <h3 style="text-align:center;" data-i18n="today_earn">Today's Earnings</h3>
         <h1 style="text-align:center; color:var(--online);">LKR <span id="daily-earn">0.00</span></h1>
@@ -358,27 +440,30 @@
             finding: "Finding Hires...", gps_on: "Keep GPS & Data ON", btn_offline: "GO OFFLINE",
             new_hire: "New Hire!", btn_accept: "GO & PICKUP", btn_notify: "Notify I'm Here", btn_cancel: "Cancel Trip",
             trip_ended: "Trip Ended", cash_collect: "Cash to Collect", btn_cash_rec: "CASH RECEIVED",
+            earnings_title: "My Earnings", today_label: "Today's Earnings", month_label: "This Month", history_title: "Full History",
             today_earn: "Today's Earnings", btn_close: "Close", my_vehicles: "My Vehicles", btn_add_veh: "+ Add Vehicle",
             sel_veh: "Select Vehicle", btn_cont: "Continue", btn_cancel: "Cancel", processing: "Processing...",
-            slide_start: "SLIDE TO START", slide_end: "SLIDE TO END"
+            slide_start: "SLIDE TO START", slide_end: "SLIDE TO END", btn_more_history: "More / Full History"
         },
         si: {
             status_title: "රියදුරු තත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලැබා ගැනීමට ලබා වෙන", btn_manage_veh: "වාහන කළමනාකරණය",
-            finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රීයව තබන්න", btn_offline: "විසන්ධි වන්න",
+            finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රීය වෙන", btn_offline: "විසන්ධි වන්න",
             new_hire: "නව හයර් එක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්",
             trip_ended: "ගමන අවසන්", cash_collect: "අයකළ ගැයීම", btn_cash_rec: "මුදල් ලැබුණි",
+            earnings_title: "මගේ ඉපැයීම්", today_label: "අද ඉපැයීම්", month_label: "මෙම මාසය", history_title: "මුලු ඉතිහාසය",
             today_earn: "අද ඉපැයීම්", btn_close: "වසන්න", my_vehicles: "මගේ වාහන", btn_add_veh: "+ වාහනයක් එක් කරන්න",
-            sel_veh: "වාහනය තෝරන්න", btn_cont: "ඉදිරිපත් කරන්", btn_cancel: "අවලංගු යියි", processing: "සකසමින් පවතී...",
-            slide_start: "ඇරඹීමට අදින්", slide_end: "අවසන් කිරීමට අදින්"
+            sel_veh: "වාහනයක් තෝරන්න", btn_cont: "ඉදිරිපත් කරන්", btn_cancel: "අවලංගු යියි", processing: "සකසමින් පවතී...",
+            slide_start: "ඇරඹීමට අදින්", slide_end: "අවසන් කිරීමට අදින්", btn_more_history: "වැඩි / සම්පූර්ණ ඉතිහාසය"
         },
         ta: {
-            status_title: "ஓட்டுநர் நிலை", btn_online: "ஆன்லைனில் செல்லுங்கள்", online_desc: "சவாரிகளைப் பெற ஆன்லைனில் செல்லவும்", btn_manage_veh: "வாகனங்களை நிர்வகிக்கும்",
+            status_title: "ஓட்டுநர் நிலை", btn_online: "ஆன்லைனில் செல்லுங்கள்", online_desc: "சவாரிகளைப் பெற ஆன்லைனில் செல்லுங்கள்", btn_manage_veh: "வாகனங்களை நிர்வகிக்கும்",
             finding: "தேடுகிறது...", gps_on: "GPS மற்றும் Data ஆன் செய்யவும்", btn_offline: "ஆஃப்லைன் செல்லுங்கள்",
             new_hire: "புதிய சவாரி!", btn_accept: "ஏற்கவும்", btn_notify: "நான் வந்துவிட்டேன்", btn_cancel: "ரத்து செய்",
             trip_ended: "சவாரி முடிந்தது", cash_collect: "பெற வேண்டிய பணம்", btn_cash_rec: "பணம் பெறப்பட்டு",
+            earnings_title: "எனது வருமானம்", today_label: "இன்றைய வருமானம்", month_label: "இந்த மாதம்", history_title: "முழு வரலாறு",
             today_earn: "இன்றைய வருமானம்", btn_close: "மூடு", my_vehicles: "எனது வாகனங்கள்", btn_add_veh: "+ வாகனத்தைச் சேர்",
             sel_veh: "வாகனத்தைத் தேர்ந்தெடுக்கவும்", btn_cont: "தொடரவும்", btn_cancel: "ரத்து", processing: "செயலாக்கிறது...",
-            slide_start: "தொடங்க இழுக்கவும்", slide_end: "முடிக்க இழுக்கவும்"
+            slide_start: "தொடங்க இழுக்கவும்", slide_end: "முடிக்க இழுக்கவும்", btn_more_history: "மேல் / முழு வரலாறு"
         }
     };
 
@@ -386,6 +471,10 @@
     let currentVehicles=[], selectedVehId, selectedVehType, isOnline=false;
     let tripState = "IDLE"; 
     let currentRideId = null, tempV={type:"",imgs:{}}, earnings=0;
+    
+    // History Logic
+    let rideHistory = []; // Array to store {id, price, time, date}
+    
     let currentLocation = null; // {lat, lng}
     let rideData = null; // Store ride info
     let pickupLine = null; // Blue Line
@@ -394,8 +483,13 @@
 
     window.onload = async () => {
         updateLangUI();
-        let savedEarn = localStorage.getItem('speedo_earnings');
-        if(savedEarn) { earnings = parseFloat(savedEarn); document.getElementById('earn-txt').innerText = earnings.toFixed(2); }
+        
+        // Load History & Earnings from LocalStorage (Simulating DB sync)
+        const savedHistory = localStorage.getItem('speedo_ride_history');
+        if(savedHistory) {
+            rideHistory = JSON.parse(savedHistory);
+            updateTopCardEarnings();
+        }
 
         const uid = localStorage.getItem('uid');
         const dist = localStorage.getItem('dist');
@@ -439,7 +533,6 @@
             console.error(e);
             alert("Error loading rider data. Please check connection.");
             document.getElementById('loading-text').innerText = "Error Loading App";
-            // Keep loader visible if error
         }
     };
 
@@ -451,6 +544,77 @@
         });
     }
 
+    // --- REVENUE & HISTORY LOGIC ---
+    function updateTopCardEarnings() {
+        // Calculate Today's Total
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        let todayTotal = 0;
+        let monthTotal = 0;
+
+        rideHistory.forEach(ride => {
+            const rideDate = new Date(ride.timestamp);
+            monthTotal += ride.price;
+
+            if(rideDate >= startOfDay) {
+                todayTotal += ride.price;
+            }
+        });
+
+        // Update Top Pill
+        document.getElementById('earn-txt').innerText = todayTotal.toFixed(2);
+        
+        // Update Modal Values
+        document.getElementById('revenue-today-total').innerText = `LKR ${todayTotal.toFixed(2)}`;
+        document.getElementById('revenue-month-total').innerText = `LKR ${monthTotal.toFixed(2)}`;
+
+        // Render List
+        renderRevenueList();
+    }
+
+    function renderRevenueList(limit = 0) {
+        const container = document.getElementById('revenue-list');
+        container.innerHTML = '';
+        
+        const sortedHistory = [...rideHistory].sort((a,b) => b.timestamp - a.timestamp);
+        const listToRender = limit > 0 ? sortedHistory.slice(0, limit) : sortedHistory;
+
+        if(listToRender.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">No rides found.</div>';
+            return;
+        }
+
+        listToRender.forEach(ride => {
+            const dateObj = new Date(ride.timestamp);
+            const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `
+                <div class="h-left">
+                    <div class="h-date">${dateStr}</div>
+                    <div class="h-type">${ride.type || 'Ride'}</div>
+                </div>
+                <div class="h-price">LKR ${ride.price.toFixed(2)}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    window.showRevenueModal = () => {
+        renderRevenueList(10); // Show top 10
+        openModal('revenue-modal');
+    }
+
+    window.showFullHistoryModal = () => {
+        closeModal('revenue-modal');
+        renderRevenueList(0); // Show all
+        openModal('full-history-modal');
+    }
+
+    // --- MAP & ONLINE ---
     function initMap() {
         const mapDiv = document.getElementById('map');
         if(!mapDiv) return;
@@ -469,9 +633,7 @@
                     map.setView([lat, lng], 16);
                 } else {
                     marker.setLatLng([lat, lng]);
-                    // If driving, update line endpoints
                     if(tripState !== 'IDLE') updateTripLines();
-                    
                     if(isOnline && selectedVehId) {
                         update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}/location`), {lat, lng, ts:Date.now()});
                     }
@@ -482,7 +644,6 @@
         }
     }
 
-    // --- ONLINE LOGIC ---
     window.initiateGoOnline = () => {
         if(!currentLocation) return toast("Waiting for GPS Location...", "error");
         
@@ -515,37 +676,25 @@
         
         update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"online"});
         
-        // Listen for requests
         ridesRef = ref(db, 'rides');
         onValue(ridesRef, (snapshot) => {
-            if(tripState !== 'IDLE') return; // Busy
+            if(tripState !== 'IDLE') return; 
                 
             const rides = snapshot.val();
             if(!rides) return;
             
-            // Check if any ride is requesting my type and matches my criteria
             for(let rid in rides) {
                 const r = rides[rid];
                 
-                // Check Status
                 if(r.status !== 'requesting') continue;
-
-                // Check Vehicle Match
                 if(r.vehicleType !== selectedVehType) continue;
-
-                // FLASH LOGIC:
-                // If this is a Flash job, I can only take it if I'm on a Bike.
-                if(r.serviceType === 'flash' && selectedVehType !== 'bike') continue;
                 
-                // If I'm a Bike, I accept both Ride and Flash.
-                // If I'm others, I only accept Ride (serviceType undefined or 'ride').
+                if(r.serviceType === 'flash' && selectedVehType !== 'Bike') continue;
+                
                 if(r.serviceType && r.serviceType !== 'flash' && r.serviceType !== 'ride') continue;
 
-                // Distance Check (Optional simple check for demo)
-                // Real app: getDistanceFromLatLonInKm(currentLocation, r.pickup) < radius
-
                 incomingRequest(rid, r);
-                break; // Stop listening once found
+                break; 
             }
         });
     }
@@ -556,7 +705,7 @@
         document.getElementById('card-offline').style.display='flex';
         if(selectedVehId) update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"offline"});
         selectedVid = null;
-        if(ridesRef) { ridesRef = null; } // Stop listener
+        if(ridesRef) { ridesRef = null; } 
     }
 
     function incomingRequest(rideId, data) {
@@ -568,7 +717,6 @@
         document.getElementById('req-pickup').innerText = data.pickup.addr;
         document.getElementById('req-drop').innerText = data.dropoff.addr;
         
-        // Handle Flash UI Ribbon
         const flashBadge = document.getElementById('req-flash-badge');
         const flashDetails = document.getElementById('req-flash-details');
         
@@ -605,12 +753,11 @@
         document.getElementById('card-request').classList.add('hidden-card');
         document.getElementById('card-trip').classList.remove('hidden-card');
         
-        // REAL DB UPDATE
         await update(ref(db, `rides/${currentRideId}`), {
             status: 'driver_found',
             driverId: currentUser.uid,
             driverName: currentUser.fullName,
-            driverPhone: currentUser.mobile || '0000000000', // In real app, ensure this exists
+            driverPhone: currentUser.mobile || '0000000000', 
             vehiclePlate: currentVehicles.find(v=>v.id===selectedVehId).plate
         });
         
@@ -621,10 +768,8 @@
         
         setupSlider(dict[lang].slide_start, startTrip);
         
-        // Update Map Lines (Blue)
         updateTripLines();
         
-        // Listen for messages
         onValue(ref(db, `rides/${currentRideId}/messages`), snap => {
             const msgs = snap.val();
             if(msgs) {
@@ -638,7 +783,6 @@
             }
         });
 
-        // Watch for cancellation
         onValue(ref(db, `rides/${currentRideId}`), s => {
             const r = s.val();
             if(r.status === 'cancelled') rejectRide();
@@ -663,14 +807,12 @@
         const drop = L.latLng(rideData.dropoff.lat, rideData.dropoff.lng);
         const rider = L.latLng(currentLocation.lat, currentLocation.lng);
         
-        // User Marker
         if(!userPosMarker) {
             const icon = L.divIcon({ html: '<div style="width:15px;height:15px;background:blue;border-radius:50%;border:2px solid white;"></div>', iconSize:[15,15], iconAnchor:[7,7]});
             userPosMarker = L.marker(pickup, {icon}).addTo(map);
         }
 
         if(tripState === 'PICKUP') {
-            // Blue Line: Rider -> Pickup
             if(rider && pickup) {
                 if(pickupLine) map.removeLayer(pickupLine);
                 pickupLine = L.polyline([rider, pickup], {color: 'blue', weight: 5, dashArray: '10, 10'}).addTo(map);
@@ -678,7 +820,6 @@
             }
             if(tripLine) { map.removeLayer(tripLine); tripLine = null; }
         } else if (tripState === 'TRIP') {
-            // Red Line: Pickup -> Drop
             if(pickupLine) { map.removeLayer(pickupLine); pickupLine = null; }
             if(!tripLine) {
                 tripLine = L.polyline([pickup, drop], {color: 'red', weight: 5}).addTo(map);
@@ -695,7 +836,7 @@
         document.getElementById('trip-status-txt').innerText = lang==='si'?"ගමනානාන්තය වෙත":"Heading to Destination";
         document.getElementById('btn-notify').style.display='none';
         setupSlider(dict[lang].slide_end, endTrip);
-        updateTripLines(); // Switch to Red Line
+        updateTripLines(); 
     }
 
     function endTrip() {
@@ -703,7 +844,18 @@
         document.getElementById('card-trip').classList.add('hidden-card');
         document.getElementById('card-offline').style.display='flex';
         
-        const ridePrice = document.getElementById('live-fare').innerText;
+        const ridePrice = parseFloat(document.getElementById('live-fare').innerText);
+        
+        // Save to History
+        const newRideEntry = {
+            id: currentRideId,
+            price: ridePrice,
+            timestamp: Date.now(),
+            type: rideData.serviceType === 'flash' ? 'Flash' : 'Ride'
+        };
+        rideHistory.push(newRideEntry);
+        localStorage.setItem('speedo_ride_history', JSON.stringify(rideHistory));
+        updateTopCardEarnings();
         
         document.getElementById('sum-total').innerText = ridePrice;
         document.getElementById('sum-base').innerText = ridePrice;
@@ -714,18 +866,14 @@
     window.finishCash = async () => {
         closeModal('summary-modal');
         const price = parseFloat(document.getElementById('sum-total').innerText);
-        earnings += price;
-        localStorage.setItem('speedo_earnings', earnings);
-        document.getElementById('earn-txt').innerText = earnings.toFixed(2);
         
-        // REAL DB UPDATE: End Ride
+        // DB Update
         await update(ref(db, `rides/${currentRideId}`), { status: 'ended' });
         
-        // Reset Rider to be available again
+        // Reset
         currentRideId = null;
         rideData = null;
         document.getElementById('btn-notify').style.display='block';
-        // Back to Searching state visually
         document.getElementById('card-offline').style.display='none';
         document.getElementById('card-searching').classList.remove('hidden-card');
     }
@@ -809,7 +957,7 @@
         }
         openModal('vehicle-man-modal');
     }
-    window.openAddVehicle = () => { closeModal('vehicle-man-modal'); window.open('add-vehicle.html','_blank'); } // Open separate file for brevity
+    window.openAddVehicle = () => { closeModal('vehicle-man-modal'); window.open('add-vehicle.html','_blank'); }
 
     // --- SLIDER LOGIC ---
     function setupSlider(text, callback) {
