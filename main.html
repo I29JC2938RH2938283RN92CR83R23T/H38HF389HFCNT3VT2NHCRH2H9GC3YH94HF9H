@@ -16,6 +16,17 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
         body { margin: 0; padding: 0; font-family: 'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif; overflow: hidden; background: #eee; height: 100vh; width: 100vw; }
 
+        /* GLOBAL LOADING SCREEN (Fixes white screen) */
+        #global-loader-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s;
+        }
+        .app-logo { font-size: 40px; color: var(--primary); margin-bottom: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        .loading-text { font-weight: 600; color: #666; }
+
         /* MAP */
         #map { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
         .leaflet-routing-container { display: none; }
@@ -111,7 +122,7 @@
         /* VEHICLE LIST ITEM */
         .v-item { padding: 15px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 12px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .v-item.selected { border: 2px solid var(--primary); background: #ffebee; }
-        .del-btn { background: #ffebee; color: #d32f2f; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-top: 5px; cursor: pointer; transition: 0.Name: 0.2s; }
+        .del-btn { background: #ffebee; color: #d32f2f; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-top: 5px; cursor: pointer; transition: 0.2s; }
         .del-btn:active { background: #ffcdd2; }
         
         .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
@@ -132,6 +143,12 @@
     </style>
 </head>
 <body>
+
+<!-- GLOBAL LOADING SCREEN -->
+<div id="global-loader-screen">
+    <i class="fa-solid fa-taxi app-logo"></i>
+    <div class="loading-text">Loading Speedo...</div>
+</div>
 
 <!-- MAP -->
 <div id="map"></div>
@@ -347,7 +364,7 @@
         },
         si: {
             status_title: "රියදුරු තත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලැබා ගැනීමට ලබා වෙන", btn_manage_veh: "වාහන කළමනාකරණය",
-            finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රියව තබන්න", btn_offline: "විසන්ධි වන්න",
+            finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රීයව තබන්න", btn_offline: "විසන්ධි වන්න",
             new_hire: "නව හයර් එක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්",
             trip_ended: "ගමන අවසන්", cash_collect: "අයකළ ගැයීම", btn_cash_rec: "මුදල් ලැබුණි",
             today_earn: "අද ඉපැයීම්", btn_close: "වසන්න", my_vehicles: "මගේ වාහන", btn_add_veh: "+ වාහනයක් එක් කරන්න",
@@ -382,12 +399,22 @@
 
         const uid = localStorage.getItem('uid');
         const dist = localStorage.getItem('dist');
-        if(!uid) return location.href="rider.html"; // Redirect if no auth
+        
+        if(!uid || !dist) { 
+            alert("Login required. Redirecting..."); 
+            location.href="rider.html"; 
+            return; 
+        }
 
         try {
             const s = await get(ref(db, `riders/${dist}/${uid}`));
             if(s.exists()) {
                 const d = s.val().riderdata;
+                if(!d) {
+                    alert("Invalid rider data. Please login again.");
+                    location.reload();
+                    return;
+                }
                 currentUser = { ...d, uid, dist };
                 document.getElementById('user-pic').src = d.selfie || '';
                 document.getElementById('user-name').innerText = d.fullName.split(" ")[0];
@@ -397,8 +424,23 @@
                 document.getElementById('top-ui').style.display='flex';
                 document.getElementById('card-offline').style.display='flex';
                 initMap();
+                
+                // Remove loader once UI is ready
+                const loader = document.getElementById('global-loader-screen');
+                if(loader) {
+                    loader.style.opacity = '0';
+                    setTimeout(() => loader.remove(), 500);
+                }
+            } else {
+                alert("User not found.");
+                location.href="rider.html";
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { 
+            console.error(e);
+            alert("Error loading rider data. Please check connection.");
+            document.getElementById('loading-text').innerText = "Error Loading App";
+            // Keep loader visible if error
+        }
     };
 
     function updateLangUI() {
@@ -410,6 +452,9 @@
     }
 
     function initMap() {
+        const mapDiv = document.getElementById('map');
+        if(!mapDiv) return;
+
         map = L.map('map', {zoomControl:false}).setView([7.8, 80.7], 8);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
@@ -474,7 +519,7 @@
         ridesRef = ref(db, 'rides');
         onValue(ridesRef, (snapshot) => {
             if(tripState !== 'IDLE') return; // Busy
-            
+                
             const rides = snapshot.val();
             if(!rides) return;
             
