@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
 
     <style>
-        :root { --primary: #D32F2F; --white: #ffffff; --text: #333; --online: #00C853; --offline: #D32F2F; --bg: #f4f4f4; }
+        :root { --primary: #D32F2F; --flash: #FFC107; --white: #ffffff; --text: #333; --online: #00C853; --offline: #D32F2F; --bg: #f4f4f4; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
         body { margin: 0; padding: 0; font-family: 'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif; overflow: hidden; background: #eee; height: 100vh; width: 100vw; }
 
@@ -47,9 +47,9 @@
         @keyframes loadMove { 0% { left: -30%; } 100% { left: 100%; } }
 
         /* REQUEST UI */
-        .req-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 5px; animation: flash 1s infinite; }
-        .req-fare { font-size: 24px; font-weight: 800; color: #333; margin-bottom: 15px; }
+        .req-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 5px; animation: flash 1s infinite; display: flex; justify-content: space-between; align-items: center; }
         @keyframes flash { 50% { opacity: 0.5; } }
+        .req-fare { font-size: 24px; font-weight: 800; color: #333; margin-bottom: 15px; }
         
         .loc-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
         .loc-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
@@ -63,6 +63,19 @@
         .timer-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .timer-circle { fill: none; stroke: rgba(255,255,255,0.3); stroke-width: 55; stroke-dasharray: 400; stroke-dashoffset: 0; transition: stroke-dashoffset 10s linear; }
         
+        /* FLASH RIBBON & DETAILS */
+        .flash-ribbon {
+            background: var(--flash);
+            color: #333;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-left: 10px;
+        }
+
         /* TRIP UI */
         .trip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .trip-status { font-size: 12px; font-weight: 700; color: #2196F3; background: #E3F2FD; padding: 4px 10px; border-radius: 10px; }
@@ -191,12 +204,19 @@
 
     <!-- 3. INCOMING REQUEST CARD -->
     <div class="bottom-card hidden-card" id="card-request" style="z-index:200;">
-        <div class="req-title" data-i18n="new_hire">New Hire!</div>
+        <div class="req-title">
+            <span data-i18n="new_hire">New Hire!</span>
+            <!-- Flash Ribbon injected via JS -->
+            <span id="req-flash-badge"></span>
+        </div>
         <div class="req-fare">LKR <span id="req-price">0</span></div>
         
         <div class="loc-row"><div class="loc-dot dot-blue"></div><div class="loc-txt" id="req-pickup">...</div></div>
         <div class="loc-row"><div class="loc-dot dot-red"></div><div class="loc-txt" id="req-drop">...</div></div>
         
+        <!-- Flash details injected via JS -->
+        <div id="req-flash-details" style="font-size:12px; color:#f57f17; margin-bottom:10px; display:none; font-weight:600; padding:8px; background:#fffde7; border-radius:8px;"></div>
+
         <div class="req-meta">
             <span><i class="fas fa-location-arrow"></i> <span id="req-dist-user">0</span> km</span>
             <span><i class="fas fa-route"></i> <span id="req-dist-trip">0</span> km</span>
@@ -301,7 +321,7 @@
 
 <!-- JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpx/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, get, update, set, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -329,7 +349,7 @@
             status_title: "රියදුරු තත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලැබා ගැනීමට ලබා වෙන", btn_manage_veh: "වාහන කළමනාකරණය",
             finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රියව තබන්න", btn_offline: "විසන්ධි වන්න",
             new_hire: "නව හයර් එක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්",
-            trip_ended: "ගමන අවසන්", cash_collect: "අයකළ �ැයීම", btn_cash_rec: "මුදල් ලැබුණි",
+            trip_ended: "ගමන අවසන්", cash_collect: "අයකළ ගැයීම", btn_cash_rec: "මුදල් ලැබුණි",
             today_earn: "අද ඉපැයීම්", btn_close: "වසන්න", my_vehicles: "මගේ වාහන", btn_add_veh: "+ වාහනයක් එක් කරන්න",
             sel_veh: "වාහනය තෝරන්න", btn_cont: "ඉදිරිපත් කරන්", btn_cancel: "අවලංගු යියි", processing: "සකසමින් පවතී...",
             slide_start: "ඇරඹීමට අදින්", slide_end: "අවසන් කිරීමට අදින්"
@@ -451,10 +471,6 @@
         update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"online"});
         
         // Listen for requests
-        // NOTE: In a real app, you'd use Cloud Functions to match logic efficiently.
-        // Here, we listen to 'rides' and filter client-side for simplicity + matching.
-        // To avoid self-matching conflicts in this demo, we listen to 'rides' and find a match for ME.
-        
         ridesRef = ref(db, 'rides');
         onValue(ridesRef, (snapshot) => {
             if(tripState !== 'IDLE') return; // Busy
@@ -465,10 +481,26 @@
             // Check if any ride is requesting my type and matches my criteria
             for(let rid in rides) {
                 const r = rides[rid];
-                if(r.status === 'requesting' && r.vehicleType === selectedVehType && r.driverId === currentUser.uid) {
-                    incomingRequest(rid, r);
-                break;
-                // Stop listening once found
+                
+                // Check Status
+                if(r.status !== 'requesting') continue;
+
+                // Check Vehicle Match
+                if(r.vehicleType !== selectedVehType) continue;
+
+                // FLASH LOGIC:
+                // If this is a Flash job, I can only take it if I'm on a Bike.
+                if(r.serviceType === 'flash' && selectedVehType !== 'bike') continue;
+                
+                // If I'm a Bike, I accept both Ride and Flash.
+                // If I'm others, I only accept Ride (serviceType undefined or 'ride').
+                if(r.serviceType && r.serviceType !== 'flash' && r.serviceType !== 'ride') continue;
+
+                // Distance Check (Optional simple check for demo)
+                // Real app: getDistanceFromLatLonInKm(currentLocation, r.pickup) < radius
+
+                incomingRequest(rid, r);
+                break; // Stop listening once found
             }
         });
     }
@@ -491,6 +523,20 @@
         document.getElementById('req-pickup').innerText = data.pickup.addr;
         document.getElementById('req-drop').innerText = data.dropoff.addr;
         
+        // Handle Flash UI Ribbon
+        const flashBadge = document.getElementById('req-flash-badge');
+        const flashDetails = document.getElementById('req-flash-details');
+        
+        if(data.serviceType === 'flash') {
+            flashBadge.innerHTML = `<span class="flash-ribbon">FLASH DELIVERY</span>`;
+            flashDetails.style.display = 'block';
+            const itemText = data.flashItem ? data.flashItem.charAt(0).toUpperCase() + data.flashItem.slice(1) : 'Unknown';
+            flashDetails.innerText = `Item: ${itemText} | Note: ${data.note || 'None'}`;
+        } else {
+            flashBadge.innerHTML = '';
+            flashDetails.style.display = 'none';
+        }
+
         const distToUser = getDistanceFromLatLonInKm(currentLocation.lat, currentLocation.lng, data.pickup.lat, data.pickup.lng).toFixed(1);
         const distTrip = getDistanceFromLatLonInKm(data.pickup.lat, data.pickup.lng, data.dropoff.lat, data.dropoff.lng).toFixed(1);
         
@@ -676,7 +722,7 @@
     }
     function deg2rad(deg) { return deg * (Math.PI/180) }
 
-    // --- VEHICLE MANAGER (OMITTED BREVITY BUT LOGIC RETAINED) ---
+    // --- VEHICLE MANAGER ---
     async function loadVehicles() {
         currentVehicles=[];
         const categories = ["Bike","Tuk Tuk","Car","Van"];
@@ -706,7 +752,7 @@
                 d.className = 'v-item';
                 let st = v.approved_status===true ? "<span style='color:green; font-size:10px;'>Approved</span>" : 
                          (v.approved_status==="declined" ? "<span style='color:red; font-size:10px;'>Declined</span>" : 
-                         "<span style='color:orange; font-size:10px;'>Pending</span>";
+                         "<span style='color:orange; font-size:10px;'>Pending</span>");
                 
                 d.innerHTML = `
                     <div><b>${v.brand}</b> <span style="font-size:12px;color:#777;">${v.model}</span><br><small>${v.plate}</small></div>
