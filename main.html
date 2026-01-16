@@ -27,7 +27,7 @@
         @keyframes pulse-ring { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
 
         /* TOP CARD */
-        .top-card { position: fixed; top: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-radius: 15px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 100; }
+        .top-card { position: fixed; top: 15px; left: 15px; right: 15px; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-radius: 15px; padding: 10px 15px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 100; }
         .profile-sec { display: flex; align-items: center; gap: 10px; }
         .p-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
         .p-name { font-weight: 700; font-size: 14px; color: var(--text); }
@@ -98,7 +98,7 @@
         /* VEHICLE LIST ITEM */
         .v-item { padding: 15px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 12px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .v-item.selected { border: 2px solid var(--primary); background: #ffebee; }
-        .del-btn { background: #ffebee; color: #d32f2f; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-top: 5px; cursor: pointer; transition: 0.2s; }
+        .del-btn { background: #ffebee; color: #d32f2f; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-top: 5px; cursor: pointer; transition: 0.Name: 0.2s; }
         .del-btn:active { background: #ffcdd2; }
         
         .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
@@ -241,8 +241,6 @@
         </div>
     </div>
 
-</div>
-
 <!-- SUMMARY MODAL -->
 <div id="summary-modal" class="modal-overlay full-screen-modal">
     <div class="modal-card">
@@ -303,10 +301,10 @@
 
 <!-- JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<script src="https://unpx/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, get, update, set, remove, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getDatabase, ref, get, update, set, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
     const db = getDatabase(initializeApp({
         apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
@@ -328,21 +326,21 @@
             slide_start: "SLIDE TO START", slide_end: "SLIDE TO END"
         },
         si: {
-            status_title: "රියදුරු තත්ත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලබා ගැනීමට ඔන්ලයින් වන්න", btn_manage_veh: "වාහන කළමනාකරණය",
+            status_title: "රියදුරු තත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලැබා ගැනීමට ලබා වෙන", btn_manage_veh: "වාහන කළමනාකරණය",
             finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රියව තබන්න", btn_offline: "විසන්ධි වන්න",
-            new_hire: "නව හයර් එකක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්න",
-            trip_ended: "ගමන අවසන්", cash_collect: "අයකළ යුතු මුදල", btn_cash_rec: "මුදල් ලැබුණි",
+            new_hire: "නව හයර් එක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්",
+            trip_ended: "ගමන අවසන්", cash_collect: "අයකළ �ැයීම", btn_cash_rec: "මුදල් ලැබුණි",
             today_earn: "අද ඉපැයීම්", btn_close: "වසන්න", my_vehicles: "මගේ වාහන", btn_add_veh: "+ වාහනයක් එක් කරන්න",
-            sel_veh: "වාහනය තෝරන්න", btn_cont: "ඉදිරිපත් කරන්න", btn_cancel: "අවලංගුයි", processing: "සකසමින් පවතී...",
-            slide_start: "ඇරඹීමට අදින්න", slide_end: "අවසන් කිරීමට අදින්න"
+            sel_veh: "වාහනය තෝරන්න", btn_cont: "ඉදිරිපත් කරන්", btn_cancel: "අවලංගු යියි", processing: "සකසමින් පවතී...",
+            slide_start: "ඇරඹීමට අදින්", slide_end: "අවසන් කිරීමට අදින්"
         },
         ta: {
-            status_title: "ஓட்டுநர் நிலை", btn_online: "ஆன்லைனில் செல்லுங்கள்", online_desc: "சவாரிகளைப் பெற ஆன்லைனில் செல்லவும்", btn_manage_veh: "வாகனங்களை நிர்வகிக்கவும்",
+            status_title: "ஓட்டுநர் நிலை", btn_online: "ஆன்லைனில் செல்லுங்கள்", online_desc: "சவாரிகளைப் பெற ஆன்லைனில் செல்லவும்", btn_manage_veh: "வாகனங்களை நிர்வகிக்கும்",
             finding: "தேடுகிறது...", gps_on: "GPS மற்றும் Data ஆன் செய்யவும்", btn_offline: "ஆஃப்லைன் செல்லுங்கள்",
             new_hire: "புதிய சவாரி!", btn_accept: "ஏற்கவும்", btn_notify: "நான் வந்துவிட்டேன்", btn_cancel: "ரத்து செய்",
-            trip_ended: "சவாரி முடிந்தது", cash_collect: "பெற வேண்டிய பணம்", btn_cash_rec: "பணம் பெறப்பட்டது",
+            trip_ended: "சவாரி முடிந்தது", cash_collect: "பெற வேண்டிய பணம்", btn_cash_rec: "பணம் பெறப்பட்டு",
             today_earn: "இன்றைய வருமானம்", btn_close: "மூடு", my_vehicles: "எனது வாகனங்கள்", btn_add_veh: "+ வாகனத்தைச் சேர்",
-            sel_veh: "வாகனத்தைத் தேர்ந்தெடுக்கவும்", btn_cont: "தொடரவும்", btn_cancel: "ரத்து", processing: "செயலாக்குகிறது...",
+            sel_veh: "வாகனத்தைத் தேர்ந்தெடுக்கவும்", btn_cont: "தொடரவும்", btn_cancel: "ரத்து", processing: "செயலாக்கிறது...",
             slide_start: "தொடங்க இழுக்கவும்", slide_end: "முடிக்க இழுக்கவும்"
         }
     };
@@ -453,6 +451,10 @@
         update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"online"});
         
         // Listen for requests
+        // NOTE: In a real app, you'd use Cloud Functions to match logic efficiently.
+        // Here, we listen to 'rides' and filter client-side for simplicity + matching.
+        // To avoid self-matching conflicts in this demo, we listen to 'rides' and find a match for ME.
+        
         ridesRef = ref(db, 'rides');
         onValue(ridesRef, (snapshot) => {
             if(tripState !== 'IDLE') return; // Busy
@@ -460,16 +462,13 @@
             const rides = snapshot.val();
             if(!rides) return;
             
+            // Check if any ride is requesting my type and matches my criteria
             for(let rid in rides) {
                 const r = rides[rid];
-                if(r.status === 'requesting' && r.vehicleType === selectedVehType) {
-                    // Distance Check
-                    const d = getDistanceFromLatLonInKm(currentLocation.lat, currentLocation.lng, r.pickup.lat, r.pickup.lng);
-                    if(d <= 5) { 
-                        incomingRequest(rid, r);
-                        break; 
-                    }
-                }
+                if(r.status === 'requesting' && r.vehicleType === selectedVehType && r.driverId === currentUser.uid) {
+                    incomingRequest(rid, r);
+                break;
+                // Stop listening once found
             }
         });
     }
@@ -479,8 +478,8 @@
         document.getElementById('card-searching').classList.add('hidden-card');
         document.getElementById('card-offline').style.display='flex';
         if(selectedVehId) update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"offline"});
-        selectedVehId = null;
-        // Detach listeners ideally
+        selectedVid = null;
+        if(ridesRef) { ridesRef = null; } // Stop listener
     }
 
     function incomingRequest(rideId, data) {
@@ -515,15 +514,16 @@
         document.getElementById('card-request').classList.add('hidden-card');
         document.getElementById('card-trip').classList.remove('hidden-card');
         
+        // REAL DB UPDATE
         await update(ref(db, `rides/${currentRideId}`), {
             status: 'driver_found',
             driverId: currentUser.uid,
             driverName: currentUser.fullName,
-            driverPhone: currentUser.mobile || '0000000000', // Mock phone
+            driverPhone: currentUser.mobile || '0000000000', // In real app, ensure this exists
             vehiclePlate: currentVehicles.find(v=>v.id===selectedVehId).plate
         });
         
-        document.getElementById('trip-status-txt').innerText = lang==='si'?"මගියා වෙත යමින්":"On way to pickup";
+        document.getElementById('trip-status-txt').innerText = lang==='si'?"සියයා වෙත යමින්":"On way to pickup";
         document.getElementById('trip-from').innerText = rideData.pickup.addr;
         document.getElementById('trip-to').innerText = rideData.dropoff.addr;
         document.getElementById('live-fare').innerText = rideData.price.replace('LKR ', '');
@@ -571,7 +571,7 @@
         const pickup = L.latLng(rideData.pickup.lat, rideData.pickup.lng);
         const drop = L.latLng(rideData.dropoff.lat, rideData.dropoff.lng);
         const rider = L.latLng(currentLocation.lat, currentLocation.lng);
-
+        
         // User Marker
         if(!userPosMarker) {
             const icon = L.divIcon({ html: '<div style="width:15px;height:15px;background:blue;border-radius:50%;border:2px solid white;"></div>', iconSize:[15,15], iconAnchor:[7,7]});
@@ -580,9 +580,11 @@
 
         if(tripState === 'PICKUP') {
             // Blue Line: Rider -> Pickup
-            if(pickupLine) map.removeLayer(pickupLine);
-            pickupLine = L.polyline([rider, pickup], {color: 'blue', weight: 5, dashArray: '10, 10'}).addTo(map);
-            map.fitBounds([rider, pickup], {padding: [50, 50]});
+            if(rider && pickup) {
+                if(pickupLine) map.removeLayer(pickupLine);
+                pickupLine = L.polyline([rider, pickup], {color: 'blue', weight: 5, dashArray: '10, 10'}).addTo(map);
+                map.fitBounds([rider, pickup], {padding: [50, 50]});
+            }
             if(tripLine) { map.removeLayer(tripLine); tripLine = null; }
         } else if (tripState === 'TRIP') {
             // Red Line: Pickup -> Drop
@@ -594,21 +596,12 @@
         }
     }
 
-    function clearLines() {
-        if(pickupLine) map.removeLayer(pickupLine);
-        if(tripLine) map.removeLayer(tripLine);
-        pickupLine = null;
-        tripLine = null;
-        if(userPosMarker) map.removeLayer(userPosMarker);
-        userPosMarker = null;
-    }
-
     window.notifyUser = () => { toast("User Notified!", "success"); }
     window.openMsgPopup = () => document.getElementById('msg-popup').style.display = 'flex';
 
     function startTrip() {
         tripState = "TRIP";
-        document.getElementById('trip-status-txt').innerText = lang==='si'?"ගමනාන්තය වෙත":"Heading to Destination";
+        document.getElementById('trip-status-txt').innerText = lang==='si'?"ගමනානාන්තය වෙත":"Heading to Destination";
         document.getElementById('btn-notify').style.display='none';
         setupSlider(dict[lang].slide_end, endTrip);
         updateTripLines(); // Switch to Red Line
@@ -634,14 +627,14 @@
         localStorage.setItem('speedo_earnings', earnings);
         document.getElementById('earn-txt').innerText = earnings.toFixed(2);
         
-        // End ride in DB
+        // REAL DB UPDATE: End Ride
         await update(ref(db, `rides/${currentRideId}`), { status: 'ended' });
         
-        // Reset Rider
+        // Reset Rider to be available again
         currentRideId = null;
         rideData = null;
         document.getElementById('btn-notify').style.display='block';
-        // Back to Searching
+        // Back to Searching state visually
         document.getElementById('card-offline').style.display='none';
         document.getElementById('card-searching').classList.remove('hidden-card');
     }
@@ -713,7 +706,7 @@
                 d.className = 'v-item';
                 let st = v.approved_status===true ? "<span style='color:green; font-size:10px;'>Approved</span>" : 
                          (v.approved_status==="declined" ? "<span style='color:red; font-size:10px;'>Declined</span>" : 
-                         "<span style='color:orange; font-size:10px;'>Pending</span>");
+                         "<span style='color:orange; font-size:10px;'>Pending</span>";
                 
                 d.innerHTML = `
                     <div><b>${v.brand}</b> <span style="font-size:12px;color:#777;">${v.model}</span><br><small>${v.plate}</small></div>
