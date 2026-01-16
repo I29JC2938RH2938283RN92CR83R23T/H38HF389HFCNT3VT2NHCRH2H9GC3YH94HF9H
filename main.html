@@ -104,6 +104,18 @@
         .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
         .img-upload { background: #f0f0f0; border: 2px dashed #ccc; height: 110px; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; position: relative; flex-direction: column; text-align: center; font-size: 12px; color: #777; }
         .img-upload img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; }
+
+        /* Message Popup */
+        #msg-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 6000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .msg-content {
+            background: white; padding: 30px; border-radius: 20px; width: 80%; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .msg-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -115,6 +127,24 @@
 <div id="global-loader" class="popup-loader">
     <div class="spinner"></div>
     <div style="font-weight:600; color:#555;" data-i18n="processing">Processing...</div>
+</div>
+
+<!-- MESSAGE POPUP -->
+<div id="msg-popup">
+    <div class="msg-content">
+        <h3>Message Customer</h3>
+        <input type="text" id="msg-input-text" class="msg-input" placeholder="Type a message...">
+        <div style="display:flex; gap:10px;">
+            <button class="go-online-btn" style="background:#ddd; color:#333;" onclick="document.getElementById('msg-popup').style.display='none'">Cancel</button>
+            <button class="go-online-btn" onclick="sendMessageToUser()">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- FULL SCREEN USER MESSAGE -->
+<div id="user-msg-fullscreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9000; display:none; justify-content:center; align-items:center; color:white; font-size:24px; text-align:center; padding:20px;">
+    <i class="fa-solid fa-comment-dots" style="margin-bottom:20px; font-size:50px;"></i>
+    <div id="user-msg-text">Message from Customer</div>
 </div>
 
 <!-- TOP UI -->
@@ -198,8 +228,8 @@
             <button class="go-online-btn" style="background:#2196F3; font-size:14px; margin-bottom:10px;" id="btn-notify" onclick="notifyUser()">
                 <span data-i18n="btn_notify">Notify I'm Here</span>
             </button>
-            <button class="go-online-btn" style="background:#555; font-size:12px; padding:10px;" onclick="cancelTrip()">
-                <span data-i18n="btn_cancel">Cancel / Stop Trip</span>
+            <button class="go-online-btn" style="background:#555; font-size:12px; padding:10px; margin-bottom:10px;" onclick="openMsgPopup()">
+                <i class="fa-solid fa-comment"></i> Message Customer
             </button>
 
             <!-- SLIDE BUTTON -->
@@ -276,7 +306,7 @@
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, get, update, set, remove, onValue, onChildAdded, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getDatabase, ref, get, update, set, remove, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
     const db = getDatabase(initializeApp({
         apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
@@ -298,7 +328,7 @@
             slide_start: "SLIDE TO START", slide_end: "SLIDE TO END"
         },
         si: {
-            status_title: "රියදුරු තත්ත්වය", btn_online: "මාර්ගගත වන්න", online_desc: "හයර් ලබා ගැනීමට ඔන්ලයින් වන්න", btn_manage_veh: "වාහන කළමනාකරණය",
+            status_title: "රියදුරු තත්ත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලබා ගැනීමට ඔන්ලයින් වන්න", btn_manage_veh: "වාහන කළමනාකරණය",
             finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රියව තබන්න", btn_offline: "විසන්ධි වන්න",
             new_hire: "නව හයර් එකක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්න",
             trip_ended: "ගමන අවසන්", cash_collect: "අයකළ යුතු මුදල", btn_cash_rec: "මුදල් ලැබුණි",
@@ -322,7 +352,10 @@
     let tripState = "IDLE"; 
     let currentRideId = null, tempV={type:"",imgs:{}}, earnings=0;
     let currentLocation = null; // {lat, lng}
-    let ridesRef = null; // Listener
+    let rideData = null; // Store ride info
+    let pickupLine = null; // Blue Line
+    let tripLine = null; // Red Line
+    let userPosMarker = null; // Customer Marker
 
     window.onload = async () => {
         updateLangUI();
@@ -373,14 +406,15 @@
                     map.setView([lat, lng], 16);
                 } else {
                     marker.setLatLng([lat, lng]);
-                    if(isOnline && !currentRideId) map.setView([lat, lng]); 
+                    // If driving, update line endpoints
+                    if(tripState !== 'IDLE') updateTripLines();
                     
                     if(isOnline && selectedVehId) {
                         update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}/location`), {lat, lng, ts:Date.now()});
                     }
                 }
             }, (err) => {
-                toast("GPS Error: " + err.message, "error");
+                toast("GPS Error", "error");
             }, {enableHighAccuracy:true});
         }
     }
@@ -418,26 +452,22 @@
         
         update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"online"});
         
-        // --- REAL TIME LISTENER FOR REQUESTS ---
-        // Listen to rides that match my vehicle type and are 'requesting'
-        // Note: Complex SQL-like queries are hard in Firebase Realtime without indexes.
-        // We will listen to 'rides' and filter client side for this demo.
+        // Listen for requests
         ridesRef = ref(db, 'rides');
         onValue(ridesRef, (snapshot) => {
-            if(currentRideId) return; // Already busy
+            if(tripState !== 'IDLE') return; // Busy
             
             const rides = snapshot.val();
             if(!rides) return;
             
-            // Find a ride for me
             for(let rid in rides) {
                 const r = rides[rid];
                 if(r.status === 'requesting' && r.vehicleType === selectedVehType) {
-                    // Calculate distance to user (simple check)
+                    // Distance Check
                     const d = getDistanceFromLatLonInKm(currentLocation.lat, currentLocation.lng, r.pickup.lat, r.pickup.lng);
-                    if(d <= 5) { // Within 5km
+                    if(d <= 5) { 
                         incomingRequest(rid, r);
-                        break; // Stop looking
+                        break; 
                     }
                 }
             }
@@ -450,20 +480,20 @@
         document.getElementById('card-offline').style.display='flex';
         if(selectedVehId) update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"offline"});
         selectedVehId = null;
-        if(ridesRef) { /* Detach listener logic needed ideally, but simplified here */ }
+        // Detach listeners ideally
     }
 
-    function incomingRequest(rideId, rideData) {
+    function incomingRequest(rideId, data) {
         currentRideId = rideId;
+        rideData = data;
         tripState = "REQUEST";
         
-        document.getElementById('req-price').innerText = rideData.price.replace('LKR ', '');
-        document.getElementById('req-pickup').innerText = rideData.pickup.addr;
-        document.getElementById('req-drop').innerText = rideData.dropoff.addr;
+        document.getElementById('req-price').innerText = data.price.replace('LKR ', '');
+        document.getElementById('req-pickup').innerText = data.pickup.addr;
+        document.getElementById('req-drop').innerText = data.dropoff.addr;
         
-        // Calculate distances
-        const distToUser = getDistanceFromLatLonInKm(currentLocation.lat, currentLocation.lng, rideData.pickup.lat, rideData.pickup.lng).toFixed(1);
-        const distTrip = getDistanceFromLatLonInKm(rideData.pickup.lat, rideData.pickup.lng, rideData.dropoff.lat, rideData.dropoff.lng).toFixed(1);
+        const distToUser = getDistanceFromLatLonInKm(currentLocation.lat, currentLocation.lng, data.pickup.lat, data.pickup.lng).toFixed(1);
+        const distTrip = getDistanceFromLatLonInKm(data.pickup.lat, data.pickup.lng, data.dropoff.lat, data.dropoff.lng).toFixed(1);
         
         document.getElementById('req-dist-user').innerText = distToUser;
         document.getElementById('req-dist-trip').innerText = distTrip;
@@ -475,12 +505,9 @@
         btn.style.strokeDashoffset = 0;
         setTimeout(() => btn.style.strokeDashoffset = 400, 10);
         
-        // Auto timeout if not accepted
         setTimeout(() => {
-            if(tripState === "REQUEST") {
-                rejectRide();
-            }
-        }, 10000); // 10s to accept
+            if(tripState === "REQUEST") rejectRide();
+        }, 10000);
     }
 
     window.acceptHire = async () => {
@@ -488,48 +515,103 @@
         document.getElementById('card-request').classList.add('hidden-card');
         document.getElementById('card-trip').classList.remove('hidden-card');
         
-        const rideRef = ref(db, `rides/${currentRideId}`);
-        const snap = await get(rideRef);
-        const data = snap.val();
-        
-        // Update DB Ride
-        await update(rideRef, {
+        await update(ref(db, `rides/${currentRideId}`), {
             status: 'driver_found',
             driverId: currentUser.uid,
             driverName: currentUser.fullName,
+            driverPhone: currentUser.mobile || '0000000000', // Mock phone
             vehiclePlate: currentVehicles.find(v=>v.id===selectedVehId).plate
         });
         
         document.getElementById('trip-status-txt').innerText = lang==='si'?"මගියා වෙත යමින්":"On way to pickup";
-        document.getElementById('trip-from').innerText = data.pickup.addr;
-        document.getElementById('trip-to').innerText = data.dropoff.addr;
-        document.getElementById('live-fare').innerText = data.price.replace('LKR ', '');
+        document.getElementById('trip-from').innerText = rideData.pickup.addr;
+        document.getElementById('trip-to').innerText = rideData.dropoff.addr;
+        document.getElementById('live-fare').innerText = rideData.price.replace('LKR ', '');
         
         setupSlider(dict[lang].slide_start, startTrip);
         
-        // Watch Ride Status
-        onValue(rideRef, (s) => {
+        // Update Map Lines (Blue)
+        updateTripLines();
+        
+        // Listen for messages
+        onValue(ref(db, `rides/${currentRideId}/messages`), snap => {
+            const msgs = snap.val();
+            if(msgs) {
+                const last = Object.values(msgs).pop();
+                if(last && last.sender !== 'driver') {
+                    const fs = document.getElementById('user-msg-fullscreen');
+                    document.getElementById('user-msg-text').innerText = last.text;
+                    fs.style.display = 'flex';
+                    setTimeout(() => fs.style.display = 'none', 2000);
+                }
+            }
+        });
+
+        // Watch for cancellation
+        onValue(ref(db, `rides/${currentRideId}`), s => {
             const r = s.val();
-            if(r.status === 'cancelled') { rejectRide(); }
+            if(r.status === 'cancelled') rejectRide();
         });
     }
     
     function rejectRide() {
         currentRideId = null;
         tripState = "IDLE";
+        rideData = null;
+        clearLines();
         document.getElementById('card-request').classList.add('hidden-card');
         document.getElementById('card-trip').classList.add('hidden-card');
         if(isOnline) document.getElementById('card-searching').classList.remove('hidden-card');
         else document.getElementById('card-offline').style.display='flex';
     }
 
+    function updateTripLines() {
+        if(!rideData) return;
+        
+        const pickup = L.latLng(rideData.pickup.lat, rideData.pickup.lng);
+        const drop = L.latLng(rideData.dropoff.lat, rideData.dropoff.lng);
+        const rider = L.latLng(currentLocation.lat, currentLocation.lng);
+
+        // User Marker
+        if(!userPosMarker) {
+            const icon = L.divIcon({ html: '<div style="width:15px;height:15px;background:blue;border-radius:50%;border:2px solid white;"></div>', iconSize:[15,15], iconAnchor:[7,7]});
+            userPosMarker = L.marker(pickup, {icon}).addTo(map);
+        }
+
+        if(tripState === 'PICKUP') {
+            // Blue Line: Rider -> Pickup
+            if(pickupLine) map.removeLayer(pickupLine);
+            pickupLine = L.polyline([rider, pickup], {color: 'blue', weight: 5, dashArray: '10, 10'}).addTo(map);
+            map.fitBounds([rider, pickup], {padding: [50, 50]});
+            if(tripLine) { map.removeLayer(tripLine); tripLine = null; }
+        } else if (tripState === 'TRIP') {
+            // Red Line: Pickup -> Drop
+            if(pickupLine) { map.removeLayer(pickupLine); pickupLine = null; }
+            if(!tripLine) {
+                tripLine = L.polyline([pickup, drop], {color: 'red', weight: 5}).addTo(map);
+                map.fitBounds([pickup, drop], {padding: [100, 100]});
+            }
+        }
+    }
+
+    function clearLines() {
+        if(pickupLine) map.removeLayer(pickupLine);
+        if(tripLine) map.removeLayer(tripLine);
+        pickupLine = null;
+        tripLine = null;
+        if(userPosMarker) map.removeLayer(userPosMarker);
+        userPosMarker = null;
+    }
+
     window.notifyUser = () => { toast("User Notified!", "success"); }
+    window.openMsgPopup = () => document.getElementById('msg-popup').style.display = 'flex';
 
     function startTrip() {
         tripState = "TRIP";
         document.getElementById('trip-status-txt').innerText = lang==='si'?"ගමනාන්තය වෙත":"Heading to Destination";
         document.getElementById('btn-notify').style.display='none';
         setupSlider(dict[lang].slide_end, endTrip);
+        updateTripLines(); // Switch to Red Line
     }
 
     function endTrip() {
@@ -542,25 +624,38 @@
         document.getElementById('sum-total').innerText = ridePrice;
         document.getElementById('sum-base').innerText = ridePrice;
         document.getElementById('summary-modal').style.display = 'flex';
-        
-        // Update DB
-        update(ref(db, `rides/${currentRideId}`), { status: 'ended' });
-        currentRideId = null;
+        clearLines();
     }
 
-    window.finishCash = () => {
+    window.finishCash = async () => {
         closeModal('summary-modal');
         const price = parseFloat(document.getElementById('sum-total').innerText);
         earnings += price;
         localStorage.setItem('speedo_earnings', earnings);
         document.getElementById('earn-txt').innerText = earnings.toFixed(2);
-        document.getElementById('card-searching').classList.remove('hidden-card');
+        
+        // End ride in DB
+        await update(ref(db, `rides/${currentRideId}`), { status: 'ended' });
+        
+        // Reset Rider
+        currentRideId = null;
+        rideData = null;
         document.getElementById('btn-notify').style.display='block';
+        // Back to Searching
+        document.getElementById('card-offline').style.display='none';
+        document.getElementById('card-searching').classList.remove('hidden-card');
     }
 
-    window.showEarnings = () => {
-        document.getElementById('daily-earn').innerText = earnings.toFixed(2);
-        openModal('earnings-modal');
+    window.sendMessageToUser = async () => {
+        const txt = document.getElementById('msg-input-text').value;
+        if(!txt) return;
+        document.getElementById('msg-popup').style.display = 'none';
+        
+        await push(ref(db, `rides/${currentRideId}/messages`), {
+            sender: 'driver',
+            text: txt,
+            timestamp: Date.now()
+        });
     }
 
     // --- UTILS ---
@@ -578,20 +673,17 @@
         else { d.style.display='none'; a.className='fas fa-chevron-down pill-expand-icon'; }
     }
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-        var R = 6371; // Radius of the earth in km
+        var R = 6371; 
         var dLat = deg2rad(lat2-lat1);  
         var dLon = deg2rad(lon2-lon1); 
-        var a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2); 
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c; // Distance in km
+        var d = R * c; 
         return d;
     }
     function deg2rad(deg) { return deg * (Math.PI/180) }
 
-    // --- VEHICLE MANAGER (SIMPLIFIED FOR FULL CODE BREVITY) ---
+    // --- VEHICLE MANAGER (OMITTED BREVITY BUT LOGIC RETAINED) ---
     async function loadVehicles() {
         currentVehicles=[];
         const categories = ["Bike","Tuk Tuk","Car","Van"];
@@ -633,7 +725,7 @@
         }
         openModal('vehicle-man-modal');
     }
-    window.openAddVehicle = () => { /* Wizard omitted for brevity but keeps existing functionality */ toast("Open Add Vehicle Page", "success"); closeModal('vehicle-man-modal'); }
+    window.openAddVehicle = () => { closeModal('vehicle-man-modal'); window.open('add-vehicle.html','_blank'); } // Open separate file for brevity
 
     // --- SLIDER LOGIC ---
     function setupSlider(text, callback) {
