@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Speedo Rider</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts: Noto Sans for Sinhala/Tamil support -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Leaflet & Routing Machine -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
 
     <style>
         :root { --primary: #D32F2F; --white: #ffffff; --text: #333; --online: #00C853; --offline: #D32F2F; --bg: #f4f4f4; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
-        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; overflow: hidden; background: #eee; height: 100vh; width: 100vw; }
+        body { margin: 0; padding: 0; font-family: 'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif; overflow: hidden; background: #eee; height: 100vh; width: 100vw; }
 
         /* MAP */
         #map { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-        /* Hide Leaflet Routing Container */
         .leaflet-routing-container { display: none; }
 
         /* MARKERS */
@@ -32,18 +31,22 @@
         .profile-sec { display: flex; align-items: center; gap: 10px; }
         .p-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
         .p-name { font-weight: 700; font-size: 14px; color: var(--text); }
-        .lang-btn { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; color: #555; position: absolute; left: 50%; transform: translateX(-50%); }
+        .lang-btn { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; color: #555; position: absolute; left: 50%; transform: translateX(-50%); cursor: pointer; border:1px solid #ccc; }
         
-        /* EARNINGS PILL */
-        .earnings-pill { background: var(--white); border: 2px solid #ddd; padding: 5px 15px; border-radius: 30px; font-weight: 700; font-size: 13px; color: var(--online); display: flex; align-items: center; gap: 5px; transition: 0.3s; cursor: pointer; }
-        .earnings-pill.offline { color: var(--offline); border-color: var(--offline); }
+        /* EARNINGS PILL (Always Visible) */
+        .earnings-pill { background: var(--white); border: 2px solid #ddd; padding: 5px 15px; border-radius: 30px; font-weight: 700; font-size: 13px; color: var(--online); display: flex; align-items: center; gap: 5px; transition: 0.3s; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .earnings-pill i { color: #FFD700; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
 
-        /* BOTTOM CARDS (Common) */
+        /* BOTTOM CARDS */
         .bottom-card { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); border-radius: 25px 25px 0 0; padding: 25px 20px 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); z-index: 100; display: flex; flex-direction: column; transition: transform 0.3s ease; }
         .hidden-card { transform: translateY(110%); }
 
-        /* REQUEST CARD (NEW HIRE) */
+        /* LINEAR LOADER */
+        .linear-loader { width: 100%; height: 4px; background: #eee; position: relative; overflow: hidden; margin-bottom: 15px; border-radius: 2px; display: none; }
+        .linear-bar { position: absolute; left: 0; top: 0; height: 100%; width: 30%; background: var(--primary); animation: loadMove 1.5s infinite ease-in-out; }
+        @keyframes loadMove { 0% { left: -30%; } 100% { left: 100%; } }
+
+        /* REQUEST UI */
         .req-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 5px; animation: flash 1s infinite; }
         .req-fare { font-size: 24px; font-weight: 800; color: #333; margin-bottom: 15px; }
         @keyframes flash { 50% { opacity: 0.5; } }
@@ -56,57 +59,59 @@
         
         .req-meta { display: flex; justify-content: space-between; font-size: 13px; color: #777; margin: 15px 0; background: #f9f9f9; padding: 10px; border-radius: 8px; }
         
-        /* 5s TIMER BUTTON */
         .accept-btn { position: relative; width: 100%; height: 55px; background: var(--primary); color: white; border: none; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .timer-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .timer-circle { fill: none; stroke: rgba(255,255,255,0.3); stroke-width: 55; stroke-dasharray: 400; stroke-dashoffset: 0; transition: stroke-dashoffset 5s linear; }
         
-        /* ACTIVE TRIP UI */
+        /* TRIP UI */
         .trip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .trip-status { font-size: 12px; font-weight: 700; color: #2196F3; background: #E3F2FD; padding: 4px 10px; border-radius: 10px; }
-        .pill-minimized { padding: 15px 20px; flex-direction: row; justify-content: space-between; align-items: center; cursor: pointer; }
         .pill-expand-icon { transition: 0.3s; }
         
-        /* SLIDE BUTTON */
         .slide-btn-container { position: relative; width: 100%; height: 55px; background: #eee; border-radius: 30px; margin-top: 15px; overflow: hidden; }
         .slide-text { position: absolute; width: 100%; text-align: center; line-height: 55px; font-weight: 700; color: #888; z-index: 1; letter-spacing: 1px; }
         .slide-handle { position: absolute; left: 2px; top: 2px; width: 51px; height: 51px; background: var(--primary); border-radius: 50%; z-index: 2; display: flex; align-items: center; justify-content: center; color: white; cursor: grab; transition: background 0.3s; box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
         .slide-bg { position: absolute; top: 0; left: 0; height: 100%; width: 0; background: var(--primary); opacity: 0.5; z-index: 0; }
 
-        /* BUTTONS */
         .go-online-btn { background: var(--primary); color: white; width: 100%; padding: 15px; border: none; border-radius: 50px; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4); margin-top: 10px; transition: transform 0.1s; }
         .dot { width: 10px; height: 10px; background: white; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
-        .vehicles-strip { width: 100%; background: #f5f5f5; padding: 12px; border-radius: 12px; margin-top: 15px; text-align: center; font-weight: 600; color: #333; font-size: 14px; border: 1px solid #ddd; }
+        .vehicles-strip { width: 100%; background: #f5f5f5; padding: 12px; border-radius: 12px; margin-top: 15px; text-align: center; font-weight: 600; color: #333; font-size: 14px; border: 1px solid #ddd; cursor: pointer; }
 
-        /* FULL SCREEN MODALS */
+        /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); }
         .modal-card { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 25px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; animation: slideUp 0.3s ease; }
         .full-screen-modal { align-items: center; justify-content: center; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* SUMMARY MODAL */
-        .summary-box { text-align: center; padding: 20px; }
-        .total-price { font-size: 40px; font-weight: 800; color: var(--online); margin: 10px 0; }
-        .collect-lbl { font-size: 14px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-        .breakdown { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: left; }
-        .bd-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; color: #555; }
+        /* POPUP LOADER */
+        .popup-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #eee; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ADD VEHICLE & MANAGER STYLES (Existing) */
+        /* ADD VEHICLE STYLE */
         .carousel { flex: 1; position: relative; overflow: hidden; min-height: 450px; display: flex; flex-direction: column; }
         .slide { position: absolute; top: 0; left: 100%; width: 100%; height: 100%; padding: 5px; box-sizing: border-box; transition: left 0.4s ease; display: flex; flex-direction: column; overflow-y: auto; background: white; }
         .slide.active { left: 0; } .slide.prev { left: -100%; }
         .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .type-card { background: #fff; border: 2px solid #eee; border-radius: 15px; padding: 20px; text-align: center; font-weight: 600; color: #555; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s; }
         .type-card.selected { border-color: var(--primary); background: #fff0f0; color: var(--primary); box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2); }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 8px; margin-bottom: 15px; font-family: 'Poppins'; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 8px; margin-bottom: 15px; font-family: inherit; }
         
-        .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
-        .img-upload { background: #f0f0f0; border: 2px dashed #ccc; height: 110px; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; position: relative; flex-direction: column; }
-        .img-upload img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; }
-        
+        /* AGREEMENT */
+        .agreement-box { height: 150px; overflow-y: scroll; background: #f9f9f9; border: 1px solid #ddd; padding: 10px; font-size: 12px; border-radius: 8px; margin-bottom: 10px; color: #555; line-height: 1.5; }
+        .check-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-weight: 600; font-size: 14px; }
+        .check-row input { width: 20px; height: 20px; margin: 0; }
+
+        /* VEHICLE LIST ITEM */
         .v-item { padding: 15px; border: 1px solid #eee; border-radius: 12px; margin-bottom: 12px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .v-item.selected { border: 2px solid var(--primary); background: #ffebee; }
+        .del-btn { background: #ffebee; color: #d32f2f; border: none; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 12px; margin-top: 5px; cursor: pointer; transition: 0.2s; }
+        .del-btn:active { background: #ffcdd2; }
+        
+        .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .img-upload { background: #f0f0f0; border: 2px dashed #ccc; height: 110px; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; position: relative; flex-direction: column; text-align: center; font-size: 12px; color: #777; }
+        .img-upload img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; }
 
         /* TOAST */
         #toast-container { position: fixed; top: 90px; left: 50%; transform: translateX(-50%); z-index: 9000; width: 90%; pointer-events: none; }
@@ -120,6 +125,12 @@
 <!-- MAP -->
 <div id="map"></div>
 
+<!-- GLOBAL POPUP LOADER -->
+<div id="global-loader" class="popup-loader">
+    <div class="spinner"></div>
+    <div style="font-weight:600; color:#555;" data-i18n="processing">Processing...</div>
+</div>
+
 <!-- TOP UI -->
 <div class="top-card" id="top-ui" style="display:none;">
     <div class="profile-sec" onclick="openProfile()">
@@ -127,8 +138,9 @@
         <div class="p-name"><span id="user-name">Rider</span></div>
     </div>
     <button class="lang-btn" onclick="toggleLang()" id="lang-btn">EN</button>
-    <div class="earnings-pill offline" id="earn-pill" onclick="showEarnings()">
-        <i class="fas fa-coins"></i> <span id="earn-txt">OFFLINE</span>
+    <!-- Always visible earnings -->
+    <div class="earnings-pill" id="earn-pill" onclick="showEarnings()">
+        <i class="fas fa-coins"></i> <span id="earn-txt">0.00</span>
     </div>
 </div>
 
@@ -137,45 +149,46 @@
 
     <!-- 1. OFFLINE CARD -->
     <div class="bottom-card" id="card-offline" style="display:none;">
-        <div style="font-weight:700; color:#444; margin-bottom:10px;">Driver Status</div>
+        <div style="font-weight:700; color:#444; margin-bottom:10px;" data-i18n="status_title">Driver Status</div>
         <button class="go-online-btn" onclick="initiateGoOnline()">
-            <div class="dot"></div> GO ONLINE
+            <div class="dot"></div> <span data-i18n="btn_online">GO ONLINE</span>
         </button>
-        <p style="font-size:12px; color:#777; text-align:center; margin:10px 0;">Go online to receive hires</p>
+        <p style="font-size:12px; color:#777; text-align:center; margin:10px 0;" data-i18n="online_desc">Go online to receive hires</p>
         <div class="vehicles-strip" onclick="openVehicleManager()">
-            <i class="fas fa-car"></i> Manage Vehicles
+            <i class="fas fa-car"></i> <span data-i18n="btn_manage_veh">Manage Vehicles</span>
         </div>
     </div>
 
     <!-- 2. ONLINE (SEARCHING) CARD -->
     <div class="bottom-card hidden-card" id="card-searching">
+        <div class="linear-loader" style="display:block;">
+            <div class="linear-bar"></div>
+        </div>
         <div style="text-align:center; margin-bottom:10px;">
-            <h3 style="color:var(--primary); margin:0;">Finding Hires...</h3>
-            <p style="font-size:12px; color:#777;">Keep GPS & Data ON</p>
+            <h3 style="color:var(--primary); margin:0;" data-i18n="finding">Finding Hires...</h3>
+            <p style="font-size:12px; color:#777;" data-i18n="gps_on">Keep GPS & Data ON</p>
         </div>
-        <button class="go-online-btn" style="background:#333; font-size:14px; padding:12px;" onclick="goOffline()">GO OFFLINE</button>
-        <div style="display:flex; justify-content:space-between; width:100%; margin-top:10px;">
-            <label style="font-size:12px;"><input type="checkbox" id="chk-close"> Closer Rides</label>
-            <label style="font-size:12px;"><input type="checkbox" id="chk-long"> Long Trips</label>
-        </div>
+        <button class="go-online-btn" style="background:#333; font-size:14px; padding:12px;" onclick="goOffline()">
+            <span data-i18n="btn_offline">GO OFFLINE</span>
+        </button>
     </div>
 
     <!-- 3. INCOMING REQUEST CARD -->
     <div class="bottom-card hidden-card" id="card-request" style="z-index:200;">
-        <div class="req-title">New Hire!</div>
+        <div class="req-title" data-i18n="new_hire">New Hire!</div>
         <div class="req-fare">LKR <span id="req-price">0</span></div>
         
         <div class="loc-row"><div class="loc-dot dot-blue"></div><div class="loc-txt" id="req-pickup">...</div></div>
         <div class="loc-row"><div class="loc-dot dot-red"></div><div class="loc-txt" id="req-drop">...</div></div>
         
         <div class="req-meta">
-            <span><i class="fas fa-location-arrow"></i> <span id="req-dist-user">0</span> km away</span>
-            <span><i class="fas fa-route"></i> <span id="req-dist-trip">0</span> km trip</span>
+            <span><i class="fas fa-location-arrow"></i> <span id="req-dist-user">0</span> km</span>
+            <span><i class="fas fa-route"></i> <span id="req-dist-trip">0</span> km</span>
         </div>
 
         <button class="accept-btn" id="accept-btn" onclick="acceptHire()">
             <svg class="timer-svg" viewBox="0 0 200 60"><rect x="0" y="0" width="200" height="60" class="timer-circle" rx="30"/></svg>
-            <span style="position:relative; z-index:2;">GO & PICKUP</span>
+            <span style="position:relative; z-index:2;" data-i18n="btn_accept">GO & PICKUP</span>
         </button>
     </div>
 
@@ -186,7 +199,7 @@
                 <i class="fas fa-chevron-up pill-expand-icon" id="trip-arrow"></i>
                 <div>
                     <div style="font-weight:700; font-size:16px;" id="trip-cust-name">Customer</div>
-                    <div style="font-size:12px; color:#777;" id="trip-status-txt">On way to pickup</div>
+                    <div style="font-size:12px; color:#777;" id="trip-status-txt">On way...</div>
                 </div>
             </div>
             <div class="trip-status">LKR <span id="live-fare">0</span></div>
@@ -196,8 +209,12 @@
             <div class="loc-row"><div class="loc-dot dot-blue"></div><div class="loc-txt" id="trip-from">...</div></div>
             <div class="loc-row"><div class="loc-dot dot-red"></div><div class="loc-txt" id="trip-to">...</div></div>
             
-            <button class="go-online-btn" style="background:#2196F3; font-size:14px; margin-bottom:10px;" id="btn-notify" onclick="notifyUser()">Notify I'm Here</button>
-            <button class="go-online-btn" style="background:#555; font-size:12px; padding:10px;" onclick="cancelTrip()">Cancel / Stop Trip</button>
+            <button class="go-online-btn" style="background:#2196F3; font-size:14px; margin-bottom:10px;" id="btn-notify" onclick="notifyUser()">
+                <span data-i18n="btn_notify">Notify I'm Here</span>
+            </button>
+            <button class="go-online-btn" style="background:#555; font-size:12px; padding:10px;" onclick="cancelTrip()">
+                <span data-i18n="btn_cancel">Cancel / Stop Trip</span>
+            </button>
 
             <!-- SLIDE BUTTON -->
             <div class="slide-btn-container" id="slider-cont">
@@ -213,19 +230,20 @@
 <!-- SUMMARY MODAL -->
 <div id="summary-modal" class="modal-overlay full-screen-modal">
     <div class="modal-card">
-        <div class="summary-box">
+        <div class="summary-box" style="text-align:center;">
             <i class="fas fa-check-circle" style="font-size:50px; color:var(--online); margin-bottom:10px;"></i>
-            <h2>Trip Ended</h2>
-            <div class="collect-lbl">Cash to Collect</div>
-            <div class="total-price">LKR <span id="sum-total">0</span></div>
+            <h2 data-i18n="trip_ended">Trip Ended</h2>
+            <div class="collect-lbl" data-i18n="cash_collect">Cash to Collect</div>
+            <div class="total-price" style="font-size:40px; font-weight:800; color:var(--online);">LKR <span id="sum-total">0</span></div>
             
-            <div class="breakdown">
-                <div class="bd-row"><span>Base Fare</span> <span id="sum-base">0</span></div>
-                <div class="bd-row"><span>Distance</span> <span id="sum-dist">0</span></div>
-                <div class="bd-row"><span>Waiting (<span id="sum-wait-time">0</span>m)</span> <span id="sum-wait-cost">0</span></div>
+            <div class="breakdown" style="background:#f9f9f9; padding:15px; border-radius:10px; margin:20px 0; text-align:left;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Base</span> <span id="sum-base">0</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>Wait</span> <span id="sum-wait-cost">0</span></div>
             </div>
             
-            <button class="go-online-btn" onclick="finishCash()">CASH RECEIVED</button>
+            <button class="go-online-btn" onclick="finishCash()">
+                <span data-i18n="btn_cash_rec">CASH RECEIVED</span>
+            </button>
         </div>
     </div>
 </div>
@@ -233,62 +251,72 @@
 <!-- EARNINGS MODAL -->
 <div id="earnings-modal" class="modal-overlay">
     <div class="modal-card">
-        <h3 style="text-align:center;">Today's Earnings</h3>
+        <h3 style="text-align:center;" data-i18n="today_earn">Today's Earnings</h3>
         <h1 style="text-align:center; color:var(--online);">LKR <span id="daily-earn">0.00</span></h1>
-        <hr>
-        <div id="earn-list" style="max-height:300px; overflow-y:auto;"></div>
-        <button class="vehicles-strip" onclick="closeModal('earnings-modal')">Close</button>
+        <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+        <div id="earn-list" style="max-height:300px; overflow-y:auto; text-align:center; color:#777;">
+            No trips yet today.
+        </div>
+        <button class="vehicles-strip" onclick="closeModal('earnings-modal')" data-i18n="btn_close">Close</button>
     </div>
 </div>
 
-<!-- ADD VEHICLE / MANAGER MODALS (Same as before) -->
+<!-- VEHICLE MANAGER MODAL -->
 <div id="vehicle-man-modal" class="modal-overlay">
     <div class="modal-card" style="height:85vh;">
-        <h3 style="text-align:center;">My Vehicles</h3>
+        <h3 style="text-align:center;" data-i18n="my_vehicles">My Vehicles</h3>
         <div id="man-veh-list" style="flex:1; overflow-y:auto; padding-bottom:10px;"></div>
-        <button class="go-online-btn" style="background:#444; font-size:14px;" onclick="openAddVehicle()">+ Add Vehicle</button>
-        <button class="vehicles-strip" onclick="closeModal('vehicle-man-modal')">Close</button>
+        <button class="go-online-btn" style="background:#444; font-size:14px;" onclick="openAddVehicle()">
+            <span data-i18n="btn_add_veh">+ Add Vehicle</span>
+        </button>
+        <button class="vehicles-strip" onclick="closeModal('vehicle-man-modal')" data-i18n="btn_close">Close</button>
     </div>
 </div>
 
+<!-- ADD VEHICLE WIZARD -->
 <div id="add-vehicle-modal" class="modal-overlay">
     <div class="modal-card" style="height:95vh;">
-        <h3 style="text-align:center; margin-bottom:0;">Register Vehicle</h3>
+        <h3 style="text-align:center; margin-bottom:0;" data-i18n="reg_veh">Register Vehicle</h3>
         <div class="carousel">
+            <!-- TYPE -->
             <div class="slide active" id="s1">
-                <label>Vehicle Type</label>
+                <label data-i18n="lbl_type">Vehicle Type</label>
                 <div class="type-grid">
-                    <div class="type-card" onclick="selectType('Bike', this)">🏍️<br>Bike</div>
-                    <div class="type-card" onclick="selectType('Tuk Tuk', this)">🛺<br>Tuk Tuk</div>
-                    <div class="type-card" onclick="selectType('Car', this)">🚗<br>Car</div>
-                    <div class="type-card" onclick="selectType('Van', this)">🚐<br>Van</div>
+                    <div class="type-card" onclick="selectType('Bike', this)"><i class="fas fa-motorcycle fa-2x"></i><br><span data-i18n="v_bike">Bike</span></div>
+                    <div class="type-card" onclick="selectType('Tuk Tuk', this)"><i class="fas fa-shuttle-van fa-2x"></i><br><span data-i18n="v_tuk">Tuk Tuk</span></div>
+                    <div class="type-card" onclick="selectType('Car', this)"><i class="fas fa-car fa-2x"></i><br><span data-i18n="v_car">Car</span></div>
+                    <div class="type-card" onclick="selectType('Van', this)"><i class="fas fa-bus fa-2x"></i><br><span data-i18n="v_van">Van</span></div>
                 </div>
-                <button class="go-online-btn" style="margin-top:20px;" onclick="next(1)">Next</button>
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(1)" data-i18n="btn_next">Next</button>
             </div>
+            <!-- BRAND/MODEL -->
             <div class="slide" id="s2">
-                <label>Brand</label><select id="v-brand" onchange="loadModels()"><option value="">Select</option></select>
-                <label>Model</label><select id="v-model"><option value="">Select</option></select>
-                <input type="text" id="v-other" placeholder="Other model name (Optional)" style="margin-top:5px;">
-                <button class="go-online-btn" style="margin-top:20px;" onclick="next(2)">Next</button>
-                <button class="vehicles-strip" onclick="prev(2)">Back</button>
+                <label data-i18n="lbl_brand">Brand</label><select id="v-brand" onchange="loadModels()"><option value="">Select</option></select>
+                <label data-i18n="lbl_model">Model</label><select id="v-model"><option value="">Select</option></select>
+                <input type="text" id="v-other" placeholder="Other model (Optional)" style="margin-top:5px;">
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(2)" data-i18n="btn_next">Next</button>
+                <button class="vehicles-strip" onclick="prev(2)" data-i18n="btn_back">Back</button>
             </div>
+            <!-- PLATE -->
             <div class="slide" id="s3">
-                <label>Number Plate</label>
+                <label data-i18n="lbl_plate">Number Plate</label>
                 <div style="display:flex; gap:10px;">
                     <select id="v-plate-prov" style="width:30%"><option>WP</option><option>CP</option><option>SP</option><option>NP</option><option>EP</option><option>NW</option><option>NC</option><option>UP</option><option>SG</option></select>
-                    <input type="text" id="v-plate-num" placeholder="CAB-1234" style="width:70%; text-transform:uppercase;" maxlength="8">
+                    <input type="text" id="v-plate-num" placeholder="ABC-1234" style="width:70%; text-transform:uppercase;" maxlength="8">
                 </div>
-                <button class="go-online-btn" style="margin-top:20px;" onclick="next(3)">Next</button>
-                <button class="vehicles-strip" onclick="prev(3)">Back</button>
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(3)" data-i18n="btn_next">Next</button>
+                <button class="vehicles-strip" onclick="prev(3)" data-i18n="btn_back">Back</button>
             </div>
+            <!-- DETAILS -->
             <div class="slide" id="s4">
-                <label>Color</label><select id="v-color"><option>White</option><option>Black</option><option>Red</option><option>Blue</option><option>Silver</option></select>
-                <label>Details</label><textarea id="v-det" rows="2"></textarea>
-                <button class="go-online-btn" style="margin-top:20px;" onclick="next(4)">Next</button>
-                <button class="vehicles-strip" onclick="prev(4)">Back</button>
+                <label data-i18n="lbl_color">Color</label><select id="v-color"><option>White</option><option>Black</option><option>Red</option><option>Blue</option><option>Silver</option><option>Other</option></select>
+                <label data-i18n="lbl_det">Details</label><textarea id="v-det" rows="2" placeholder="Condition, Features..."></textarea>
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(4)" data-i18n="btn_next">Next</button>
+                <button class="vehicles-strip" onclick="prev(4)" data-i18n="btn_back">Back</button>
             </div>
+            <!-- PHOTOS -->
             <div class="slide" id="s5">
-                <label>Photos (Ext & Int)</label>
+                <label data-i18n="lbl_photo">Photos (Ext & Int)</label>
                 <div class="img-grid">
                     <div class="img-upload" onclick="up('ext1')">Front Ext<img id="p-ext1"></div>
                     <div class="img-upload" onclick="up('ext2')">Back Ext<img id="p-ext2"></div>
@@ -297,37 +325,45 @@
                 </div>
                 <input type="file" id="f-ext1" hidden onchange="proc(this,'p-ext1')"><input type="file" id="f-ext2" hidden onchange="proc(this,'p-ext2')">
                 <input type="file" id="f-int1" hidden onchange="proc(this,'p-int1')"><input type="file" id="f-int2" hidden onchange="proc(this,'p-int2')">
-                <button class="go-online-btn" style="margin-top:20px;" onclick="next(5)">Next</button>
-                <button class="vehicles-strip" onclick="prev(5)">Back</button>
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(5)" data-i18n="btn_next">Next</button>
+                <button class="vehicles-strip" onclick="prev(5)" data-i18n="btn_back">Back</button>
             </div>
+            <!-- LICENSE -->
             <div class="slide" id="s6">
-                <label>License</label>
+                <label data-i18n="lbl_lic">Revenue License</label>
                 <div class="img-grid">
                     <div class="img-upload" onclick="up('lic1')">Front<img id="p-lic1"></div>
                     <div class="img-upload" onclick="up('lic2')">Back<img id="p-lic2"></div>
                 </div>
                 <input type="file" id="f-lic1" hidden onchange="proc(this,'p-lic1')"><input type="file" id="f-lic2" hidden onchange="proc(this,'p-lic2')">
-                <button class="go-online-btn" style="margin-top:20px;" onclick="next(6)">Next</button>
-                <button class="vehicles-strip" onclick="prev(6)">Back</button>
+                <button class="go-online-btn" style="margin-top:20px;" onclick="next(6)" data-i18n="btn_next">Next</button>
+                <button class="vehicles-strip" onclick="prev(6)" data-i18n="btn_back">Back</button>
             </div>
+            <!-- AGREEMENT -->
             <div class="slide" id="s7">
-                <h4>Agreement</h4>
-                <div style="height:100px; overflow-y:scroll; background:#f9f9f9; font-size:12px; padding:10px;">Terms...</div>
-                <label><input type="checkbox" id="agree-chk"> I Agree</label>
-                <button class="go-online-btn" style="margin-top:20px;" onclick="submitVehicle()">Submit</button>
-                <button class="vehicles-strip" onclick="prev(7)">Back</button>
+                <h4 data-i18n="lbl_terms">Terms & Agreement</h4>
+                <div class="agreement-box" id="agreement-text">
+                    <!-- Text inserted by JS -->
+                </div>
+                <div class="check-row">
+                    <input type="checkbox" id="agree-chk">
+                    <span data-i18n="lbl_agree">I have read and agree to the terms.</span>
+                </div>
+                <button class="go-online-btn" style="margin-top:20px;" onclick="submitVehicle()" data-i18n="btn_submit">Submit</button>
+                <button class="vehicles-strip" onclick="prev(7)" data-i18n="btn_back">Back</button>
             </div>
         </div>
-        <button class="vehicles-strip" onclick="closeModal('add-vehicle-modal')">Close</button>
+        <button class="vehicles-strip" onclick="closeModal('add-vehicle-modal')" data-i18n="btn_close">Close</button>
     </div>
 </div>
 
+<!-- SELECT VEHICLE FOR ONLINE -->
 <div id="vehicle-select-modal" class="modal-overlay">
     <div class="modal-card">
-        <h3 style="text-align:center;">Select Vehicle</h3>
+        <h3 style="text-align:center;" data-i18n="sel_veh">Select Vehicle</h3>
         <div id="online-veh-list" style="max-height:300px; overflow-y:auto; margin-bottom:10px;"></div>
-        <button class="go-online-btn" onclick="confirmVehicle()">Continue</button>
-        <button class="vehicles-strip" onclick="closeModal('vehicle-select-modal')">Cancel</button>
+        <button class="go-online-btn" onclick="confirmVehicle()" data-i18n="btn_cont">Continue</button>
+        <button class="vehicles-strip" onclick="closeModal('vehicle-select-modal')" data-i18n="btn_cancel">Cancel</button>
     </div>
 </div>
 
@@ -338,7 +374,7 @@
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, get, update, set, remove, onDisconnect, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+    import { getDatabase, ref, get, update, set, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
     const db = getDatabase(initializeApp({
         apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
@@ -347,29 +383,74 @@
         projectId: "speedo-acb7c"
     }));
 
+    // --- TRANSLATION DATA ---
+    let lang = localStorage.getItem('speedo_lang') || 'en';
+    const dict = {
+        en: {
+            status_title: "Driver Status", btn_online: "GO ONLINE", online_desc: "Go online to receive hires", btn_manage_veh: "Manage Vehicles",
+            finding: "Finding Hires...", gps_on: "Keep GPS & Data ON", btn_offline: "GO OFFLINE",
+            new_hire: "New Hire!", btn_accept: "GO & PICKUP", btn_notify: "Notify I'm Here", btn_cancel: "Cancel Trip",
+            trip_ended: "Trip Ended", cash_collect: "Cash to Collect", btn_cash_rec: "CASH RECEIVED",
+            today_earn: "Today's Earnings", btn_close: "Close", my_vehicles: "My Vehicles", btn_add_veh: "+ Add Vehicle",
+            reg_veh: "Register Vehicle", lbl_type: "Vehicle Type", v_bike: "Bike", v_tuk: "Tuk Tuk", v_car: "Car", v_van: "Van",
+            btn_next: "Next", btn_back: "Back", lbl_brand: "Brand", lbl_model: "Model", lbl_plate: "Number Plate",
+            lbl_color: "Color", lbl_det: "Details", lbl_photo: "Photos (Ext & Int)", lbl_lic: "Revenue License",
+            lbl_terms: "Terms & Agreement", lbl_agree: "I Agree to the Terms", btn_submit: "Submit",
+            sel_veh: "Select Vehicle", btn_cont: "Continue", btn_cancel: "Cancel", processing: "Processing...",
+            terms_text: `<b>1. Driver Responsibility</b><br>You are responsible for the safety of the vehicle and passengers.<br><br><b>2. Documents</b><br>All provided documents must be valid.<br><br><b>3. Conduct</b><br>Be polite to customers.`,
+            slide_start: "SLIDE TO START", slide_end: "SLIDE TO END"
+        },
+        si: {
+            status_title: "රියදුරු තත්ත්වය", btn_online: "මාර්ගගත වන්න", online_desc: "හයර් ලබා ගැනීමට ඔන්ලයින් වන්න", btn_manage_veh: "වාහන කළමනාකරණය",
+            finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රියව තබන්න", btn_offline: "විසන්ධි වන්න",
+            new_hire: "නව හයර් එකක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්න",
+            trip_ended: "ගමන අවසන්", cash_collect: "අයකළ යුතු මුදල", btn_cash_rec: "මුදල් ලැබුණි",
+            today_earn: "අද ඉපැයීම්", btn_close: "වසන්න", my_vehicles: "මගේ වාහන", btn_add_veh: "+ වාහනයක් එක් කරන්න",
+            reg_veh: "වාහනය ලියාපදිංචි කිරීම", lbl_type: "වාහන වර්ගය", v_bike: "යතුරු පැදි", v_tuk: "ත්‍රිරෝද", v_car: "කාර්", v_van: "වෑන්",
+            btn_next: "ඊළඟ", btn_back: "ආපසු", lbl_brand: "වර්ගය", lbl_model: "මාදිලිය", lbl_plate: "ලියාපදිංචි අංකය",
+            lbl_color: "පැහැය", lbl_det: "විස්තර", lbl_photo: "ඡායාරූප", lbl_lic: "ආදායම් බලපත්‍රය",
+            lbl_terms: "කොන්දේසි", lbl_agree: "මම එකඟ වෙමි", btn_submit: "යොමු කරන්න",
+            sel_veh: "වාහනය තෝරන්න", btn_cont: "ඉදිරියට", btn_cancel: "අවලංගුයි", processing: "සකසමින් පවතී...",
+            terms_text: `<b>1. රියදුරු වගකීම</b><br>මගීන්ගේ ආරක්ෂාව ඔබ සතුය.<br><br><b>2. ලියකියවිලි</b><br>සියලුම ලියකියවිලි වලංගු විය යුතුය.<br><br><b>3. හැසිරීම</b><br>ගනුදෙනුකරුවන් සමඟ සුහදව කටයුතු කරන්න.`,
+            slide_start: "ඇරඹීමට අදින්න", slide_end: "අවසන් කිරීමට අදින්න"
+        },
+        ta: {
+            status_title: "ஓட்டுநர் நிலை", btn_online: "ஆன்லைனில் செல்லுங்கள்", online_desc: "சவாரிகளைப் பெற ஆன்லைனில் செல்லவும்", btn_manage_veh: "வாகனங்களை நிர்வகிக்கவும்",
+            finding: "தேடுகிறது...", gps_on: "GPS மற்றும் Data ஆன் செய்யவும்", btn_offline: "ஆஃப்லைன் செல்லுங்கள்",
+            new_hire: "புதிய சவாரி!", btn_accept: "ஏற்கவும்", btn_notify: "நான் வந்துவிட்டேன்", btn_cancel: "ரத்து செய்",
+            trip_ended: "சவாரி முடிந்தது", cash_collect: "பெற வேண்டிய பணம்", btn_cash_rec: "பணம் பெறப்பட்டது",
+            today_earn: "இன்றைய வருமானம்", btn_close: "மூடு", my_vehicles: "எனது வாகனங்கள்", btn_add_veh: "+ வாகனத்தைச் சேர்",
+            reg_veh: "வாகனப் பதிவு", lbl_type: "வாகன வகை", v_bike: "பைக்", v_tuk: "ஆட்டோ", v_car: "கார்", v_van: "வான்",
+            btn_next: "அடுத்து", btn_back: "பின்னால்", lbl_brand: "பிராண்ட்", lbl_model: "மாடல்", lbl_plate: "வண்டி எண்",
+            lbl_color: "நிறம்", lbl_det: "விவரங்கள்", lbl_photo: "புகைப்படங்கள்", lbl_lic: "உரிமம்",
+            lbl_terms: "விதிமுறைகள்", lbl_agree: "நான் ஒப்புக்கொள்கிறேன்", btn_submit: "சமர்ப்பிக்கவும்",
+            sel_veh: "வாகனத்தைத் தேர்ந்தெடுக்கவும்", btn_cont: "தொடரவும்", btn_cancel: "ரத்து", processing: "செயலாக்குகிறது...",
+            terms_text: `<b>1. ஓட்டுநர் பொறுப்பு</b><br>பயணிகளின் பாதுகாப்பு உங்கள் பொறுப்பு.<br><br><b>2. ஆவணங்கள்</b><br>அனைத்து ஆவணங்களும் செல்லுபடியாகும்.<br><br><b>3. நடத்தை</b><br>வாடிக்கையாளர்களிடம் கண்ணியமாக இருங்கள்.`,
+            slide_start: "தொடங்க இழுக்கவும்", slide_end: "முடிக்க இழுக்கவும்"
+        }
+    };
+
     const vehicleDB = {
-        "Bike": {"Honda":["Dio","Hornet"],"Yamaha":["FZ","MT15"],"Bajaj":["Pulsar"]},
-        "Tuk Tuk": {"Bajaj":["RE 4S","Compact"],"TVS":["King"]},
-        "Car": {"Toyota":["Axio","Vitz","Premio","Corolla","Aqua","Prius"],"Suzuki":["Alto","WagonR","Swift"],"Honda":["Grace","Fit","Vezel"]},
-        "Van": {"Toyota":["KDH","Hiace"],"Nissan":["Caravan"]}
+        "Bike": {"Honda":["Dio","Hornet","CBR"],"Yamaha":["FZ","MT15","R15"],"Bajaj":["Pulsar","CT100"]},
+        "Tuk Tuk": {"Bajaj":["RE 4S","Compact","Maxima"],"TVS":["King"],"Piaggio":["Ape"]},
+        "Car": {"Toyota":["Axio","Vitz","Premio","Corolla","Aqua","Prius"],"Suzuki":["Alto","WagonR","Swift","Celerio"],"Honda":["Grace","Fit","Vezel","Civic"]},
+        "Van": {"Toyota":["KDH","Hiace","TownAce"],"Nissan":["Caravan","Urvan"]}
     };
 
     let currentUser=null, map, marker, routeControl;
     let currentVehicles=[], selectedVehId, selectedVehType, isOnline=false;
-    let tripState = "IDLE"; // IDLE, REQUEST, PICKUP, TRIP, END
+    let tripState = "IDLE"; 
     let currentOrder = null, tempV={type:"",imgs:{}}, earnings=0;
-    
-    // Trip Vars
-    let tripInterval, waitInterval, waitMinutes=0, lastPos=null, tripPrice=0;
+    let currentLocation = null; // {lat, lng}
 
     window.onload = async () => {
-        // Load Earnings
+        updateLangUI();
         let savedEarn = localStorage.getItem('speedo_earnings');
-        if(savedEarn) { earnings = parseFloat(savedEarn); updateEarnUI(); }
+        if(savedEarn) { earnings = parseFloat(savedEarn); document.getElementById('earn-txt').innerText = earnings.toFixed(2); }
 
         const uid = localStorage.getItem('uid');
         const dist = localStorage.getItem('dist');
-        if(!uid) return location.href="rider.html";
+        if(!uid) return location.href="rider.html"; // Redirect if no auth
 
         try {
             const s = await get(ref(db, `riders/${dist}/${uid}`));
@@ -378,48 +459,61 @@
                 currentUser = { ...d, uid, dist };
                 document.getElementById('user-pic').src = d.selfie || '';
                 document.getElementById('user-name').innerText = d.fullName.split(" ")[0];
+                
                 await loadVehicles();
+                
                 document.getElementById('top-ui').style.display='flex';
                 document.getElementById('card-offline').style.display='flex';
                 initMap();
             }
-        } catch(e){}
+        } catch(e) { console.error(e); }
     };
+
+    function updateLangUI() {
+        document.getElementById('lang-btn').innerText = lang.toUpperCase();
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if(dict[lang][key]) el.innerHTML = dict[lang][key];
+        });
+        document.getElementById('agreement-text').innerHTML = dict[lang].terms_text;
+    }
 
     function initMap() {
         map = L.map('map', {zoomControl:false}).setView([7.8, 80.7], 8);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
         if("geolocation" in navigator) {
             navigator.geolocation.watchPosition(pos => {
                 const {latitude:lat, longitude:lng} = pos.coords;
+                currentLocation = {lat, lng};
+                
                 if(!marker) {
                     const icon = L.divIcon({ className:'c', html:`<div class='gps-marker-container'><div class='gps-pulse'></div><div class='gps-dot'></div></div>`, iconSize:[50,50] });
                     marker = L.marker([lat, lng], {icon}).addTo(map);
                     map.setView([lat, lng], 16);
                 } else {
                     marker.setLatLng([lat, lng]);
-                    if(isOnline && !currentOrder) map.setView([lat, lng]); // Follow if idle
+                    if(isOnline && !currentOrder) map.setView([lat, lng]); 
                     
                     if(isOnline && selectedVehId) {
                         update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}/location`), {lat, lng, ts:Date.now()});
-                        update(ref(db, `riders/${currentUser.dist}/${currentUser.uid}/location`), {lat, lng});
                     }
-                    
-                    // Trip Logic
-                    if(tripState === "TRIP" || tripState === "PICKUP") checkArrival(lat, lng);
-                    if(tripState === "TRIP") calculateTripMetrics(lat, lng, pos.coords.speed);
                 }
-            }, null, {enableHighAccuracy:true});
+            }, (err) => {
+                toast("GPS Error: " + err.message, "error");
+            }, {enableHighAccuracy:true});
         }
     }
 
     // --- ONLINE LOGIC ---
     window.initiateGoOnline = () => {
+        if(!currentLocation) return toast("Waiting for GPS Location...", "error");
+        
         const app = currentVehicles.filter(v => v.approved_status === true);
         if(app.length===0) return toast("No Approved Vehicles", "error");
         
         const list = document.getElementById('online-veh-list');
-        list.innerHTML = "";
+        list.innerHTML = ""; // FIX: Clear list first
         app.forEach(v => {
             let d = document.createElement('div');
             d.className = 'v-item';
@@ -435,53 +529,31 @@
     }
 
     window.confirmVehicle = () => {
-        if(!selectedVehId) return;
+        if(!selectedVehId) return toast(lang==='si'?"කරුණාකර වාහනයක් තෝරන්න":"Select a vehicle", "error");
         closeModal('vehicle-select-modal');
         isOnline = true;
         
         document.getElementById('card-offline').style.display='none';
         document.getElementById('card-searching').classList.remove('hidden-card');
-        document.getElementById('earn-pill').classList.remove('offline');
-        document.getElementById('earn-txt').innerText = earnings.toFixed(2);
-
-        update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"online"});
-        update(ref(db, `riders/${currentUser.dist}/${currentUser.uid}`), {rider_status:"online", active_vehicle:selectedVehId});
         
-        // Listen for requests (Simulation: listening to node)
-        listenForHires();
+        update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"online"});
+        
+        // Simulating a request for demo purposes
+        // setTimeout(() => window.testRequest(), 5000);
     }
 
     window.goOffline = () => {
         isOnline = false;
         document.getElementById('card-searching').classList.add('hidden-card');
         document.getElementById('card-offline').style.display='flex';
-        document.getElementById('earn-pill').classList.add('offline');
-        document.getElementById('earn-txt').innerText = "OFFLINE";
-        update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"offline"});
-        // Stop listening
+        if(selectedVehId) update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"offline"});
+        selectedVehId = null;
     }
 
     // --- RIDE FLOW ---
-    function listenForHires() {
-        // In real app, listen to `riders/{dist}/{uid}/request`
-        // Here we assume a request comes in
-        // SIMULATION FOR UI DEMO:
-        /* 
-        setTimeout(() => {
-            if(isOnline && tripState==="IDLE") showRequest({
-                id: "ORD123", price: 450, pickup: "Main St", drop: "City Mall",
-                distUser: 1.2, distTrip: 5.5, pLat: 7.8, pLng: 80.7, dLat: 7.85, dLng: 80.75
-            });
-        }, 5000);
-        */
-    }
-
-    // Function to call from console to test: window.testRequest()
     window.testRequest = () => {
-        showRequest({ id:"O1", price:300, pickup:"Town Hall", drop:"Cinema", distUser:0.5, distTrip:3.2, pLat:7.87, pLng:80.77, dLat:7.89, dLng:80.78 });
-    }
-
-    function showRequest(req) {
+        let req = { id:"O1", price:300, pickup:"Town Hall", drop:"Cinema", distUser:0.5, distTrip:3.2, pLat:7.87, pLng:80.77, dLat:7.89, dLng:80.78 };
+        
         currentOrder = req;
         tripState = "REQUEST";
         document.getElementById('req-price').innerText = req.price;
@@ -493,19 +565,9 @@
         document.getElementById('card-searching').classList.add('hidden-card');
         document.getElementById('card-request').classList.remove('hidden-card');
         
-        // 5s Timer
         let btn = document.querySelector('.timer-circle');
         btn.style.strokeDashoffset = 0;
         setTimeout(() => btn.style.strokeDashoffset = 400, 10);
-        
-        setTimeout(() => {
-            if(tripState === "REQUEST") { // Timeout
-                tripState = "IDLE";
-                currentOrder = null;
-                document.getElementById('card-request').classList.add('hidden-card');
-                document.getElementById('card-searching').classList.remove('hidden-card');
-            }
-        }, 5000);
     }
 
     window.acceptHire = () => {
@@ -513,137 +575,45 @@
         document.getElementById('card-request').classList.add('hidden-card');
         document.getElementById('card-trip').classList.remove('hidden-card');
         
-        // Setup Pickup UI
-        document.getElementById('trip-status-txt').innerText = "On way to pickup";
+        document.getElementById('trip-status-txt').innerText = lang==='si'?"මගියා වෙත යමින්":"On way to pickup";
         document.getElementById('trip-from').innerText = currentOrder.pickup;
         document.getElementById('trip-to').innerText = currentOrder.drop;
         document.getElementById('live-fare').innerText = currentOrder.price;
         
-        setupSlider("SLIDE TO START", startTrip);
-        drawRoute(currentOrder.pLat, currentOrder.pLng); // Route to pickup
+        setupSlider(dict[lang].slide_start, startTrip);
     }
 
-    window.notifyUser = () => {
-        toast("User Notified!", "success");
-        // Update DB order status = "arrived"
-    }
+    window.notifyUser = () => { toast("User Notified!", "success"); }
 
     function startTrip() {
         tripState = "TRIP";
-        document.getElementById('trip-status-txt').innerText = "Heading to Destination";
+        document.getElementById('trip-status-txt').innerText = lang==='si'?"ගමනාන්තය වෙත":"Heading to Destination";
         document.getElementById('btn-notify').style.display='none';
-        
-        setupSlider("SLIDE TO END", endTrip);
-        drawRoute(currentOrder.dLat, currentOrder.dLng); // Route to drop
-        
-        // Start Pricing
-        waitMinutes = 0;
-        tripPrice = currentOrder.price;
-        waitInterval = setInterval(() => {
-            // Wait Logic (Simplified: if state is TRIP and not moving much)
-            // In real app, check speed from GPS
-            // waitMinutes++;
-            // if(waitMinutes > 5) { tripPrice += 50; updateFareUI(); }
-        }, 60000);
+        setupSlider(dict[lang].slide_end, endTrip);
     }
 
     function endTrip() {
-        clearInterval(waitInterval);
         tripState = "IDLE";
-        
         document.getElementById('card-trip').classList.add('hidden-card');
-        
-        // Show Summary
-        document.getElementById('sum-total').innerText = tripPrice;
+        document.getElementById('sum-total').innerText = currentOrder.price;
         document.getElementById('sum-base').innerText = currentOrder.price;
-        document.getElementById('sum-dist').innerText = "0"; // Calc real dist
-        document.getElementById('sum-wait-cost').innerText = (Math.max(0, waitMinutes-5) * 10); // Example
-        
         document.getElementById('summary-modal').style.display = 'flex';
-        
-        if(routeControl) { map.removeControl(routeControl); routeControl=null; }
     }
 
     window.finishCash = () => {
         closeModal('summary-modal');
-        earnings += tripPrice;
+        earnings += currentOrder.price;
         localStorage.setItem('speedo_earnings', earnings);
         document.getElementById('earn-txt').innerText = earnings.toFixed(2);
-        
         document.getElementById('card-searching').classList.remove('hidden-card');
-        document.getElementById('btn-notify').style.display='block'; // Reset UI
+        document.getElementById('btn-notify').style.display='block';
         currentOrder = null;
     }
 
-    // --- HELPER FUNC ---
-    function drawRoute(lat, lng) {
-        if(routeControl) map.removeControl(routeControl);
-        routeControl = L.Routing.control({
-            waypoints: [
-                L.latLng(marker.getLatLng()),
-                L.latLng(lat, lng)
-            ],
-            lineOptions: { styles: [{color: 'blue', opacity: 0.6, weight: 6}] },
-            createMarker: function() { return null; }, // No markers
-            addWaypoints: false,
-            draggableWaypoints: false,
-            fitSelectedRoutes: true,
-            show: false // Hide text instructions
-        }).addTo(map);
-    }
-
-    function checkArrival(lat, lng) {
-        let target = tripState==="PICKUP" ? {lat:currentOrder.pLat, lng:currentOrder.pLng} : {lat:currentOrder.dLat, lng:currentOrder.dLng};
-        let d = map.distance([lat,lng], [target.lat, target.lng]);
-        if(d < 50) {
-            // Auto expand card logic if minified
-            document.getElementById('trip-details').style.display='block';
-        }
-    }
-
-    // --- SLIDER LOGIC ---
-    function setupSlider(text, callback) {
-        const slider = document.getElementById('slider-handle');
-        const bg = document.getElementById('slider-bg');
-        document.getElementById('slider-text').innerText = text;
-        
-        let isDragging = false;
-        let startX, containerWidth;
-
-        slider.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            startX = e.touches[0].clientX;
-            containerWidth = document.getElementById('slider-cont').offsetWidth - 55;
-        });
-
-        document.addEventListener('touchmove', (e) => {
-            if(!isDragging) return;
-            let moveX = e.touches[0].clientX - startX;
-            if(moveX < 0) moveX = 0;
-            if(moveX > containerWidth) moveX = containerWidth;
-            
-            slider.style.left = (moveX + 2) + 'px';
-            bg.style.width = moveX + 'px';
-            
-            if(moveX >= containerWidth) {
-                isDragging = false;
-                callback();
-                resetSlider();
-            }
-        });
-
-        document.addEventListener('touchend', () => {
-            if(isDragging) resetSlider();
-            isDragging = false;
-        });
-        
-        function resetSlider() {
-            slider.style.transition = '0.3s';
-            bg.style.transition = '0.3s';
-            slider.style.left = '2px';
-            bg.style.width = '0px';
-            setTimeout(() => { slider.style.transition = 'none'; bg.style.transition = 'none'; }, 300);
-        }
+    window.showEarnings = () => {
+        document.getElementById('daily-earn').innerText = earnings.toFixed(2);
+        // Here you would normally fetch list from DB
+        openModal('earnings-modal');
     }
 
     // --- UTILS ---
@@ -654,16 +624,78 @@
     }
     window.openModal=(id)=>document.getElementById(id).style.display='flex';
     window.closeModal=(id)=>document.getElementById(id).style.display='none';
-    
-    // Toggle Trip Card Size
     window.toggleTripCard = () => {
         let d = document.getElementById('trip-details');
         let a = document.getElementById('trip-arrow');
-        if(d.style.display==='none') { d.style.display='block'; a.classList.remove('fa-chevron-down'); a.classList.add('fa-chevron-up'); }
-        else { d.style.display='none'; a.classList.remove('fa-chevron-up'); a.classList.add('fa-chevron-down'); }
+        if(d.style.display==='none') { d.style.display='block'; a.className='fas fa-chevron-up pill-expand-icon'; }
+        else { d.style.display='none'; a.className='fas fa-chevron-down pill-expand-icon'; }
     }
 
-    // --- VEHICLE REGISTRATION (Restored Logic) ---
+    // --- VEHICLE MANAGER (FIXED) ---
+    async function loadVehicles() {
+        currentVehicles=[];
+        // Fetch from all categories
+        const categories = ["Bike","Tuk Tuk","Car","Van"];
+        for(let t of categories) {
+            try { 
+                const s = await get(ref(db, `vehicles/${t}`)); 
+                if(s.exists()) {
+                    s.forEach(v => { 
+                        if(v.val().ownerUid === currentUser.uid) {
+                            currentVehicles.push({...v.val(), id:v.key, type:t}); 
+                        }
+                    }); 
+                }
+            } catch(e){ console.log(e); }
+        }
+    }
+
+    window.openVehicleManager = async () => {
+        // Ensure data is fresh
+        await loadVehicles();
+        
+        const l = document.getElementById('man-veh-list');
+        l.innerHTML = ""; // FIX: Clear list completely
+        
+        if(currentVehicles.length === 0) {
+            l.innerHTML = "<p style='text-align:center; color:#999; margin-top:20px;'>No vehicles added</p>";
+        } else {
+            currentVehicles.forEach(v => {
+                let d = document.createElement('div');
+                d.className = 'v-item';
+                let st = v.approved_status===true ? "<span style='color:green; font-size:10px;'>Approved</span>" : 
+                         (v.approved_status==="declined" ? "<span style='color:red; font-size:10px;'>Declined</span>" : 
+                         "<span style='color:orange; font-size:10px;'>Pending</span>");
+                
+                d.innerHTML = `
+                    <div><b>${v.brand}</b> <span style="font-size:12px;color:#777;">${v.model}</span><br><small>${v.plate}</small></div>
+                    <div style="text-align:right;">
+                        ${st}<br>
+                        <button class="del-btn" onclick="askDelete('${v.type}','${v.id}')">Delete</button>
+                    </div>`;
+                l.appendChild(d);
+            });
+        }
+        openModal('vehicle-man-modal');
+    }
+
+    window.askDelete = async (t, i) => { 
+        if(confirm(lang==='si'?"මැකීමට අවශ්‍යද?":"Delete this vehicle?")) { 
+            document.getElementById('global-loader').style.display='flex';
+            try {
+                await remove(ref(db, `vehicles/${t}/${i}`)); 
+                await loadVehicles(); // Reload data
+                document.getElementById('global-loader').style.display='none';
+                openVehicleManager(); // Re-render list
+                toast("Vehicle deleted", "success");
+            } catch(e) {
+                document.getElementById('global-loader').style.display='none';
+                toast("Error deleting", "error");
+            }
+        } 
+    }
+
+    // --- ADD VEHICLE WIZARD ---
     window.openAddVehicle = () => { closeModal('vehicle-man-modal'); openModal('add-vehicle-modal'); }
     window.selectType = (t, el) => { document.querySelectorAll('.type-card').forEach(x=>x.classList.remove('selected')); el.classList.add('selected'); tempV.type = t; }
     window.loadModels = () => {
@@ -671,12 +703,13 @@
         let m = document.getElementById('v-model'); m.innerHTML="<option value=''>Select</option>";
         if(b && vehicleDB[tempV.type][b]) vehicleDB[tempV.type][b].forEach(x=>m.innerHTML+=`<option>${x}</option>`);
     }
+    
     window.next = (s) => {
         if(s===1) { if(!tempV.type) return toast("Select Type","error"); let b=document.getElementById('v-brand'); b.innerHTML="<option>Select</option>"; Object.keys(vehicleDB[tempV.type]).forEach(x=>b.innerHTML+=`<option>${x}</option>`); }
         if(s===2) { tempV.brand=document.getElementById('v-brand').value; tempV.model=document.getElementById('v-model').value || document.getElementById('v-other').value; if(!tempV.brand) return toast("Brand required","error"); }
         if(s===3) { 
             let p = document.getElementById('v-plate-num').value.toUpperCase();
-            if(!/^[A-Z]{2,3}[-\s]?\d{4}$/.test(p)) return toast("Invalid Plate","error");
+            if(!/^[A-Z]{2,3}[-\s]?\d{4}$/.test(p)) return toast("Invalid Plate (Ex: ABC-1234)","error");
             tempV.plate = document.getElementById('v-plate-prov').value + " " + p;
         }
         if(s===5 && (!tempV.imgs.ext1 || !tempV.imgs.int1)) return toast("Photos required","error");
@@ -700,7 +733,10 @@
         }; r.readAsDataURL(i.files[0]);
     }
     window.submitVehicle = async () => {
-        if(!document.getElementById('agree-chk').checked) return toast("Agree to terms","error");
+        if(!document.getElementById('agree-chk').checked) return toast("Accept Terms","error");
+        
+        document.getElementById('global-loader').style.display='flex'; // Show loader
+        
         let vid="V"+Date.now();
         await set(ref(db, `vehicles/${tempV.type}/${vid}`), {
             ownerUid:currentUser.uid, ownerName:currentUser.fullName, district:currentUser.dist,
@@ -708,30 +744,47 @@
             color:document.getElementById('v-color').value, details:document.getElementById('v-det').value,
             images:tempV.imgs, approved_status:false
         });
-        toast("Submitted","success"); closeModal('add-vehicle-modal'); loadVehicles();
+        
+        document.getElementById('global-loader').style.display='none';
+        toast("Submitted for Approval","success"); 
+        closeModal('add-vehicle-modal'); 
+        
+        // Reset Form logic here if needed, then reopen manager
+        loadVehicles().then(() => openVehicleManager());
     }
-    
-    // Manage Vehicles
-    async function loadVehicles() {
-        currentVehicles=[];
-        for(let t of ["Bike","Tuk Tuk","Car","Van"]) {
-            try { const s=await get(ref(db, `vehicles/${t}`)); if(s.exists()) s.forEach(v=>{ if(v.val().ownerUid===currentUser.uid) currentVehicles.push({...v.val(), id:v.key, type:t}); }); } catch(e){}
+
+    // --- SLIDER LOGIC ---
+    function setupSlider(text, callback) {
+        const slider = document.getElementById('slider-handle');
+        const bg = document.getElementById('slider-bg');
+        document.getElementById('slider-text').innerText = text;
+        
+        let isDragging = false, startX, containerWidth;
+        const cont = document.getElementById('slider-cont');
+
+        slider.ontouchstart = (e) => {
+            isDragging = true; startX = e.touches[0].clientX; containerWidth = cont.offsetWidth - 55;
+        };
+        document.ontouchmove = (e) => {
+            if(!isDragging) return;
+            let moveX = e.touches[0].clientX - startX;
+            if(moveX < 0) moveX = 0; if(moveX > containerWidth) moveX = containerWidth;
+            slider.style.left = (moveX + 2) + 'px'; bg.style.width = moveX + 'px';
+            if(moveX >= containerWidth) { isDragging = false; callback(); resetSlider(); }
+        };
+        document.ontouchend = () => { if(isDragging) resetSlider(); isDragging = false; };
+        function resetSlider() {
+            slider.style.transition = '0.3s'; bg.style.transition = '0.3s';
+            slider.style.left = '2px'; bg.style.width = '0px';
+            setTimeout(() => { slider.style.transition = 'none'; bg.style.transition = 'none'; }, 300);
         }
     }
-    window.openVehicleManager=()=>{
-        const l=document.getElementById('man-veh-list'); l.innerHTML="";
-        if(currentVehicles.length===0) l.innerHTML="<p style='text-align:center'>No vehicles</p>";
-        currentVehicles.forEach(v=>{
-            let d=document.createElement('div'); d.className='v-item';
-            let st=v.approved_status===true?"<span style='color:green'>Approved</span>": (v.approved_status==="declined"?"<span style='color:red'>Declined</span>":"<span style='color:orange'>Pending</span>");
-            d.innerHTML=`<div><b>${v.brand}</b><br><small>${v.plate}</small></div><div>${st}<br><button class="del-btn" onclick="askDelete('${v.type}','${v.id}')">Delete</button></div>`;
-            l.appendChild(d);
-        });
-        openModal('vehicle-man-modal');
-    }
-    window.askDelete=(t,i)=>{ if(confirm("Delete?")) { remove(ref(db, `vehicles/${t}/${i}`)); loadVehicles(); openVehicleManager(); } }
 
-    window.toggleLang=()=>{lang=lang==='en'?'si':(lang==='si'?'ta':'en'); localStorage.setItem('speedo_lang',lang); document.getElementById('lang-btn').innerText=lang.toUpperCase();}
+    window.toggleLang=()=>{
+        lang = lang==='en'?'si':(lang==='si'?'ta':'en'); 
+        localStorage.setItem('speedo_lang',lang); 
+        updateLangUI();
+    }
 </script>
 </body>
 </html>
