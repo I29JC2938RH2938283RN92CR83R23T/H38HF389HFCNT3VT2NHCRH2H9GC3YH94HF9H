@@ -16,7 +16,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
         body { margin: 0; padding: 0; font-family: 'Poppins', 'Noto Sans Sinhala', 'Noto Sans Tamil', sans-serif; overflow: hidden; background: #eee; height: 100vh; width: 100vw; }
 
-        /* GLOBAL LOADING SCREEN */
+        /* GLOBAL LOADING SCREEN (Fixes white screen) */
         #global-loader-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #fff; z-index: 9999;
@@ -122,7 +122,7 @@
         .go-online-btn { background: var(--primary); color: white; width: 100%; padding: 15px; border: none; border-radius: 50px; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(211, 47, 47, 0.4); margin-top: 10px; transition: transform 0.1s; }
         .dot { width: 10px; height: 10px; background: white; border-radius: 50%; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
-        .vehicles-strip { width: 100%; background: #f5f5f5; padding: 12px; border-radius: 12px; margin-top: 15px; text-align: center; font-weight: 600; color: #333; font-size: 14px; border: 1px solid #ddd; cursor: pointer; }
+        .vehicles-strip { width: 100%; background: #f5f5f5; padding: 12px; border-radius: 12px; margin-top: 15px; text-align: center; font-weight: 600; color: #333; font-size:  14px; border: 1px solid #ddd; cursor: pointer; }
 
         /* MODALS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; justify-content: center; align-items: flex-end; backdrop-filter: blur(3px); }
@@ -370,17 +370,6 @@
     </div>
 </div>
 
-<!-- FULL HISTORY MODAL (New) -->
-<div id="full-history-modal" class="modal-overlay full-screen-modal">
-    <div class="modal-card">
-        <h3 class="revenue-header" data-i18n="history_title">Full History</h3>
-        <div class="history-list" id="full-history-list" style="max-height:60vh;">
-            <!-- Full list injected -->
-        </div>
-        <button class="vehicles-strip" onclick="closeModal('full-history-modal')" data-i18n="btn_close">Close</button>
-    </div>
-</div>
-
 <!-- EARNINGS MODAL (Legacy - Hidden) -->
 <div id="earnings-modal" class="modal-overlay" style="display:none;">
     <div class="modal-card">
@@ -446,24 +435,24 @@
             slide_start: "SLIDE TO START", slide_end: "SLIDE TO END", btn_more_history: "More / Full History"
         },
         si: {
-            status_title: "රියදුරු තත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලැබා ගැනීමට ලබා වෙන", btn_manage_veh: "වාහන කළමනාකරණය",
-            finding: "හයර් සොයමින්...", gps_on: "GPS සහ Data සක්‍රීය වෙන", btn_offline: "විසන්ධි වන්න",
-            new_hire: "නව හයර් එක්!", btn_accept: "පිළිගන්න", btn_notify: "මම පැමිණියෙමි", btn_cancel: "අවලංගු කරන්",
-            trip_ended: "ගමන අවසන්", cash_collect: "අයකළ ගැයීම", btn_cash_rec: "මුදල් ලැබුණි",
-            earnings_title: "මගේ ඉපැයීම්", today_label: "අද ඉපැයීම්", month_label: "මෙම මාසය", history_title: "මුලු ඉතිහාසය",
-            today_earn: "අද ඉපැයීම්", btn_close: "වසන්න", my_vehicles: "මගේ වාහන", btn_add_veh: "+ වාහනයක් එක් කරන්න",
-            sel_veh: "වාහනයක් තෝරන්න", btn_cont: "ඉදිරිපත් කරන්", btn_cancel: "අවලංගු යියි", processing: "සකසමින් පවතී...",
-            slide_start: "ඇරඹීමට අදින්", slide_end: "අවසන් කිරීමට අදින්", btn_more_history: "වැඩි / සම්පූර්ණ ඉතිහාසය"
+            status_title: "රියදුරු තත්වය", btn_online: "මාර්ගත වන්න", online_desc: "හයර් ලැබා ගැනීමට ලා වෙන", btn_manage_veh: "වාහන කළමනාකරණය",
+            finding: "හයර් සොයමින්...", gps_on: "GPS ස Data සක්‍රීය වෙන", btn_offline: "විසන්ධි වන්න",
+            new_hire: "නව හයර් එක්!", btn_accept: "පිළිගන්න", btn_notify: "මියයා වෙත යමිණියෙමි", btn_cancel: "අවලංගු කරන්",
+            trip_ended: "ගමන අවසන්", cash_collect: "අයකළ �ගැයීම", btn_cash_rec: "මුදල් ලැබුණි",
+            earnings_title: "මගේ ඉපැයීම්", today_label: "අද ඉපැයීම්", month_label: "මෙම මාසය", history_title: "සම්පූ්රැා �ී",
+            today_earn: "අද ඉපැයීම්", btn_close: "වසන්න", my_vehicles: "මගේ වාහන", btn_add_veh: "+ වාහනයක් එක්",
+            sel_veh: "වාහනයක් තෝරන්න", btn_cont: "ඉදිරිපත් කරන්න", btn_cancel: "අවලංගු කරන්",
+            slide_start: "ඇරඹීමට අදින්", slide_end: "අවසන් කිරීමට අදින්"
         },
-        ta: {
-            status_title: "ஓட்டுநர் நிலை", btn_online: "ஆன்லைனில் செல்லுங்கள்", online_desc: "சவாரிகளைப் பெற ஆன்லைனில் செல்லுங்கள்", btn_manage_veh: "வாகனங்களை நிர்வகிக்கும்",
-            finding: "தேடுகிறது...", gps_on: "GPS மற்றும் Data ஆன் செய்யவும்", btn_offline: "ஆஃப்லைன் செல்லுங்கள்",
-            new_hire: "புதிய சவாரி!", btn_accept: "ஏற்கவும்", btn_notify: "நான் வந்துவிட்டேன்", btn_cancel: "ரத்து செய்",
-            trip_ended: "சவாரி முடிந்தது", cash_collect: "பெற வேண்டிய பணம்", btn_cash_rec: "பணம் பெறப்பட்டு",
-            earnings_title: "எனது வருமானம்", today_label: "இன்றைய வருமானம்", month_label: "இந்த மாதம்", history_title: "முழு வரலாறு",
-            today_earn: "இன்றைய வருமானம்", btn_close: "மூடு", my_vehicles: "எனது வாகனங்கள்", btn_add_veh: "+ வாகனத்தைச் சேர்",
-            sel_veh: "வாகனத்தைத் தேர்ந்தெடுக்கவும்", btn_cont: "தொடரவும்", btn_cancel: "ரத்து", processing: "செயலாக்கிறது...",
-            slide_start: "தொடங்க இழுக்கவும்", slide_end: "முடிக்க இழுக்கவும்", btn_more_history: "மேல் / முழு வரலாறு"
+        ta: { 
+            status_title: "ஓட்டுநர் நிலை", btn_online: "ஆன்லைனில் செல்லுங்கள்", online_desc: "சவாரிகைப் பெற ஆன்லைனில் செல்லுங்கள்", btn_manage_veh: "வாகனங்களை நிர்வகிக்கும்",
+            finding: "தேடுக்கிறது...", gps_on: "GPS & Data ஆன் செய்யும்", btn_offline: "ஆஃப்லைன்லுங்கள்",
+            new_hire: "புதிய சவாரி!", btn_accept: "ஏற்குவும்", btn_notify: "நான் வந்துவிட்டேன்ற", btn_cancel: "ரது செய்லிக",
+            trip_ended: "பயணம் முடிந்தது", cash_collect: "ரொயை பெணவேண்டிய பணம்", btn_cash_rec: "ரொயை பெற்ப்பட்டு",
+            earnings_title: "வருமானம்", today_label: "இன்றைய வருமானம்", month_label: "இந்த மாதம்", history_title: "முழுவரலாறு",
+            today_earn: "இன்றைய வருமானம்", btn_close: "மூடு", my_vehicles: "எனது வாகனங்கள்", btn_add_veh: "+ வாகனத்தை",
+            sel_veh: "வாகனத்தைத் தேர்வு செய்யும்", btn_cont: "தொடரவும்", btn_cancel: "ரது", processing: "செயலாக்கிறது...",
+            slide_start: "தொடங்க இழுக்கவும்", slide_end: "முடிக்க இழுக்க வும்"
         }
     };
 
@@ -647,6 +636,7 @@
     window.initiateGoOnline = () => {
         if(!currentLocation) return toast("Waiting for GPS Location...", "error");
         
+        // FIXED: Includes "Car (Cheap)" category to support user app selection
         const app = currentVehicles.filter(v => v.approved_status === true);
         if(app.length===0) return toast("No Approved Vehicles", "error");
         
@@ -655,11 +645,17 @@
         app.forEach(v => {
             let d = document.createElement('div');
             d.className = 'v-item';
-            d.innerHTML = `<div class="v-info"><b>${v.brand} ${v.model}</b> <br><small>${v.plate}</small></div>`;
+            // Map internal types if needed, here we just use the raw DB type
+            const displayName = v.type === 'Car (Cheap)' ? 'Mini (Cheap)' : v.type; 
+            
+            d.innerHTML = `<div class="v-info"><b>${v.brand} ${displayName}</b> <br><small>${v.plate}</small></div>`;
             d.onclick = () => {
                 document.querySelectorAll('.v-item').forEach(x=>x.classList.remove('selected'));
                 d.classList.add('selected');
-                selectedVehId = v.id; selectedVehType = v.type;
+                selectedVehId = v.id; 
+                // Normalize type for ride data (User app sends car_cheap, we store it as is or map to Car for logic)
+                if (v.type === 'Car (Cheap)') selectedVehType = 'car'; 
+                else selectedVehType = v.type;
             };
             list.appendChild(d);
         });
@@ -687,14 +683,36 @@
                 const r = rides[rid];
                 
                 if(r.status !== 'requesting') continue;
-                if(r.vehicleType !== selectedVehType) continue;
                 
-                if(r.serviceType === 'flash' && selectedVehType !== 'Bike') continue;
+                // MATCHING LOGIC: Check User App Vehicle Type
+                let match = false;
                 
-                if(r.serviceType && r.serviceType !== 'flash' && r.serviceType !== 'ride') continue;
+                // If rider has "Car (Cheap)", it can take ride type "car_cheap" OR "Car"
+                if(selectedVehType === 'Car (Cheap)') {
+                    if(r.vehicleType === 'car_cheap' || r.vehicleType === 'Car') {
+                        match = true;
+                    console.log("Matched Car (Cheap) request");
+                    }
+                } else {
+                    if(r.vehicleType === selectedVehType) {
+                        match = true;
+                    console.log("Matched " + r.vehicleType + " request");
+                    }
+                }
+                
+                // Logic for Bike accepting anything
+                if(selectedVehType === 'Bike') {
+                    if(r.vehicleType === 'bike' || r.serviceType === 'flash') match = true;
+                } else if (selectedVehType === 'Tuk Tuk') {
+                    if(r.vehicleType === 'tuk') match = true;
+                } else if (selectedVehType === 'Van') {
+                    if(r.vehicleType === 'van') match = true;
+                }
 
-                incomingRequest(rid, r);
-                break; 
+                if(match) {
+                    incomingRequest(rid, r);
+                    break; 
+                }
             }
         });
     }
@@ -704,7 +722,7 @@
         document.getElementById('card-searching').classList.add('hidden-card');
         document.getElementById('card-offline').style.display='flex';
         if(selectedVehId) update(ref(db, `vehicles/${selectedVehType}/${selectedVehId}`), {status:"offline"});
-        selectedVid = null;
+        // selectedVid = null; // FIX: Removed line to avoid clearing intended persistent selection
         if(ridesRef) { ridesRef = null; } 
     }
 
@@ -744,14 +762,17 @@
         setTimeout(() => btn.style.strokeDashoffset = 400, 10);
         
         setTimeout(() => {
-            if(tripState === "REQUEST") rejectRide();
+            if(tripState === "REQUEST") rejectRide(); // Timeout triggers the Cancellation Fix
         }, 10000);
     }
-
+    
     window.acceptHire = async () => {
         tripState = "PICKUP";
         document.getElementById('card-request').classList.add('hidden-card');
         document.getElementById('card-trip').classList.remove('hidden-card');
+        
+        // Map Logic: Draw Route (Blue Line)
+        updateTripLines();
         
         await update(ref(db, `rides/${currentRideId}`), {
             status: 'driver_found',
@@ -768,8 +789,6 @@
         
         setupSlider(dict[lang].slide_start, startTrip);
         
-        updateTripLines();
-        
         onValue(ref(db, `rides/${currentRideId}/messages`), snap => {
             const msgs = snap.val();
             if(msgs) {
@@ -785,19 +804,8 @@
 
         onValue(ref(db, `rides/${currentRideId}`), s => {
             const r = s.val();
-            if(r.status === 'cancelled') rejectRide();
+            if(r.status === 'cancelled') rejectRide(); // Listen for cancellation
         });
-    }
-    
-    function rejectRide() {
-        currentRideId = null;
-        tripState = "IDLE";
-        rideData = null;
-        clearLines();
-        document.getElementById('card-request').classList.add('hidden-card');
-        document.getElementById('card-trip').classList.add('hidden-card');
-        if(isOnline) document.getElementById('card-searching').classList.remove('hidden-card');
-        else document.getElementById('card-offline').style.display='flex';
     }
 
     function updateTripLines() {
@@ -807,24 +815,21 @@
         const drop = L.latLng(rideData.dropoff.lat, rideData.dropoff.lng);
         const rider = L.latLng(currentLocation.lat, currentLocation.lng);
         
-        if(!userPosMarker) {
-            const icon = L.divIcon({ html: '<div style="width:15px;height:15px;background:blue;border-radius:50%;border:2px solid white;"></div>', iconSize:[15,15], iconAnchor:[7,7]});
-            userPosMarker = L.marker(pickup, {icon}).addTo(map);
-        }
-
+        // Markers
         if(tripState === 'PICKUP') {
-            if(rider && pickup) {
-                if(pickupLine) map.removeLayer(pickupLine);
-                pickupLine = L.polyline([rider, pickup], {color: 'blue', weight: 5, dashArray: '10, 10'}).addTo(map);
-                map.fitBounds([rider, pickup], {padding: [50, 50]});
+            if(!userPosMarker) {
+                const icon = L.divIcon({ html: '<div style="width:15px;height:15px;background:blue;border-radius:50%;border:2px solid white;"></div>', iconSize:[15,15], iconAnchor:[7,7]});
+                userPosMarker = L.marker(pickup, {icon}).addTo(map);
             }
-            if(tripLine) { map.removeLayer(tripLine); tripLine = null; }
         } else if (tripState === 'TRIP') {
-            if(pickupLine) { map.removeLayer(pickupLine); pickupLine = null; }
+            if(userPosMarker) { map.removeLayer(userPosMarker); userPosMarker = null; }
             if(!tripLine) {
                 tripLine = L.polyline([pickup, drop], {color: 'red', weight: 5}).addTo(map);
                 map.fitBounds([pickup, drop], {padding: [100, 100]});
             }
+            if(pickupLine) { map.removeLayer(pickupLine); pickupLine = null; }
+        } else {
+            if(pickupLine) { map.removeLayer(pickupLine); pickupLine = null; }
         }
     }
 
@@ -833,7 +838,7 @@
 
     function startTrip() {
         tripState = "TRIP";
-        document.getElementById('trip-status-txt').innerText = lang==='si'?"ගමනානාන්තය වෙත":"Heading to Destination";
+        document.getElementById('trip-status-txt').innerText = lang==='si'?"ගමනා නාන්ත වෙත යමි": "Heading to Destination";
         document.getElementById('btn-notify').style.display='none';
         setupSlider(dict[lang].slide_end, endTrip);
         updateTripLines(); 
@@ -918,14 +923,21 @@
     // --- VEHICLE MANAGER ---
     async function loadVehicles() {
         currentVehicles=[];
-        const categories = ["Bike","Tuk Tuk","Car","Van"];
+        
+        // ADDED 'Car (Cheap)' Category
+        const categories = ["Bike","Tuk Tuk","Car","Car (Cheap)","Van"];
+        
         for(let t of categories) {
             try { 
-                const s = await get(ref(db, `vehicles/${t}`)); 
+                // If Key has spaces, encode/decode for Firebase compatibility. 
+                const dbKey = t.includes(" ") ? t.replace(" ", "%20") : t;
+                
+                const s = await get(ref(db, `vehicles/${dbKey}`)); 
                 if(s.exists()) {
                     s.forEach(v => { 
                         if(v.val().ownerUid === currentUser.uid) {
-                            currentVehicles.push({...v.val(), id:v.key, type:t}); 
+                            // Save type exactly as is
+                            currentVehicles.push({...v.val(), id:v.key, type:v.val().type || t}); 
                         }
                     }); 
                 }
@@ -945,7 +957,10 @@
                 d.className = 'v-item';
                 let st = v.approved_status===true ? "<span style='color:green; font-size:10px;'>Approved</span>" : 
                          (v.approved_status==="declined" ? "<span style='color:red; font-size:10px;'>Declined</span>" : 
-                         "<span style='color:orange; font-size:10px;'>Pending</span>");
+                         "<span style='color:orange; font-size:10px;'>Pending</span>";
+                
+                // Display Type
+                let displayType = v.type === 'Car (Cheap)' ? 'Car (Cheap)' : v.type;
                 
                 d.innerHTML = `
                     <div><b>${v.brand}</b> <span style="font-size:12px;color:#777;">${v.model}</span><br><small>${v.plate}</small></div>
@@ -971,7 +986,7 @@
         slider.ontouchstart = (e) => {
             isDragging = true; startX = e.touches[0].clientX; containerWidth = cont.offsetWidth - 55;
         };
-        document.ontouchmove = (e) => {
+        document..ontouchmove = (e) => {
             if(!isDragging) return;
             let moveX = e.touches[0].clientX - startX;
             if(moveX < 0) moveX = 0; if(moveX > containerWidth) moveX = containerWidth;
@@ -990,6 +1005,40 @@
         lang = lang==='en'?'si':(lang==='si'?'ta':'en'); 
         localStorage.setItem('speedo_lang',lang); 
         updateLangUI();
+    }
+
+    // --- CRITICAL: RESET & CANCEL LOGIC ---
+    function rejectRide() {
+        console.log("Rejecting ride...");
+        
+        // Stop listeners
+        if(rideListener) { rideListener(); rideListener = null; }
+
+        // 1. Clear Map Layers (Fix for Red Road Stuck issue)
+        if(map) {
+            map.eachLayer(layer => map.removeLayer(layer));
+            // Clear markers explicitly if needed or just rely on clearLayers
+            markersLayer = null; 
+        }
+        
+        // 2. Clear specific lines
+        if(pickupLine) { map.removeLayer(pickupLine); pickupLine = null; }
+        if(tripLine) { map.removeLayer(tripLine); tripLine = null; }
+        if(routingControl) { map.removeControl(routingControl); routingControl = null; }
+        
+        // 3. Reset UI State
+        tripState = "IDLE";
+        currentRideId = null;
+        rideData = null;
+
+        // 4. Show Correct Previous State
+        if(isOnline) {
+            document.getElementById('card-offline').style.display='none';
+            document.getElementById('card-searching').classList.remove('hidden-card');
+        } else {
+            document.getElementById('card-offline').style.display='flex';
+            document.getElementById('card-searching').classList.add('hidden-card');
+        }
     }
 </script>
 </body>
