@@ -19,7 +19,6 @@
             --primary-red: #D32F2F;
             --primary-dark: #b71c1c;
             --green: #4CAF50;
-            --blue: #2196F3;
             --white: #ffffff;
             --bg-gray: #e0e0e0;
             --text-dark: #333333;
@@ -296,23 +295,39 @@
         .slider-thumb { width: 44px; height: 44px; background: var(--primary-red); border-radius: 50%; position: absolute; left: 3px; top: 3px; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: grab; color: white; user-select: none; }
         .online-status-view { height: 50px; width: 100%; background: var(--green); border-radius: 25px; display: none; align-items: center; justify-content: center; color: white; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); user-select: none; }
         
-        /* VEHICLE REGISTRATION */
+        /* ============================
+           VEHICLE REGISTRATION (From Snippet)
+           ============================ */
         .carousel-step { width: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.4s ease; }
         .carousel-step.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .step-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; color: var(--text-dark); }
+        .step-subtitle { font-size: 14px; color: #888; margin-bottom: 25px; text-align: center; }
+        
         .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
         .type-card { background: #f9f9f9; border: 2px solid #eee; border-radius: 16px; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; user-select: none; }
         .type-card.selected { border-color: var(--primary-red); background: #fff0f0; }
+        .type-icon { font-size: 32px; margin-bottom: 5px; color: #555; }
+        .type-card.selected .type-icon { color: var(--primary-red); }
+        .type-label { font-size: 13px; font-weight: 600; color: #444; }
+        
         .upload-grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-bottom: 20px; }
-        .upload-box { background: #f9f9f9; border: 2px dashed #ccc; border-radius: 12px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; cursor: pointer; }
+        .upload-grid-docs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-bottom: 20px; }
+        .upload-box { background: #f9f9f9; border: 2px dashed #ccc; border-radius: 12px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; cursor: pointer; transition: 0.2s; }
         .upload-box.active { border-color: var(--primary-red); background: #fff0f0; }
-        .upload-label { font-size: 11px; font-weight: 600; color: #555; pointer-events: none; }
+        .upload-label { font-size: 11px; font-weight: 600; color: #555; pointer-events: none; text-align: center; padding: 5px; }
         .upload-preview { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         .upload-input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .step-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-        .step-subtitle { font-size: 14px; color: #888; margin-bottom: 25px; }
+
+        /* AGREEMENT SLIDER */
+        .v-agree-slider { width: 100%; height: 50px; background: #eee; border-radius: 25px; position: relative; overflow: hidden; margin-top: 20px; }
+        .v-agree-text { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 1px; z-index: 1; }
+        .v-agree-thumb { width: 44px; height: 44px; background: var(--primary-red); border-radius: 50%; position: absolute; left: 3px; top: 3px; z-index: 2; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: grab; transition: transform 0.1s; color: white; user-select: none; }
+        .v-agree-thumb:active { cursor: grabbing; transform: scale(1.1); }
+        .v-agree-thumb.unlocked { background: #4CAF50; transform: translateX(calc(100% - 50px)); }
         
-        /* PRICE MODAL */
+        /* PRICE MODAL (Fixed CSS) */
         #modal-price {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 9000;
@@ -364,11 +379,11 @@
             <span class="material-icons arc-icon">navigation</span>
             <span id="arc-dest-text">Destination</span>
         </div>
-        <!-- Dynamic Status Text will go here -->
+        <!-- Dynamic Status Text -->
         <div class="arc-status-text" id="arc-status-text">Ride In Progress</div>
     </div>
 
-    <!-- 2. NEW REQUEST MODAL -->
+    <!-- 2. NEW RIDE REQUEST MODAL -->
     <div id="modal-request-full">
         <div class="req-header">
             <div class="req-title">New Request</div>
@@ -546,74 +561,91 @@
         </div>
     </div>
 
-    <!-- VEHICLE REGISTRATION -->
+    <!-- VEHICLE REGISTRATION (From Snippet) -->
     <div id="section-vehicle-reg" class="full-center hidden">
+        <!-- Step 1: Type -->
         <div id="v-step-1" class="carousel-step active">
             <h2 class="step-title" id="t-v-type-title">Vehicle Type</h2>
-            <p class="step-subtitle" id="t-v-type-sub">Select category</p>
+            <p class="step-subtitle" id="t-v-type-sub">Select your vehicle category</p>
             <div class="type-grid">
-                <div class="type-card" onclick="selectType('bike',this)"><span class="material-icons type-icon">two_wheeler</span><span class="type-label" id="t-bike">Bike</span></div>
-                <div class="type-card" onclick="selectType('tuk',this)"><span class="material-icons type-icon">electric_rickshaw</span><span class="type-label" id="t-tuk">Tuk</span></div>
-                <div class="type-card" onclick="selectType('car',this)"><span class="material-icons type-icon">directions_car</span><span class="type-label" id="t-car">Car</span></div>
-                <div class="type-card" onclick="selectType('van',this)"><span class="material-icons type-icon">airport_shuttle</span><span class="type-label" id="t-van">Van</span></div>
+                <div class="type-card" onclick="selectType('bike',this)">
+                    <span class="material-icons type-icon">two_wheeler</span>
+                    <span class="type-label" id="t-bike">Bike</span>
+                </div>
+                <div class="type-card" onclick="selectType('tuk',this)">
+                    <span class="material-icons type-icon">electric_rickshaw</span>
+                    <span class="type-label" id="t-tuk">Tuk Tuk</span>
+                </div>
+                <div class="type-card" onclick="selectType('car',this)">
+                    <span class="material-icons type-icon">directions_car</span>
+                    <span class="type-label" id="t-car">Car</span>
+                </div>
+                <div class="type-card" onclick="selectType('van',this)">
+                    <span class="material-icons type-icon">airport_shuttle</span>
+                    <span class="type-label" id="t-van">Van</span>
+                </div>
             </div>
             <button class="btn hidden" id="v-btn-1" style="margin-top:20px;" onclick="nextVStep(2)">Next</button>
         </div>
-
+        <!-- Step 2: Details -->
         <div id="v-step-2" class="carousel-step">
-            <h2 class="step-title" id="t-v-det-title">Details</h2>
-            <label class="pm-label" id="t-v-model-lbl">Model</label>
-            <input type="text" id="v-model">
-            <label class="pm-label" id="t-v-plate-lbl">Plate</label>
-            <input type="text" id="v-plate" style="text-transform:uppercase;">
+            <h2 class="step-title" id="t-v-det-title">Vehicle Details</h2>
+            <p class="step-subtitle" id="t-v-det-sub">Brand, Model and Number Plate</p>
+            <label style="font-size:12px; color:#777; text-align:left; width:100%; margin-bottom:5px;" id="t-v-model-lbl">Vehicle Brand & Model</label>
+            <input type="text" id="v-model" placeholder="e.g. Bajaj RE, Honda Dio">
+            <label style="font-size:12px; color:#777; text-align:left; width:100%; margin-bottom:5px;" id="t-v-plate-lbl">Number Plate</label>
+            <input type="text" id="v-plate" placeholder="e.g. AB-1234" style="text-transform: uppercase;">
             <button class="btn" onclick="nextVStep(3)" id="t-btn-next-2">Next</button>
             <button class="btn-outline" style="border:none; margin-top:10px;" onclick="nextVStep(1)" id="t-btn-back-2">Back</button>
         </div>
-
+        <!-- Step 3: Photos -->
         <div id="v-step-3" class="carousel-step">
-            <h2 class="step-title" id="t-v-pho-title">Photos</h2>
+            <h2 class="step-title" id="t-v-pho-title">Vehicle Photos</h2>
+            <p class="step-subtitle" id="t-v-pho-sub">Upload clear images (2 Outside, 2 Inside)</p>
             <div class="upload-grid-2x2">
-                <div class="upload-box"><span class="upload-label" id="t-out1">Out 1</span><input type="file" class="upload-input" onchange="handleVUpload(this,'out1')"><img class="upload-preview hidden"></div>
-                <div class="upload-box"><span class="upload-label" id="t-out2">Out 2</span><input type="file" class="upload-input" onchange="handleVUpload(this,'out2')"><img class="upload-preview hidden"></div>
-                <div class="upload-box"><span class="upload-label" id="t-in1">In 1</span><input type="file" class="upload-input" onchange="handleVUpload(this,'in1')"><img class="upload-preview hidden"></div>
-                <div class="upload-box"><span class="upload-label" id="t-in2">In 2</span><input type="file" class="upload-input" onchange="handleVUpload(this,'in2')"><img class="upload-preview hidden"></div>
+                <div class="upload-box" id="up-out-1"><span class="upload-label" id="t-out1">Outside 1</span><input type="file" class="upload-input" accept="image/*" onchange="handleVUpload(this,'out1')"><img class="upload-preview hidden"></div>
+                <div class="upload-box" id="up-out-2"><span class="upload-label" id="t-out2">Outside 2</span><input type="file" class="upload-input" accept="image/*" onchange="handleVUpload(this,'out2')"><img class="upload-preview hidden"></div>
+                <div class="upload-box" id="up-in-1"><span class="upload-label" id="t-in1">Inside 1</span><input type="file" class="upload-input" accept="image/*" onchange="handleVUpload(this,'in1')"><img class="upload-preview hidden"></div>
+                <div class="upload-box" id="up-in-2"><span class="upload-label" id="t-in2">Inside 2</span><input type="file" class="upload-input" accept="image/*" onchange="handleVUpload(this,'in2')"><img class="upload-preview hidden"></div>
             </div>
             <button class="btn" onclick="validateVStep3()" id="t-btn-next-3">Next</button>
             <button class="btn-outline" style="border:none; margin-top:10px;" onclick="nextVStep(2)" id="t-btn-back-3">Back</button>
         </div>
-
+        <!-- Step 4: Docs -->
         <div id="v-step-4" class="carousel-step">
-            <h2 class="step-title" id="t-v-doc-title">Docs</h2>
+            <h2 class="step-title" id="t-v-doc-title">Documents</h2>
+            <p class="step-subtitle" id="t-v-doc-sub">Revenue Permit & Insurance</p>
             <div class="upload-grid-docs">
-                <div class="upload-box"><span class="upload-label" id="t-permit">Permit</span><input type="file" class="upload-input" onchange="handleVUpload(this,'permit')"><img class="upload-preview hidden"></div>
-                <div class="upload-box"><span class="upload-label" id="t-ins">Insurance</span><input type="file" class="upload-input" onchange="handleVUpload(this,'insurance')"><img class="upload-preview hidden"></div>
+                <div class="upload-box" id="up-permit"><span class="upload-label" id="t-permit">Revenue Permit</span><input type="file" class="upload-input" accept="image/*" onchange="handleVUpload(this,'permit')"><img class="upload-preview hidden"></div>
+                <div class="upload-box" id="up-insurance"><span class="upload-label" id="t-ins">Insurance Cert</span><input type="file" class="upload-input" accept="image/*" onchange="handleVUpload(this,'insurance')"><img class="upload-preview hidden"></div>
             </div>
             <button class="btn" onclick="validateVStep4()" id="t-btn-next-4">Next</button>
             <button class="btn-outline" style="border:none; margin-top:10px;" onclick="nextVStep(3)" id="t-btn-back-4">Back</button>
         </div>
-
+        <!-- Step 5: Agreement -->
         <div id="v-step-5" class="carousel-step">
             <h2 class="step-title" id="t-agree-title">Agreement</h2>
-            <div style="height:150px; overflow-y:auto; text-align:left; font-size:12px; background:#f9f9f9; padding:10px; margin-bottom:15px;">
-                <p id="t-terms-1">Terms...</p><p id="t-terms-2">Fee...</p>
+            <div style="height: 200px; overflow-y: auto; text-align: left; font-size: 12px; color: #555; line-height: 1.6; background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                <p style="margin-bottom:10px;" id="t-terms-1"><strong>Terms of Service:</strong> By registering this vehicle, you agree to adhere to Speedo's standards of service and safety.</p>
+                <p style="color:var(--primary-red); font-weight:600;" id="t-terms-2"><strong>Weekly Fee:</strong> You agree to pay a subscription fee of LKR 1000/- per week to Speedo LK to keep your driver profile active and online.</p>
             </div>
             <div class="slider-wrapper" id="v-agree-slider">
                 <div class="slider-text" id="t-slide">Slide to Agree</div>
-                <div class="slider-thumb" id="v-agree-thumb"><span class="material-icons" style="color:white;">arrow_forward</span></div>
+                <div class="slider-thumb" id="v-agree-thumb"><span class="material-icons" style="color:white; font-size:18px;">arrow_forward</span></div>
             </div>
-            <button class="btn-outline" style="border:none; margin-top:10px;" onclick="nextVStep(4)" id="t-btn-back-5">Back</button>
+            <button class="btn-outline" style="border:none; margin-top:15px;" onclick="nextVStep(4)" id="t-btn-back-5">Back</button>
         </div>
     </div>
 
-    <!-- WELCOME -->
+    <!-- WELCOME MODAL -->
     <div id="modal-welcome" class="modal-overlay hidden">
-        <div class="welcome-card">
-            <h2 id="welcome-name">Welcome!</h2>
-            <p id="t-welcome-body" class="welcome-text">Loading...</p>
-            <input type="text" id="promo-code" class="promo-input" placeholder="Promo Code">
-            <button class="btn-outline" onclick="checkPromo()" id="t-btn-check" style="font-size:12px; padding:8px;">Check</button>
-            <div id="t-promo-msg" class="hidden promo-success">Code applied!</div>
-            <button class="btn" onclick="finalizeWelcome()" id="t-btn-agree" style="margin-top:15px;">I Agree</button>
+        <div class="welcome-card" style="background:white; width:100%; max-width:400px; padding:30px; border-radius:24px; text-align:center;">
+            <h2 id="welcome-name" style="margin-bottom:15px;">Welcome!</h2>
+            <p id="t-welcome-body" class="welcome-text" style="font-size:14px; color:#444; line-height:1.6; margin-bottom:20px;">Loading welcome message...</p>
+            <input type="text" id="promo-code" class="promo-input" placeholder="Promo Code (Optional)" style="background:#f0f0f0; border:none; margin-bottom:10px;">
+            <button class="btn-outline" onclick="checkPromo()" id="t-btn-check" style="padding: 8px; font-size:13px; border-radius:8px; margin-bottom:10px;">Check Code</button>
+            <div id="t-promo-msg" class="hidden promo-success" style="color:#4CAF50; font-size:12px; margin-bottom:10px; font-weight:600;">You have gained 14 days free app usage by PROMO CODE!</div>
+            <button class="btn" onclick="finalizeWelcome()" id="t-btn-agree">I Agree</button>
         </div>
     </div>
 
@@ -649,16 +681,12 @@
         let tempReceiptBase64 = null;
         let isPromoValid = false;
         let userName = "Passenger";
-        
-        // NAVIGATION STATE (NEW)
-        let routeSteps = []; // Stores OSRM steps
-        let currentStepIndex = 0; // Current step index
 
         // TRANSLATIONS
         const translations = {
-            en: { welcome: "Welcome", loading: "Loading...", locTitle: "Fetching Location", locDesc: "Enable location access", goodLuck: "Good Luck Driver!", vTypeTitle: "Vehicle Type", vTypeSub: "Select category", bike: "Bike", tuk: "Tuk Tuk", car: "Car", van: "Van", vDetTitle: "Vehicle Details", vDetSub: "Brand & Model", vModelLbl: "Model", vPlateLbl: "Number Plate", vPlatePh: "e.g. AB-1234", vPhoTitle: "Photos", vPhoSub: "Upload images", out1: "Outside 1", out2: "Outside 2", in1: "Inside 1", in2: "Inside 2", vDocTitle: "Documents", vDocSub: "Permit & Insurance", permit: "Revenue Permit", ins: "Insurance", agreeTitle: "Agreement", terms1: "Terms of Service...", terms2: "Weekly Fee: 1000/-", slide: "Slide to Agree", welcomeBody: "Pay 1000/- weekly to keep account active.", btnNext: "Next", btnBack: "Back", btnCheck: "Check", btnAgree: "I Agree", promoSuccess: "Promo Applied!", earnings: "Earnings", slideOnline: "Slide to Go Online", setPrice: "Set Price", baseDesc: "Base amount for 1st KM included", per100m: "Price per 100m", cancel: "Cancel", touchOffline: "Tap to Go Offline" },
-            si: { welcome: "ආයුබෝවන්", loading: "පූරණය වෙමින්...", locTitle: "පිහිටීම සොයමින්", locDesc: "Location සබල කරන්න", goodLuck: "සුභ පැතුම්!", vTypeTitle: "වාහන වර්ගය", vTypeSub: "තෝරන්න", bike: "යතුරුපැදි", tuk: "ත්‍රිරෝද", car: "කාර්", van: "වෑන්", vDetTitle: "විස්තර", vDetSub: "වෙළඳ නාමය", vModelLbl: "මාදිලිය", vPlateLbl: "අංක තහඩුව", vPlatePh: "උදා: AB-1234", vPhoTitle: "ඡායාරූප", vPhoSub: "අප්ලෝඩ් කරන්න", out1: "පිටත 1", out2: "පිටත 2", in1: "ඇතුළත 1", in2: "ඇතුළත 2", vDocTitle: "ලේඛන", vDocSub: "බලපත්‍ර", permit: "ආදායම් බලපත්‍රය", ins: "රක්ෂණ", agreeTitle: "ගිවිසුම", terms1: "කොන්දේසි...", terms2: "සතිපතා ගාස්තුව: 1000/-", slide: "එකඟ වීමට", welcomeBody: "සතිපතා රු.1000 ගෙවන්න.", btnNext: "ඊළඟ", btnBack: "ආපසු", btnCheck: "පරීක්ෂා", btnAgree: "එකඟයි", promoSuccess: "කේතය නිවැරදියි!", earnings: "ආදායම", slideOnline: "මාර්ගගත වන්න", setPrice: "මිල", baseDesc: "මූලික මුදල (1 KM)", per100m: "100m ක මිල", cancel: "අවලංගු", touchOffline: "මාර්ගගතවීම නවත්වන්න" },
-            ta: { welcome: "வணக்கம்", loading: "ஏற்றுகிறது...", locTitle: "இடம் தேடல்", locDesc: "Location ஐ இயக்கவும்", goodLuck: "வாழ்த்துக்கள்!", vTypeTitle: "வாகன வகை", vTypeSub: "தேர்ந்தெடு", bike: "பைக்", tuk: "ஆட்டோ", car: "கார்", van: "வேன்", vDetTitle: "விவரங்கள்", vDetSub: "பிராண்ட்", vModelLbl: "மாதிரி", vPlateLbl: "எண் பலகை", vPlatePh: "உ.ம்: AB-1234", vPhoTitle: "புகைப்படங்கள்", vPhoSub: "பதிவேற்றவும்", out1: "வெளியே 1", out2: "வெளியே 2", in1: "உள்ளே 1", in2: "உள்ளே 2", vDocTitle: "ஆவணங்கள்", vDocSub: "அனுமதி", permit: "வருவாய் அனுமதி", ins: "காப்பீடு", agreeTitle: "ஒப்பந்தம்", terms1: "விதிமுறைகள்...", terms2: "வாராந்திர கட்டணம்: 1000/-", slide: "ஒப்புக்கொள்ள", welcomeBody: "வாரத்திற்கு 1000/- செலுத்தவும்.", btnNext: "அடுத்து", btnBack: "பின்னால்", btnCheck: "சரிபார்க்கவும்", btnAgree: "ஒப்புக்கொள்கிறேன்", promoSuccess: "குறியீடு சரி!", earnings: "வருமானம்", slideOnline: "ஆன்லைன் செல்ல", setPrice: "விலை", baseDesc: "அடிப்படை தொகை (1 KM)", per100m: "100 மீ விலை", cancel: "ரத்து", touchOffline: "ஆஃப்லைன் செல்ல" }
+            en: { welcome: "Welcome", loading: "Loading...", locTitle: "Fetching Location", locDesc: "Enable location access", goodLuck: "Good Luck Driver!", vTypeTitle: "Vehicle Type", vTypeSub: "Select your vehicle category", bike: "Bike", tuk: "Tuk Tuk", car: "Car", van: "Van", vDetTitle: "Vehicle Details", vDetSub: "Brand, Model and Number Plate", vModelLbl: "Vehicle Brand & Model", vPlateLbl: "Number Plate", vPlatePh: "e.g. AB-1234", vPhoTitle: "Vehicle Photos", vPhoSub: "Upload clear images (2 Outside, 2 Inside)", out1: "Outside 1", out2: "Outside 2", in1: "Inside 1", in2: "Inside 2", vDocTitle: "Documents", vDocSub: "Revenue Permit & Insurance", permit: "Revenue Permit", ins: "Insurance Cert", agreeTitle: "Agreement", terms1: "<strong>Terms of Service:</strong> By registering this vehicle, you agree to adhere to Speedo's standards of service and safety.", terms2: "<strong>Weekly Fee:</strong> You agree to pay a subscription fee of LKR 1000/- per week to Speedo LK to keep your driver profile active and online.", slide: "Slide to Agree", welcomeBody: "To continue keeping your driver profile updated and online, you need to pay LKR 1000/- every week to Speedo LK. You will be notified when week is over.", btnNext: "Next", btnBack: "Back", btnCheck: "Check Code", btnAgree: "I Agree", promoSuccess: "You have gained 14 days free app usage by PROMO CODE!", earnings: "Earnings", slideOnline: "Slide to Go Online", setPrice: "Set Price", baseDesc: "Base amount for 1st KM included", per100m: "Price per 100m", cancel: "Cancel", touchOffline: "Tap to Go Offline" },
+            si: { welcome: "ආයුබෝවන්", loading: "පූරණය වෙමින්...", locTitle: "පිහිටීම සොයමින්", locDesc: "Location සබල කරන්න", goodLuck: "සුභ පැතුම්!", vTypeTitle: "වාහන වර්ගය", vTypeSub: "ඔබේ වාහන කාණ්ඩය තෝරන්න", bike: "යතුරුපැදි", tuk: "ත්‍රිරෝද රථ", car: "කාර්", van: "වෑන්", vDetTitle: "විස්තර", vDetSub: "වෙළඳ නාමය සහ මාදිලිය", vModelLbl: "වාහන වෙළඳ නාමය සහ මාදිලිය", vPlateLbl: "රිය අංක තහඩුව", vPlatePh: "උදා: AB-1234", vPhoTitle: "වාහන ඡායාරූප", vPhoSub: "පැහැදිලි ඡායාරූප (පිටතින් 2, ඇතුළතින් 2)", out1: "පිටත 1", out2: "පිටත 2", in1: "ඇතුළත 1", in2: "ඇතුළත 2", vDocTitle: "ලේඛන", vDocSub: "ආදායම් බලපත්‍රය සහ රක්ෂණය", permit: "ආදායම් බලපත්‍රය", ins: "රක්ෂණ සහතිකය", agreeTitle: "ගිවිසුම", terms1: "<strong>සේවා කොන්දේසි:</strong> මෙම වාහනය ලියාපදිංචි කිරීමෙන්, ඔබ ස්පීඩෝ හි සේවා සහ ආරක්ෂක ප්‍රමිතීන්ට අනුකූල වීමට එකඟ වේ.", terms2: "<strong>සතිපතා ගාස්තුව:</strong> ඔබගේ රියදුරු ගිණුම ක්‍රියාකාරීව තබා ගැනීම සඳහා ස්පීඩෝ එල්කේ වෙත සතික රු. 1000/- ක දායක මුදලක් ගෙවීමට ඔබ එකඟ වේ.", slide: "එකඟ වීමට ස්ලයිඩ් කරන්න", welcomeBody: "ඔබගේ ගිණුම ක්‍රියාත්මකව පවත්වාගෙන යාම සඳහා ඔබට සෑම සතියක් අවසානයේ සමාගම වෙත රුපියල් 1000ක මුදලක් ගෙවීමට අවශ්‍ය වේ.", btnNext: "ඊළඟ", btnBack: "ආපසු", btnCheck: "කේතය පරීක්ෂා කරන්න", btnAgree: "මම එකඟ වෙමි", promoSuccess: "ප්‍රවර්ධන කේතය මගින් ඔබට දින 14ක නොමිලේ යෙදුම් භාවිතය හිමිවිය!", earnings: "ආදායම", slideOnline: "මාර්ගගත වන්න", setPrice: "මිල", baseDesc: "මූලික මුදල (1 KM)", per100m: "100m ක මිල", cancel: "අවලංගු", touchOffline: "මාර්ගගතවීම නවත්වන්න තවම තට්ටු කරන්න" },
+            ta: { welcome: "வணக்கம்", loading: "ஏற்றுகிறது...", locTitle: "இடம் தேடல்", locDesc: "Location ஐ இயக்கவும்", goodLuck: "வாழ்த்துக்கள்!", vTypeTitle: "வாகன வகை", vTypeSub: "உங்கள் வாகன வகையைத் தேர்ந்தெடுக்கவும்", bike: "பைக்", tuk: "ஆட்டோ", car: "கார்", van: "வேன்", vDetTitle: "வாகன விவரங்கள்", vDetSub: "பிராண்ட் & மாடல்", vModelLbl: "வாகன பிராண்ட் & மாடல்", vPlateLbl: "வாகன எண் தகடு", vPlatePh: "உ.ம்: AB-1234", vPhoTitle: "வாகன புகைப்படங்கள்", vPhoSub: "தெளிவான படங்களை பதிவேற்றவும் (2 வெளியே, 2 உள்ளே)", out1: "வெளியே 1", out2: "வெளியே 2", in1: "உள்ளே 1", in2: "உள்ளே 2", vDocTitle: "ஆவணங்கள்", vDocSub: "வருவாய் அனுமதி & காப்பீடு", permit: "வருவாய் அனுமதி", ins: "காப்பீடு சான்றிதழ்", agreeTitle: "ஒப்பந்தம்", terms1: "<strong>சேவை விதிமுறைகள்:</strong> இந்த வாகனத்தை பதிவு செய்வதன் மூலம், ஸ்பீடோவின் சேவை மற்றும் பாதுகாப்பு தரங்களை கடைபிடிக்க ஒப்புக்கொள்கிறீர்கள்.", terms2: "<strong>வாராந்திர கட்டணம்:</strong> உங்கள் டிரைவர் சுயவிவரத்தை செயலில் வைத்திருக்க, ஸ்பீடோ எல்கே நிறுவனத்திற்கு வாரத்திற்கு ரூ. 1000/- செலுத்த ஒப்புக்கொள்கிறீர்கள்.", slide: "ஒப்புக்கொள்ள நகர்த்தவும்", welcomeBody: "உங்கள் டிரைவர் சுயவிவரத்தை செயலில் வைத்திருக்க, நீங்கள் ஸ்பீடோ எல்கே நிறுவனத்திற்கு வாரத்திற்கு ரூ. 1000/- செலுத்த வேண்டும். வாரம் முடியும் போது உங்களுக்கு தெரிவிக்கப்படும்.", btnNext: "அடுத்து", btnBack: "பின்னால்", btnCheck: "குறியீட்டை சரிபார்க்கவும்", btnAgree: "நான் ஒப்புக்கொள்கிறேன்", promoSuccess: "PROMO CODE மூலம் 14 நாட்கள் இலவச பயன்பாட்டைப் பெற்றுள்ளீர்கள்!", earnings: "வருமானம்", slideOnline: "ஆன்லைனில் செல்ல", setPrice: "விலை", baseDesc: "அடிப்படை தொகை (1 KM)", per100m: "100 மீ விலை", cancel: "ரத்து", touchOffline: "ஆஃப்லைன் செல்ல மீண்டும் தட்டவும்" }
         };
         let currentLang = localStorage.getItem('language') || 'en';
         const t = translations[currentLang];
@@ -703,7 +731,13 @@
             };
             for(let id in els) {
                 const el = document.getElementById(id);
-                if(el) el.innerHTML = els[id];
+                if(el) {
+                    if(id === 't-terms-1' || id === 't-terms-2') {
+                        el.innerHTML = els[id];
+                    } else {
+                        el.innerHTML = els[id];
+                    }
+                }
             }
             if(document.getElementById('v-plate')) document.getElementById('v-plate').placeholder = t.vPlatePh;
         }
@@ -844,11 +878,6 @@
                 tripDist += (dist * 1000);
             }
             lastLoc = { lat, lng };
-
-            // --- NAVIGATION LOGIC UPDATES ---
-            if (tripState === 'started' || tripState === 'pickup') {
-                checkNavigationProgress(lat, lng);
-            }
         }
 
         function addUserMarker(latlng) {
@@ -955,13 +984,8 @@
             document.getElementById('req-pickup').innerText = data.pickup.address;
             document.getElementById('req-drop').innerText = data.drop.address;
 
-            // Fetch User Name
-            if(data.userId) {
-                const uSnap = await window.fbGet(window.fbChild(window.fbRef(window.fbDb), `users/${data.userId}`));
-                if(uSnap.exists()) {
-                    userName = uSnap.val().name || "Passenger";
-                }
-            }
+            // GET PASSENGER NAME FROM RIDE DATA (Requested change)
+            userName = data.passengername || "Passenger";
         }
 
         window.declineRide = async function() {
@@ -1011,7 +1035,7 @@
             document.getElementById('arc-user-name').innerText = firstName;
             document.getElementById('arc-dest-text').innerText = currentRide.data.drop.address.split(',')[0];
             
-            // Update Status Text as requested
+            // Update Status Text
             document.getElementById('arc-status-text').innerText = `You're riding with ${firstName}`;
 
             document.getElementById('section-navigation').style.display = 'flex';
@@ -1109,7 +1133,6 @@
             currentRide = null;
             tripDist = 0;
             userName = "Passenger";
-            routeSteps = []; // Clear navigation
             
             // Unlock & Reload Earnings
             await window.fbUpdate(window.fbChild(window.fbRef(window.fbDb), `vehicles/${vehicleData.type}/${vehicleData.id}`), { available: true, currentride: null });
@@ -1147,17 +1170,25 @@
             document.ontouchend = end; document.onmouseup = end;
         }
 
-        // --- ROUTING & NAVIGATION (UPDATED) ---
+        // --- ROUTING & NAVIGATION (SIMPLIFIED - SHOW STATIC INITIAL DIRECTION) ---
         function drawRoute(target) {
             if(!lastLoc) return;
+            
+            // Request steps=true to get instruction text, but we only use first one.
             const url = `https://router.project-osrm.org/route/v1/driving/${lastLoc.lng},${lastLoc.lat};${target.lng},${target.lat}?overview=full&geometries=geojson&steps=true`;
             
             // Show loading state
             const navAddr = document.getElementById('nav-addr');
             if(navAddr) navAddr.innerText = "Calculating directions...";
+            // Reset icon
+            const navIcon = document.getElementById('nav-icon');
+            if(navIcon) navIcon.innerText = 'navigation';
 
             fetch(url).then(r=>r.json()).then(d=>{
-                if(!d.routes || d.routes.length === 0) return;
+                if(!d.routes || d.routes.length === 0) {
+                    if(navAddr) navAddr.innerText = "Route error";
+                    return;
+                }
 
                 // 1. Draw Geometry
                 const path = d.routes[0].geometry.coordinates.map(c=>[c[1],c[0]]);
@@ -1165,99 +1196,21 @@
                 routeLine = L.polyline(path, {color:'#2196F3', weight:6}).addTo(map);
                 map.fitBounds(routeLine.getBounds(), {padding:[50,50]});
 
-                // 2. Parse Steps for Navigation
-                routeSteps = d.routes[0].legs[0].steps;
-                currentStepIndex = 0;
+                // 2. Get Initial Direction (First Step)
+                // OSRM returns legs[0].steps. The first step [0] is usually immediate departure direction.
+                const firstStep = d.routes[0].legs[0].steps[0];
+                const instruction = firstStep ? firstStep.instruction : "Head towards destination";
                 
-                // 3. Update UI immediately with first step
-                updateNavDisplay();
+                // Update UI with static initial direction
+                if(navAddr) navAddr.innerText = instruction;
+                
+                // Keep generic icon or update based on first maneuver if desired. 
+                // Keeping 'straight' is safe for initial departure.
+                
             }).catch(e => {
                 console.error(e);
                 if(navAddr) navAddr.innerText = "Route error";
             });
-        }
-
-        // Helper to map instruction to icon
-        function getIconForManeuver(maneuver) {
-            const type = maneuver.type.toLowerCase(); // turn, arrive, depart, etc.
-            const mod = maneuver.modifier ? maneuver.modifier.toLowerCase() : ''; // left, right, uturn
-            
-            if (type === 'arrive') return 'flag';
-            if (type === 'depart') return 'directions_walk'; // Start of route
-            
-            if (mod.includes('left')) return 'turn_left';
-            if (mod.includes('right')) return 'turn_right';
-            if (mod.includes('uturn')) return 'u_turn_left';
-            if (mod.includes('slight left')) return 'turn_slight_left';
-            if (mod.includes('slight right')) return 'turn_slight_right';
-            if (mod.includes('sharp left')) return 'turn_sharp_left';
-            if (mod.includes('sharp right')) return 'turn_sharp_right';
-            
-            return 'straight'; // Default
-        }
-
-        function checkNavigationProgress(currentLat, currentLng) {
-            if (!routeSteps.length || currentStepIndex >= routeSteps.length) return;
-
-            const currentStep = routeSteps[currentStepIndex];
-            
-            // Maneuver location is where we need to turn/stop
-            const maneuverLoc = currentStep.maneuver.location; // [lon, lat]
-            
-            // Distance to this maneuver point
-            const distToManeuver = getDistance(currentLat, currentLng, maneuverLoc[1], maneuverLoc[0]) * 1000; // meters
-
-            // If we are very close to the maneuver point (e.g., passed it), move to next step
-            // Threshold: 20 meters
-            if (distToManeuver < 20) {
-                // If this isn't the last step
-                if (currentStepIndex < routeSteps.length - 1) {
-                    currentStepIndex++;
-                    updateNavDisplay();
-                } else {
-                    // Arrived at final step
-                    document.getElementById('nav-icon').innerText = 'flag';
-                    document.getElementById('nav-title').innerText = "You have arrived";
-                    document.getElementById('nav-addr').innerText = currentStep.name || "Destination";
-                }
-            } else {
-                // Update distance countdown in UI
-                updateNavDisplay(distToManeuver);
-            }
-        }
-
-        function updateNavDisplay(distToManeuver = null) {
-            if (currentStepIndex >= routeSteps.length) return;
-
-            const step = routeSteps[currentStepIndex];
-            const navTitle = document.getElementById('nav-title');
-            const navAddr = document.getElementById('nav-addr');
-            const navIcon = document.getElementById('nav-icon');
-
-            // Get icon
-            navIcon.innerText = getIconForManeuver(step.maneuver);
-
-            // OSRM provides a formatted instruction string (e.g., "Turn right onto Main St")
-            // We can use that, or build our own. Using OSRM string is safest.
-            const instruction = step.instruction || "Continue";
-            
-            if (step.maneuver.type === 'arrive') {
-                navTitle.innerText = "You have arrived";
-                navAddr.innerText = step.name || "Destination";
-            } else {
-                // Show distance if provided
-                let displayText = instruction;
-                if (distToManeuver !== null && distToManeuver < 2000) {
-                    // Prepend distance (e.g., "200m • Turn right...")
-                    displayText = `${Math.round(distToManeuver)}m • ${instruction}`;
-                }
-                navAddr.innerText = displayText;
-                
-                // Keep main title generic or specific to phase
-                if (tripState === 'started') {
-                    navTitle.innerText = "Turn-by-turn Navigation";
-                }
-            }
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
@@ -1275,22 +1228,122 @@
         window.handlePayUpload = (inp) => { const f = inp.files[0]; if(!f) return; const r = new FileReader(); r.readAsDataURL(f); r.onload = e => { tempReceiptBase64 = e.target.result; document.getElementById('pay-receipt-preview').src = tempReceiptBase64; document.getElementById('pay-receipt-preview').classList.remove('hidden'); } };
         window.submitPayment = async () => { if(!tempReceiptBase64) return showToast("Upload receipt"); await window.fbSet(window.fbChild(window.fbRef(window.fbDb), 'drivers/'+driverId+'/payment_details'), {receipt:tempReceiptBase64, status:'paid', date:new Date().toISOString()}); closePaidModal(); showToast("Submitted"); };
         
-        window.selectType = (t,e) => { window.vehicleData.type = t; document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected')); e.classList.add('selected'); document.getElementById('v-btn-1').classList.remove('hidden'); }
-        window.nextVStep = (n) => { document.querySelectorAll('.carousel-step').forEach(c=>c.classList.remove('active')); document.getElementById('v-step-'+n).classList.add('active'); }
-        window.handleVUpload = (i,k) => { const f=i.files[0]; if(f){ const r=new FileReader(); r.readAsDataURL(f); r.onload=e=>window.vehicleData[k]=e.target.result; } }
-        window.validateVStep3 = () => nextVStep(4); window.validateVStep4 = () => nextVStep(5);
+        // ==============================================
+        // VEHICLE REGISTRATION LOGIC (From Snippet)
+        // ==============================================
+        window.selectType = (t,e) => { 
+            window.vehicleData.type = t; 
+            document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected')); 
+            e.classList.add('selected'); 
+            document.getElementById('v-btn-1').classList.remove('hidden'); 
+        };
+        
+        window.nextVStep = (n) => { 
+            document.querySelectorAll('.carousel-step').forEach(c=>c.classList.remove('active')); 
+            document.getElementById(`v-step-${n}`).classList.add('active'); 
+        };
+        
+        window.handleVUpload = (i,k) => { 
+            const f=i.files[0]; 
+            if(f){ 
+                // Image Compression Logic
+                compressImage(f, 800, (base64) => {
+                    window.vehicleData[k]=base64; 
+                    i.parentElement.classList.add('active'); 
+                    i.parentElement.querySelector('img').src = base64; 
+                    i.parentElement.querySelector('img').classList.remove('hidden');
+                });
+            } 
+        };
+        
+        window.validateVStep3 = () => nextVStep(4); 
+        window.validateVStep4 = () => nextVStep(5);
+        
         window.saveVehicleRegistration = async () => {
             window.vehicleData.model = document.getElementById('v-model').value;
             window.vehicleData.numberplate = document.getElementById('v-plate').value.toUpperCase();
-            window.vehicleData.status = 'pending';
+            window.vehicleData.status = 'pending_approval';
             window.vehicleData.ownerId = driverId;
+            window.vehicleData.ownerName = driverData.name;
+            window.vehicleData.ownerSelfie = driverData.selfie;
             const vid = 'veh_'+Date.now();
             await window.fbSet(window.fbChild(window.fbRef(window.fbDb), `vehicles/${window.vehicleData.type}/${vid}`), window.vehicleData);
             await window.fbUpdate(window.fbChild(window.fbRef(window.fbDb), `drivers/${driverId}`), {vehicleId:vid, vehicleType:window.vehicleData.type});
             location.reload();
+        };
+
+        // Image Compress Utility (From Snippet)
+        function compressImage(file, maxWidth, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxWidth) {
+                        h = (maxWidth / w) * h;
+                        w = maxWidth;
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    callback(canvas.toDataURL('image/jpeg', 0.6));
+                }
+            }
         }
+
+        // Agreement Slider Logic (From Snippet)
+        const vSlider = document.getElementById('v-agree-slider'); 
+        const vThumb = document.getElementById('v-agree-thumb'); 
+        let vDragging = false, vStartX = 0;
+        
+        vThumb.addEventListener('mousedown', startVDrag); vThumb.addEventListener('touchstart', startVDrag);
+        function startVDrag(e) { 
+            vDragging = true; 
+            vStartX = (e.pageX || e.touches[0].pageX) - vThumb.offsetLeft; 
+            document.addEventListener('mousemove', moveVDrag); 
+            document.addEventListener('touchmove', moveVDrag); 
+            document.addEventListener('mouseup', endVDrag); 
+            document.addEventListener('touchend', endVDrag); 
+        }
+        function moveVDrag(e) { 
+            if(!vDragging) return; 
+            const x = (e.pageX || e.touches[0].pageX) - vStartX; 
+            const max = vSlider.offsetWidth - vThumb.offsetWidth - 6; 
+            if(x >= 0 && x <= max) { 
+                vThumb.style.transform = `translateX(${x}px)`; 
+            } 
+        }
+        function endVDrag(e) { 
+            if(!vDragging) return; 
+            vDragging = false; 
+            const x = (e.pageX || (e.changedTouches ? e.changedTouches[0].pageX : 0)) - vStartX; 
+            const max = vSlider.offsetWidth - vThumb.offsetWidth - 6; 
+            if(x >= max * 0.9) { 
+                vThumb.classList.add('unlocked'); 
+                saveVehicleRegistration(); 
+            } else { 
+                vThumb.style.transform = `translateX(0px)`; 
+            } 
+            document.removeEventListener('mousemove', moveVDrag); 
+            document.removeEventListener('touchmove', moveVDrag); 
+            document.removeEventListener('mouseup', endVDrag); 
+            document.removeEventListener('touchend', endVDrag); 
+        }
+
+        // Promo & Finalize Logic
         window.toggleLanguage = () => { currentLang = currentLang==='en'?'si':currentLang==='si'?'ta':'en'; localStorage.setItem('language', currentLang); location.reload(); };
-        window.checkPromo = () => { if(document.getElementById('promo-code').value.toUpperCase()==='FIRSTPAY20'){isPromoValid=true; showToast("Applied!");} };
+        window.checkPromo = () => { 
+            if(document.getElementById('promo-code').value.toUpperCase()==='FIRSTPAY20'){
+                isPromoValid=true; 
+                document.getElementById('t-promo-msg').classList.remove('hidden'); 
+                showToast("Applied!"); 
+            } 
+        };
         window.finalizeWelcome = async () => {
             const nextPay = new Date(Date.now() + (isPromoValid?14:7)*24*60*60*1000).toISOString();
             await window.fbUpdate(window.fbChild(window.fbRef(window.fbDb), 'drivers/'+driverId), {nextpaydate:nextPay});
