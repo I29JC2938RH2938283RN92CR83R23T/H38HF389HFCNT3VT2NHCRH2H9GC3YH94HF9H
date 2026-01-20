@@ -3,313 +3,1221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AP Speedo Rider</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>Speedo - Driver Register</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mona+Sans:wght@300;400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <style>
-        :root { --primary: #D32F2F; --white: #FFFFFF; }
-        body {
-            font-family: 'Poppins', sans-serif; margin: 0; padding: 0;
-            background-color: var(--white); height: 100vh; width: 100vw;
-            overflow: hidden; display: flex; justify-content: center; align-items: center;
+        :root {
+            --primary-red: #D32F2F;
+            --primary-dark: #b71c1c;
+            --white: #ffffff;
+            --bg-gray: #f5f5f5;
+            --text-dark: #333333;
+            --border-radius: 16px;
+            --font-main: 'Poppins', sans-serif;
+            --font-ui: 'Mona Sans', sans-serif;
         }
-        /* TOAST */
-        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; pointer-events: none; }
-        .toast { background: rgba(0,0,0,0.8); color: white; padding: 12px; border-radius: 8px; text-align: center; margin-top:5px; opacity: 0; transition: opacity 0.3s; }
-        .toast.error { border-left: 5px solid red; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body {
+            font-family: var(--font-main);
+            background-color: #e0e0e0;
+            height: 100vh; width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app {
+            width: 100%; height: 100%;
+            max-width: 480px;
+            background-color: var(--white);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 25px rgba(0,0,0,0.1);
+        }
+
+        /* UTILITIES */
+        .hidden { display: none !important; }
+        .full-center { 
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            width: 100%; height: 100%; 
+            padding: 20px; text-align: center;
+            overflow-y: auto;
+        }
+        
+        /* INPUTS & BUTTONS */
+        input[type="text"], input[type="password"], input[type="tel"], input[type="date"] {
+            width: 100%; padding: 14px;
+            margin-bottom: 15px; border: 1px solid #ddd;
+            border-radius: 12px; font-family: var(--font-main); font-size: 15px;
+        }
+        input:focus { border-color: var(--primary-red); }
+        
+        .btn {
+            width: 100%; padding: 15px;
+            background: var(--primary-red); color: white;
+            border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary-red); color: var(--primary-red); }
+        
         /* SPLASH */
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        #splash-screen img { width: 250px; }
-        /* UI */
-        .container { width: 100%; max-width: 400px; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        input, select { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        button { background-color: var(--primary); color: var(--white); border: none; padding: 12px; border-radius: 5px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .carousel-container { width: 100%; flex: 1; position: relative; overflow: hidden; }
-        .step { position: absolute; top: 0; left: 100%; width: 100%; height: 100%; transition: left 0.3s ease-in-out; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--white); padding: 5px; box-sizing: border-box; }
-        .step.active { left: 0; } .step.prev { left: -100%; }
-        /* CAM & IMAGES */
-        .camera-circle { width: 180px; height: 180px; border-radius: 50%; background: #ddd; overflow: hidden; border: 3px solid var(--primary); margin-bottom: 10px; position:relative;}
-        video, canvas, #selfie-result { width: 100%; height: 100%; object-fit: cover; }
-        .nic-row { display: flex; gap: 10px; width: 100%; }
-        .nic-btn { flex: 1; background: #eee; padding: 10px; text-align: center; border: 1px solid #999; cursor:pointer;}
-        .preview-container { display: flex; gap: 10px; width: 100%; height: 120px; margin-top:5px;}
-        .preview-box { flex: 1; background: #f0f0f0; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; overflow:hidden;}
-        .nic-img { width: 100%; height: 100%; object-fit: cover; display: none; }
-        /* STATES */
-        .declined-box { border: 2px solid var(--primary); padding: 20px; width: 100%; background: #fff; margin-bottom: 20px; max-height: 60vh; overflow-y: auto; text-align: left;}
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 100%; margin-top: 10px; }
-        .keypad div { background: #eee; padding: 15px; text-align: center; font-weight: bold; border-radius: 5px; }
-        .link { color: var(--primary); margin-top: 15px; font-size: 12px; text-decoration: none; }
-        #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); z-index: 10001; display: none; justify-content: center; align-items: center; color: var(--primary); font-weight: bold; }
+        #splash-screen {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: white; z-index: 1000;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            transition: transform 0.5s ease-in-out;
+        }
+        #splash-logo { width: 200px; height: 200px; object-fit: contain; margin-bottom: 20px; }
+        .splash-text {
+            position: absolute; bottom: 40px;
+            font-family: var(--font-ui); font-size: 24px; font-weight: 700;
+            color: var(--text-dark); letter-spacing: 1px;
+        }
+
+        /* LANGUAGE SCREEN */
+        #screen-language {
+            padding: 0; justify-content: flex-start;
+        }
+        .lang-header-img {
+            width: 100%; height: 55%;
+            object-fit: cover;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .lang-content { padding: 0 30px; width: 100%; text-align: center; }
+        .lang-title { font-size: 20px; font-weight: 700; margin-bottom: 25px; color: #333; }
+        .lang-btn {
+            width: 100%; padding: 16px; margin-bottom: 12px;
+            background: white; border: 1px solid #eee;
+            border-radius: 14px;
+            font-size: 16px; font-weight: 500;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            cursor: pointer; transition: 0.2s;
+        }
+        .lang-btn:active { transform: scale(0.98); background: #f9f9f9; }
+        .lang-sub { font-size: 12px; color: #888; margin-left: 8px; font-weight: 400; }
+
+        /* TOAST */
+        #toast-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; pointer-events: none; }
+        .toast { background: rgba(0,0,0,0.85); color: white; padding: 12px 20px; border-radius: 50px; text-align: center; margin-bottom: 10px; font-size: 14px; animation: fadeUp 0.3s; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        /* CARDS */
+        .auth-card {
+            width: 100%; max-width: 360px;
+            padding: 30px 20px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            background: white;
+            transition: height 0.3s ease;
+        }
+
+        /* REGISTRATION STEPS - ANIMATION LOGIC */
+        #step-viewport {
+            position: relative; width: 100%; overflow: hidden;
+            transition: height 0.35s ease-in-out;
+        }
+
+        .step-container { 
+            display: flex; flex-direction: column; width: 100%; 
+            position: absolute; top: 0; left: 0;
+            opacity: 0; transform: translateX(100%);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            visibility: hidden; pointer-events: none;
+        }
+
+        .step-container.active { 
+            position: relative; opacity: 1; transform: translateX(0); 
+            visibility: visible; pointer-events: all; z-index: 2;
+        }
+
+        .step-container.slide-out-left { position: absolute; transform: translateX(-100%); opacity: 0; }
+        .step-container.slide-out-right { position: absolute; transform: translateX(100%); opacity: 0; }
+
+        .step-title { font-size: 20px; font-weight: 700; margin-bottom: 5px; color: var(--text-dark); }
+        .step-subtitle { font-size: 13px; color: #888; margin-bottom: 20px; }
+        .phone-warning { color: var(--primary-red); font-size: 12px; text-align: center; margin-bottom: 15px; font-weight: 600; line-height: 1.4; background: #ffebee; padding: 10px; border-radius: 8px; }
+
+        /* UPLOAD GRID */
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .upload-box {
+            background: #f9f9f9; border: 2px dashed #ccc;
+            border-radius: 12px; height: 120px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            position: relative; overflow: hidden;
+            cursor: pointer; transition: 0.2s;
+        }
+        .upload-box.active { border-color: var(--primary-red); background: #fff0f0; }
+        .upload-label { font-size: 11px; font-weight: 600; color: #555; pointer-events: none; text-align: center; padding: 5px; }
+        .upload-preview { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .upload-input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
+        /* SELFIE */
+        .selfie-wrapper { position: relative; width: 180px; height: 180px; margin: 0 auto 20px; }
+        .selfie-circle {
+            width: 100%; height: 100%; border-radius: 50%;
+            background: #f0f0f0; border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden; position: relative;
+        }
+        .selfie-preview { width: 100%; height: 100%; object-fit: cover; }
+        .cam-btn {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 40px; background: var(--primary-red); border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; z-index: 2;
+            color: white; font-size: 13px; font-weight: 600;
+        }
+
+        /* SLIDER */
+        .slider-wrapper {
+            width: 100%; height: 60px;
+            background: #eee; border-radius: 30px;
+            position: relative; overflow: hidden; margin-top: 20px;
+        }
+        .slider-text {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 1px;
+            z-index: 1;
+        }
+        .slider-thumb {
+            width: 54px; height: 54px; background: var(--primary-red); border-radius: 50%;
+            position: absolute; left: 3px; top: 3px; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: grab;
+            transition: transform 0.1s;
+        }
+        .slider-thumb:active { cursor: grabbing; transform: scale(1.1); }
+        .slider-thumb.unlocked { background: #4CAF50; transform: translateX(calc(100% - 60px)); }
+
+        /* STATUS SCREENS */
+        .status-icon { font-size: 64px; margin-bottom: 20px; }
+        .status-yellow { color: #F57F17; }
+        .status-red { color: #D32F2F; }
+        .status-text { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .status-sub { font-size: 14px; color: #666; margin-bottom: 30px; }
+
+        /* MODALS */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 3000;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .modal-box {
+            background: white; width: 100%; max-width: 340px;
+            padding: 25px; border-radius: 20px;
+            text-align: center;
+        }
+        .agreement-box {
+            height: 300px; overflow-y: auto; text-align: left;
+            font-size: 13px; line-height: 1.5; color: #444;
+            margin-bottom: 20px; padding: 10px; background: #fafafa; border-radius: 10px;
+        }
+        .agreement-box h4 { margin-top: 15px; margin-bottom: 5px; color: #000; }
+
+        /* OTP BOXES */
+        .otp-container {
+            display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;
+        }
+        .otp-box {
+            width: 40px; height: 50px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 24px; font-weight: bold; text-align: center;
+            outline: none; transition: border-color 0.2s;
+        }
+        .otp-box:focus { border-color: var(--primary-red); }
+
+        /* Loader */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index: 5000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top: 4px solid var(--primary-red); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="toast-container"></div>
-<div id="loading-overlay">Processing...</div>
-<div id="splash-screen"><img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg"></div>
+    <div id="app">
+        <!-- TOAST CONTAINER -->
+        <div id="toast-container"></div>
 
-<!-- Login -->
-<div id="login-view" class="container">
-    <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" width="100" style="margin-bottom:20px;">
-    <h2 style="text-align:center; color:var(--primary); margin:0 0 20px 0;">Rider Login</h2>
-    <input type="tel" id="login-phone" placeholder="Mobile Number">
-    <input type="password" id="login-pass" placeholder="Password">
-    <button onclick="handleLogin()">LOGIN</button>
-    <a href="#" class="link" onclick="switchView('register-view')">Create Account</a>
-</div>
-
-<!-- Register -->
-<div id="register-view" class="container">
-    <h3 style="text-align:center;">Sign Up</h3>
-    <div class="carousel-container">
-        <!-- Steps 1-7 same as before, abbreviated for length but logic retained -->
-        <div class="step active" id="step1">
-            <h4>1. Full Name</h4>
-            <input type="text" id="reg-name" placeholder="CAPITAL LETTERS ONLY" oninput="this.value=this.value.toUpperCase()">
-            <button onclick="nextStep(1)">Next</button><a href="#" class="link" onclick="switchView('login-view')">Back</a>
+        <!-- SPLASH -->
+        <div id="splash-screen">
+            <img src="https://i.ibb.co/0y4f8HBn/56bfb5ea-125e-4071-a5dc-63762dbddc05.jpg" id="splash-logo">
+            <div class="splash-text">Speedo Driver</div>
         </div>
-        <div class="step" id="step2">
-            <h4>2. Mobile Number</h4>
-            <input type="text" id="reg-phone" readonly placeholder="07XXXXXXXX">
-            <div class="keypad">
-                <div onclick="kp('1')">1</div><div onclick="kp('2')">2</div><div onclick="kp('3')">3</div>
-                <div onclick="kp('4')">4</div><div onclick="kp('5')">5</div><div onclick="kp('6')">6</div>
-                <div onclick="kp('7')">7</div><div onclick="kp('8')">8</div><div onclick="kp('9')">9</div>
-                <div onclick="kp('back')">DEL</div><div onclick="kp('0')">0</div><div onclick="nextStep(2)" style="background:var(--primary); color:white;">OK</div>
+
+        <!-- LOADER -->
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            <p style="margin-top:15px; font-weight:600;" id="loading-txt">Processing...</p>
+        </div>
+
+        <!-- LANGUAGE SELECTION SCREEN -->
+        <div id="screen-language" class="full-center hidden">
+            <img src="https://i.ibb.co/SXLJSkH0/Image-fx-16.jpg" class="lang-header-img">
+            <div class="lang-content">
+                <h2 class="lang-title">Select language to continue</h2>
+                
+                <div class="lang-btn" onclick="selectLanguage('en')">
+                    English
+                </div>
+                <div class="lang-btn" onclick="selectLanguage('si')">
+                    සිංහල <span class="lang-sub">(Sinhala)</span>
+                </div>
+                <div class="lang-btn" onclick="selectLanguage('ta')">
+                    தமிழ் <span class="lang-sub">(Tamil)</span>
+                </div>
             </div>
-            <button onclick="prevStep(2)" style="background:#555">Back</button>
         </div>
-        <div class="step" id="step3">
-            <h4>3. NIC Number</h4>
-            <input type="text" id="reg-nic" placeholder="NIC">
-            <button onclick="nextStep(3)">Next</button><button onclick="prevStep(3)" style="background:#555">Back</button>
-        </div>
-        <div class="step" id="step4">
-            <h4>4. Upload NIC</h4>
-            <div class="nic-row">
-                <div class="nic-btn" onclick="document.getElementById('nic-front-file').click()">Select Front</div>
-                <div class="nic-btn" onclick="document.getElementById('nic-back-file').click()">Select Back</div>
+
+        <!-- LOGIN SCREEN -->
+        <div id="screen-login" class="full-center hidden">
+            <div class="auth-card">
+                <h2 class="step-title" id="txt-login-title">Driver Portal</h2>
+                <p class="step-subtitle" id="txt-login-sub">Welcome back to Speedo</p>
+                <input type="tel" id="login-phone" placeholder="Mobile Number">
+                <input type="password" id="login-password" placeholder="Password">
+                <button class="btn" onclick="handleLogin()" id="btn-login-main">LOGIN</button>
+                <p style="margin-top:15px; font-size:13px;">
+                    <a href="#" onclick="openForgotPassword()" style="color:var(--primary-red); text-decoration:none;" id="txt-forgot-pass">Forgot Password?</a>
+                </p>
+                <p style="margin-top:10px; font-size:13px;">
+                    <span id="txt-new-driver">New Driver?</span> <a href="#" onclick="showScreen('screen-register')" style="color:#333; font-weight:600; text-decoration:none;" id="btn-goto-reg">Register</a>
+                </p>
             </div>
-            <input type="file" id="nic-front-file" hidden accept="image/*" onchange="procImg(this, 'front-prev')">
-            <input type="file" id="nic-back-file" hidden accept="image/*" onchange="procImg(this, 'back-prev')">
-            <div class="preview-container">
-                <div class="preview-box"><img id="front-prev" class="nic-img"></div>
-                <div class="preview-box"><img id="back-prev" class="nic-img"></div>
+        </div>
+
+        <!-- REGISTER SCREEN -->
+        <div id="screen-register" class="full-center hidden">
+            <div class="auth-card" style="max-width: 400px;">
+                
+                <div id="step-viewport">
+                    
+                    <!-- Step 1: Name -->
+                    <div id="reg-step-1" class="step-container active">
+                        <h2 class="step-title" id="txt-reg-title1">Apply to Drive</h2>
+                        <div style="height: 10px; background:#eee; border-radius:5px; margin-bottom:20px; width:100%;">
+                            <div style="width:16%; height:100%; background:var(--primary-red); border-radius:5px;"></div>
+                        </div>
+                        <label style="font-size:12px; color:#777; text-align:left; margin-bottom:5px; display:block;" id="lbl-name">Full Name</label>
+                        <input type="text" id="reg-name" placeholder="Enter Full Name">
+                        <p style="font-size:10px; color:#999; text-align:left; margin-bottom:15px;">Example: KAVINDU SAMPATH KARIYAWASAM</p>
+                        <button class="btn" onclick="validateStep1()" id="btn-next-1">Next</button>
+                        <button class="btn-outline" style="border:none; margin-top:10px;" onclick="showScreen('screen-login')" id="btn-back-1">Back</button>
+                    </div>
+
+                    <!-- Step 2: Phone -->
+                    <div id="reg-step-2" class="step-container">
+                        <h2 class="step-title" id="txt-reg-title2">Contact Info</h2>
+                        <div style="height: 10px; background:#eee; border-radius:5px; margin-bottom:20px; width:100%;">
+                            <div style="width:32%; height:100%; background:var(--primary-red); border-radius:5px;"></div>
+                        </div>
+                        <label style="font-size:12px; color:#777; text-align:left; margin-bottom:5px; display:block;" id="lbl-phone">Phone Number</label>
+                        <input type="tel" id="reg-phone" placeholder="07xxxxxxxx">
+                        <div class="phone-warning" id="txt-phone-warn">
+                            You will receive ride request details to this number so make sure to enter right one!
+                        </div>
+                        <button class="btn" onclick="validateStep2()" id="btn-next-2">Next</button>
+                        <button class="btn-outline" style="border:none; margin-top:10px;" onclick="switchStep(2, 1, 'back')" id="btn-back-2">Back</button>
+                    </div>
+
+                    <!-- Step 3: DOB -->
+                    <div id="reg-step-3" class="step-container">
+                        <h2 class="step-title" id="txt-reg-title3">Personal Details</h2>
+                        <div style="height: 10px; background:#eee; border-radius:5px; margin-bottom:20px; width:100%;">
+                            <div style="width:50%; height:100%; background:var(--primary-red); border-radius:5px;"></div>
+                        </div>
+                        <label style="font-size:12px; color:#777; text-align:left; margin-bottom:5px; display:block;" id="lbl-dob">Date of Birth</label>
+                        <input type="date" id="reg-dob">
+                        <button class="btn" onclick="validateStep3()" id="btn-next-3">Next</button>
+                        <button class="btn-outline" style="border:none; margin-top:10px;" onclick="switchStep(3, 2, 'back')" id="btn-back-3">Back</button>
+                    </div>
+
+                    <!-- Step 4: Documents -->
+                    <div id="reg-step-4" class="step-container">
+                        <h2 class="step-title" id="txt-reg-title4">Documents</h2>
+                        <div style="height: 10px; background:#eee; border-radius:5px; margin-bottom:20px; width:100%;">
+                            <div style="width:66%; height:100%; background:var(--primary-red); border-radius:5px;"></div>
+                        </div>
+                        <p style="font-size:11px; color:#666; margin-bottom:10px;" id="txt-doc-desc">Upload NIC & License (Front/Back)</p>
+                        
+                        <div class="upload-grid">
+                            <div class="upload-box" id="up-nic-f">
+                                <span class="upload-label" id="lbl-nic-f">NIC Front</span>
+                                <input type="file" class="upload-input" accept="image/*" onchange="handleUpload(this, 'nic-f')">
+                                <img class="upload-preview hidden">
+                            </div>
+                            <div class="upload-box" id="up-nic-b">
+                                <span class="upload-label" id="lbl-nic-b">NIC Back</span>
+                                <input type="file" class="upload-input" accept="image/*" onchange="handleUpload(this, 'nic-b')">
+                                <img class="upload-preview hidden">
+                            </div>
+                            <div class="upload-box" id="up-lic-f">
+                                <span class="upload-label" id="lbl-lic-f">License Front</span>
+                                <input type="file" class="upload-input" accept="image/*" onchange="handleUpload(this, 'lic-f')">
+                                <img class="upload-preview hidden">
+                            </div>
+                            <div class="upload-box" id="up-lic-b">
+                                <span class="upload-label" id="lbl-lic-b">License Back</span>
+                                <input type="file" class="upload-input" accept="image/*" onchange="handleUpload(this, 'lic-b')">
+                                <img class="upload-preview hidden">
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="validateStep4()" id="btn-next-4">Next</button>
+                        <button class="btn-outline" style="border:none; margin-top:10px;" onclick="switchStep(4, 3, 'back')" id="btn-back-4">Back</button>
+                    </div>
+
+                    <!-- Step 5: Selfie -->
+                    <div id="reg-step-5" class="step-container">
+                        <h2 class="step-title" id="txt-reg-title5">Verification</h2>
+                        <div style="height: 10px; background:#eee; border-radius:5px; margin-bottom:20px; width:100%;">
+                            <div style="width:82%; height:100%; background:var(--primary-red); border-radius:5px;"></div>
+                        </div>
+                        
+                        <div class="selfie-wrapper">
+                            <div class="selfie-circle">
+                                <img id="selfie-img" class="selfie-preview hidden">
+                                <input type="file" id="selfie-input" accept="image/*" capture="user" class="upload-input" onchange="handleSelfie(this)">
+                            </div>
+                            <div class="cam-btn" onclick="document.getElementById('selfie-input').click()">
+                                <span id="btn-cam">Upload Photo</span>
+                            </div>
+                        </div>
+
+                        <button class="btn hidden" id="btn-selfie-cont" onclick="validateStep5()">Continue</button>
+                        <button class="btn-outline hidden" id="btn-selfie-retake" style="border:none; margin-top:10px;" onclick="resetSelfie()">Retake</button>
+                        
+                        <button class="btn-outline" style="border:none; margin-top:10px;" onclick="switchStep(5, 4, 'back')" id="btn-back-5">Back</button>
+                    </div>
+
+                    <!-- Step 6: Password -->
+                    <div id="reg-step-6" class="step-container">
+                        <h2 class="step-title" id="txt-reg-title6">Security</h2>
+                        <div style="height: 10px; background:#eee; border-radius:5px; margin-bottom:20px; width:100%;">
+                            <div style="width:100%; height:100%; background:var(--primary-red); border-radius:5px;"></div>
+                        </div>
+                        <input type="password" id="reg-pass" placeholder="Create Password">
+                        <input type="password" id="reg-pass-conf" placeholder="Confirm Password">
+                        <button class="btn" onclick="validateStep6()" id="btn-final-cont">Continue</button>
+                        <button class="btn-outline" style="border:none; margin-top:10px;" onclick="switchStep(6, 5, 'back')" id="btn-back-6">Back</button>
+                    </div>
+
+                </div>
             </div>
-            <button onclick="nextStep(4)">Next</button><button onclick="prevStep(4)" style="background:#555">Back</button>
         </div>
-        <div class="step" id="step5">
-            <h4>5. Selfie</h4>
-            <div class="camera-circle"><video id="webcam" autoplay playsinline></video><img id="selfie-result" style="display:none;"></div>
-            <button id="cap-btn" onclick="capture()">Capture</button>
-            <button id="retake-btn" onclick="retake()" style="display:none; background:#333">Retake</button>
-            <button id="next-5" onclick="nextStep(5)" style="display:none;">Next</button>
-            <button onclick="prevStep(5)" style="background:#555">Back</button>
+
+        <!-- AGREEMENT MODAL -->
+        <div id="modal-agreement" class="modal-overlay hidden">
+            <div class="modal-box" style="height: 80vh; display:flex; flex-direction:column;">
+                <h3>Driver Agreement</h3>
+                <div class="agreement-box">
+                    <h4>1. Introduction</h4>
+                    <p>Welcome to Speedo Driver Portal. By registering, you agree to comply with terms.</p>
+                    <p>... (Detailed agreement assumed) ...</p>
+                </div>
+                <div class="slider-wrapper" id="agree-slider">
+                    <div class="slider-text" id="txt-slide-agree">Slide to Agree</div>
+                    <div class="slider-thumb" id="agree-thumb">
+                        <span class="material-icons" style="color:white;">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="step" id="step6">
-            <h4>6. Contact & Location</h4>
-            <input type="email" id="reg-email" placeholder="Email">
-            <select id="reg-province" onchange="fillDistricts()"><option value="">Province</option></select>
-            <select id="reg-district"><option value="">District</option></select>
-            <button onclick="nextStep(6)">Next</button><button onclick="prevStep(6)" style="background:#555">Back</button>
+
+        <!-- STATUS SCREEN (PENDING/DECLINED) -->
+        <div id="screen-status" class="full-center hidden">
+            <span class="material-icons status-icon status-yellow" id="status-icon">description</span>
+            <h2 class="status-text status-yellow" id="status-main">Your application is pending</h2>
+            <p class="status-sub" id="status-reason">Your application is reviewed and soon notify you!</p>
+            
+            <button class="btn" onclick="checkStatus()" id="btn-check-stat">Check Status</button>
+            <button class="btn-outline hidden" id="btn-retry" onclick="reRegister()" style="margin-top:10px; border:1px solid var(--primary-red);">Try Again</button>
+            <button class="btn-outline" onclick="logout()" style="border:none; margin-top:20px; color:#999;" id="btn-logout">Logout</button>
         </div>
-        <div class="step" id="step7">
-            <h4>7. Security</h4>
-            <input type="password" id="reg-pass" placeholder="Password">
-            <button onclick="submitReg()">SUBMIT</button><button onclick="prevStep(7)" style="background:#555">Back</button>
+
+        <!-- FORGOT PASSWORD MODAL -->
+        <div id="modal-forgot" class="modal-overlay hidden">
+            <div class="modal-box">
+                <h3 id="txt-reset-title">Reset Password</h3>
+                <input type="tel" id="reset-phone" placeholder="Enter Mobile Number">
+                <button class="btn" onclick="startReset()" id="btn-send-otp">Send OTP</button>
+                <button class="btn-outline" style="border:none; margin-top:10px;" onclick="closeForgot()" id="btn-cancel-reset">Cancel</button>
+            </div>
         </div>
-    </div>
-</div>
-
-<div id="pending-view" class="container">
-    <div style="text-align:center">
-        <h2 style="color:orange;">PENDING APPROVAL</h2>
-        <p>Your request is under review.</p>
-        <button onclick="location.reload()">Check Status</button>
-        <button onclick="logout()" style="background:#555">Logout</button>
-    </div>
-</div>
-
-<div id="declined-view" class="container">
-    <div class="declined-box">
-        <div style="color:var(--primary); font-weight:bold; font-size:20px;">APPLICATION DECLINED</div>
-        <p style="font-size:12px;">Issues found:</p>
-        <div id="dec-reasons"></div>
-    </div>
-    <button onclick="resetApp()">TRY AGAIN</button>
-    <button onclick="logout()" style="background:#555">Logout</button>
-</div>
-
-<!-- Firebase -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-    window.db = getDatabase(initializeApp({
-        apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
-        authDomain: "speedo-acb7c.firebaseapp.com",
-        databaseURL: "https://speedo-acb7c-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "speedo-acb7c"
-    }));
-    window.ref = ref; window.set = set; window.get = get; window.child = child; window.remove = remove;
-</script>
-
-<script>
-    // Utils
-    const toast = (m,e) => {
-        let t = document.createElement('div'); t.className = 'toast '+(e?'error':''); t.innerText=m;
-        document.getElementById('toast-container').appendChild(t);
-        setTimeout(()=>t.style.opacity=1,10); setTimeout(()=>{t.style.opacity=0;setTimeout(()=>t.remove(),300)},3000);
-    }
-    const loading = (s) => document.getElementById('loading-overlay').style.display = s?'flex':'none';
-    const slData = { "Western": ["Colombo", "Gampaha", "Kalutara"], "Central": ["Kandy", "Matale", "Nuwara Eliya"], "Southern": ["Galle", "Matara", "Hambantota"], "Northern": ["Jaffna", "Kilinochchi", "Mannar"], "Eastern": ["Ampara", "Trincomalee"], "North Western": ["Kurunegala", "Puttalam"], "Uva": ["Badulla"], "Sabaragamuwa": ["Ratnapura", "Kegalle"] };
-    let imgData = {front:"",back:"",selfie:""};
-
-    window.onload = function() {
-        const ps = document.getElementById('reg-province');
-        for(let p in slData){ let o=document.createElement('option'); o.value=p; o.text=p; ps.add(o); }
-        setTimeout(()=>{ document.getElementById('splash-screen').style.display='none'; checkLogin(); },1500);
-        startCam();
-    }
-
-    function checkLogin() {
-        const uid = localStorage.getItem('uid');
-        const dist = localStorage.getItem('dist');
-        if(uid && dist) {
-            window.get(window.child(window.ref(window.db), `riders/${dist}/${uid}`)).then(s => {
-                if(s.exists()) {
-                    let st = s.val().approved_status;
-                    if(st === true) window.location.href = "main.html"; // REDIRECT
-                    else if(st === "declined") showDeclined(s.val().rejection_reasons);
-                    else switchView('pending-view');
-                } else { localStorage.clear(); switchView('login-view'); }
-            });
-        } else { switchView('login-view'); }
-    }
-
-    window.switchView = (id) => { document.querySelectorAll('.container').forEach(d=>d.style.display='none'); document.getElementById(id).style.display='flex'; }
-
-    // Duplicate Check
-    async function checkExists(f,v) {
-        loading(true);
-        let found = false;
-        try {
-            const s = await window.get(window.ref(window.db, 'riders'));
-            if(s.exists()) s.forEach(ds => ds.forEach(rs => { if(rs.val().riderdata && rs.val().riderdata[f]===v) found=true; }));
-        } catch(e){}
-        loading(false); return found;
-    }
-
-    window.nextStep = async (n) => {
-        if(n===1) { let nm=document.getElementById('reg-name').value; if(nm.length<5) return toast("Name too short",1); if(await checkExists('fullName',nm)) return toast("Name exists",1); }
-        if(n===2) { let ph=document.getElementById('reg-phone').value; if(ph.length<10) return toast("Invalid Phone",1); if(await checkExists('phone',ph)) return toast("Phone exists",1); }
-        if(n===3) { let nic=document.getElementById('reg-nic').value; if(nic.length<10) return toast("Invalid NIC",1); if(await checkExists('nic',nic)) return toast("NIC exists",1); }
-        if(n===4 && (!imgData.front||!imgData.back)) return toast("Upload images",1);
-        if(n===5 && !imgData.selfie) return toast("Take selfie",1);
-        if(n===6) { let em=document.getElementById('reg-email').value; if(!em.includes('@')) return toast("Invalid Email",1); if(await checkExists('email',em)) return toast("Email exists",1); if(!document.getElementById('reg-district').value) return toast("Select District",1); }
         
-        document.getElementById(`step${n}`).className='step prev'; document.getElementById(`step${n+1}`).className='step active';
-    }
-    window.prevStep = (n) => { document.getElementById(`step${n}`).className='step'; document.getElementById(`step${n-1}`).className='step active'; }
-    window.kp = (k) => { let e=document.getElementById('reg-phone'); if(k==='back')e.value=e.value.slice(0,-1); else if(e.value.length<10)e.value+=k; }
+        <!-- OTP MODAL -->
+        <div id="modal-otp" class="modal-overlay hidden">
+            <div class="modal-box">
+                <h3 id="txt-verify-title">Verify OTP</h3>
+                <p style="font-size:12px; color:#777; margin-bottom:10px;" id="txt-enter-code">Enter the code sent to your phone</p>
+                <div class="otp-container" id="otp-boxes">
+                    <input type="tel" maxlength="1" class="otp-box">
+                    <input type="tel" maxlength="1" class="otp-box">
+                    <input type="tel" maxlength="1" class="otp-box">
+                    <input type="tel" maxlength="1" class="otp-box">
+                    <input type="tel" maxlength="1" class="otp-box">
+                    <input type="tel" maxlength="1" class="otp-box">
+                </div>
+                <button class="btn" onclick="verifyOtp()" id="btn-verify">Verify</button>
+                <button class="btn-outline" style="border:none; margin-top:10px;" onclick="closeOtp()" id="btn-cancel-otp">Cancel</button>
+            </div>
+        </div>
 
-    // Images
-    window.procImg = (i,id) => {
-        if(i.files[0]){
-            let r=new FileReader();
-            r.onload=(e)=>{
-                let im=new Image(); im.src=e.target.result;
-                im.onload=()=>{
-                    let c=document.createElement('canvas'), x=c.getContext('2d'), sc=800/im.width;
-                    c.width=800; c.height=im.height*sc; x.drawImage(im,0,0,c.width,c.height);
-                    let b64=c.toDataURL('image/jpeg',0.5);
-                    document.getElementById(id).src=b64; document.getElementById(id).style.display='block';
-                    if(id.includes('front'))imgData.front=b64; else imgData.back=b64;
-                }
-            }; r.readAsDataURL(i.files[0]);
-        }
-    }
-    // Camera
-    function startCam(){ navigator.mediaDevices.getUserMedia({video:true}).then(s=>document.getElementById('webcam').srcObject=s).catch(e=>{}); }
-    window.capture=()=>{
-        let v=document.getElementById('webcam'), c=document.createElement('canvas'), x=c.getContext('2d');
-        let s=400; c.width=s; c.height=s;
-        let vr=v.videoWidth/v.videoHeight, sx, sy, sw, sh;
-        if(vr>1){ sh=v.videoHeight; sw=sh; sx=(v.videoWidth-sw)/2; sy=0; } else { sw=v.videoWidth; sh=sw; sx=0; sy=(v.videoHeight-sh)/2; }
-        x.drawImage(v,sx,sy,sw,sh,0,0,s,s);
-        imgData.selfie=c.toDataURL('image/jpeg',0.6);
-        document.getElementById('selfie-result').src=imgData.selfie; document.getElementById('selfie-result').style.display='block'; v.style.display='none';
-        document.getElementById('cap-btn').style.display='none'; document.getElementById('retake-btn').style.display='inline-block'; document.getElementById('next-5').style.display='inline-block';
-    }
-    window.retake=()=>{ 
-        document.getElementById('webcam').style.display='block'; document.getElementById('selfie-result').style.display='none';
-        document.getElementById('cap-btn').style.display='inline-block'; document.getElementById('retake-btn').style.display='none'; document.getElementById('next-5').style.display='none';
-        imgData.selfie=""; 
-    }
+        <!-- NEW PASSWORD MODAL -->
+        <div id="modal-new-pass" class="modal-overlay hidden">
+            <div class="modal-box">
+                <h3 id="txt-new-pass-title">New Password</h3>
+                <p style="font-size:12px; color:#777; margin-bottom:10px;">Secure your account</p>
+                <input type="password" id="new-pass-input" placeholder="New Password">
+                <input type="password" id="confirm-new-pass-input" placeholder="Confirm Password">
+                <button class="btn" onclick="updateNewPassword()" id="btn-upd-pass">Update Password</button>
+                <button class="btn-outline" style="border:none; margin-top:10px;" onclick="closeNewPass()" id="btn-cancel-upd">Cancel</button>
+            </div>
+        </div>
 
-    // Submit
-    window.fillDistricts=()=>{
-        let p=document.getElementById('reg-province').value, d=document.getElementById('reg-district'); d.innerHTML='<option value="">District</option>';
-        if(slData[p]) slData[p].forEach(x=>{ let o=document.createElement('option'); o.value=x; o.text=x; d.add(o); });
-    }
-    window.submitReg=()=>{
-        let d=document.getElementById('reg-district').value, uid="RID_"+Date.now();
-        let dt={ riderdata:{ fullName:document.getElementById('reg-name').value, phone:document.getElementById('reg-phone').value, nic:document.getElementById('reg-nic').value, email:document.getElementById('reg-email').value, password:document.getElementById('reg-pass').value, nicFront:imgData.front, nicBack:imgData.back, selfie:imgData.selfie }, approved_status:false };
-        loading(true);
-        window.set(window.ref(window.db, `riders/${d}/${uid}`), dt).then(()=>{
-            localStorage.setItem('uid',uid); localStorage.setItem('dist',d);
-            loading(false); switchView('pending-view');
-        });
-    }
+    </div>
 
-    // Reset
-    window.resetApp=async()=>{
-        let u=localStorage.getItem('uid'), d=localStorage.getItem('dist');
-        if(u&&d){ loading(true); try{ await window.remove(window.ref(window.db, `riders/${d}/${u}`)); }catch(e){} }
-        localStorage.clear(); location.reload();
-    }
-    function showDeclined(r){
-        let d=document.getElementById('dec-reasons'); d.innerHTML="";
-        if(Array.isArray(r))r.forEach(x=>d.innerHTML+=`<div>- ${x}</div>`); else d.innerHTML=`<div>- ${r}</div>`;
-        switchView('declined-view');
-    }
-    window.logout=()=>{ localStorage.clear(); location.reload(); }
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-    window.handleLogin = async function() {
-        const ph = document.getElementById('login-phone').value;
-        const pa = document.getElementById('login-pass').value;
-        if(!ph||!pa) return toast("Fill all fields",1);
-        loading(true);
-        try {
-            const s = await window.get(window.ref(window.db, 'riders'));
-            let f = false;
-            if(s.exists()) {
-                s.forEach(ds => {
-                    ds.forEach(rs => {
-                        let d = rs.val().riderdata;
-                        if(d && d.phone === ph && d.password === pa) {
-                            f = true;
-                            // Check approval directly here
-                            if(rs.val().approved_status === true) {
-                                localStorage.setItem('uid', rs.key);
-                                localStorage.setItem('dist', ds.key);
-                                window.location.href = "main.html"; // REDIRECT
-                            } else if (rs.val().approved_status === "declined") {
-                                localStorage.setItem('uid', rs.key);
-                                localStorage.setItem('dist', ds.key);
-                                showDeclined(rs.val().rejection_reasons);
-                            } else {
-                                localStorage.setItem('uid', rs.key);
-                                localStorage.setItem('dist', ds.key);
-                                switchView('pending-view');
-                            }
-                        }
-                    });
-                });
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3Rf4x5a_L1cYVa6soADfYktQK5WyMN-4",
+            authDomain: "speedo-acb7c.firebaseapp.com",
+            databaseURL: "https://speedo-acb7c-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "speedo-acb7c",
+            storageBucket: "speedo-acb7c.firebasestorage.app",
+            messagingSenderId: "31066493782",
+            appId: "1:31066493782:web:e3e9dfa209fa855bc17cf7",
+            measurementId: "G-ND3GRGL0WQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.fbDb = db;
+        window.fbRef = ref;
+        window.fbSet = set;
+        window.fbGet = get;
+        window.fbChild = child;
+        window.fbRemove = remove;
+    </script>
+
+    <script>
+        // --- TRANSLATION DICTIONARY ---
+        const translations = {
+            "en": {
+                "txt-login-title": "Driver Portal",
+                "txt-login-sub": "Welcome back to Speedo",
+                "login-phone": "Mobile Number", // placeholder
+                "login-password": "Password", // placeholder
+                "btn-login-main": "LOGIN",
+                "txt-forgot-pass": "Forgot Password?",
+                "txt-new-driver": "New Driver?",
+                "btn-goto-reg": "Register",
+                "txt-reg-title1": "Apply to Drive",
+                "lbl-name": "Full Name",
+                "reg-name": "Enter Full Name", // placeholder
+                "btn-next-1": "Next", "btn-back-1": "Back",
+                "txt-reg-title2": "Contact Info",
+                "lbl-phone": "Phone Number",
+                "reg-phone": "07xxxxxxxx", // placeholder
+                "txt-phone-warn": "You will receive ride request details to this number so make sure to enter right one!",
+                "btn-next-2": "Next", "btn-back-2": "Back",
+                "txt-reg-title3": "Personal Details",
+                "lbl-dob": "Date of Birth",
+                "btn-next-3": "Next", "btn-back-3": "Back",
+                "txt-reg-title4": "Documents",
+                "txt-doc-desc": "Upload NIC & License (Front/Back)",
+                "lbl-nic-f": "NIC Front", "lbl-nic-b": "NIC Back",
+                "lbl-lic-f": "License Front", "lbl-lic-b": "License Back",
+                "btn-next-4": "Next", "btn-back-4": "Back",
+                "txt-reg-title5": "Verification",
+                "btn-cam": "Upload Photo",
+                "btn-selfie-cont": "Continue", "btn-selfie-retake": "Retake",
+                "btn-back-5": "Back",
+                "txt-reg-title6": "Security",
+                "reg-pass": "Create Password", // placeholder
+                "reg-pass-conf": "Confirm Password", // placeholder
+                "btn-final-cont": "Continue", "btn-back-6": "Back",
+                "txt-slide-agree": "Slide to Agree",
+                "status-pending-main": "Your application is pending",
+                "status-pending-sub": "Your application is reviewed and soon notify you!",
+                "status-declined-main": "Your application is declined",
+                "btn-check-stat": "Check Status",
+                "btn-retry": "Try Again",
+                "btn-logout": "Logout",
+                "txt-reset-title": "Reset Password",
+                "reset-phone": "Enter Mobile Number", // placeholder
+                "btn-send-otp": "Send OTP", "btn-cancel-reset": "Cancel",
+                "txt-verify-title": "Verify OTP",
+                "txt-enter-code": "Enter the code sent to your phone",
+                "btn-verify": "Verify", "btn-cancel-otp": "Cancel",
+                "txt-new-pass-title": "New Password",
+                "new-pass-input": "New Password", // placeholder
+                "confirm-new-pass-input": "Confirm Password", // placeholder
+                "btn-upd-pass": "Update", "btn-cancel-upd": "Cancel"
+            },
+            "si": {
+                "txt-login-title": "Speedo ඩ්‍රයිවර්",
+                "txt-login-sub": "ආයෙත් සාදරයෙන් පිළිගන්නවා",
+                "login-phone": "දුරකථන අංකය",
+                "login-password": "මුරපදය (Password)",
+                "btn-login-main": "ඇතුල් වන්න",
+                "txt-forgot-pass": "Password අමතකද?",
+                "txt-new-driver": "අලුත් ඩ්‍රයිවර් කෙනෙක්ද?",
+                "btn-goto-reg": "ලියාපදිංචි වන්න",
+                "txt-reg-title1": "ලියාපදිංචි වීම",
+                "lbl-name": "සම්පූර්ණ නම",
+                "reg-name": "ඔබේ නම ඇතුලත් කරන්න",
+                "btn-next-1": "ඉදිරියට", "btn-back-1": "ආපසු",
+                "txt-reg-title2": "සම්බන්ධතා තොරතුරු",
+                "lbl-phone": "දුරකථන අංකය",
+                "reg-phone": "07xxxxxxxx",
+                "txt-phone-warn": "හයර් විස්තර එන්නේ මේ නම්බර් එකට. ඒක නිසා වැඩ කරන නම්බර් එකක් දාන්න.",
+                "btn-next-2": "ඉදිරියට", "btn-back-2": "ආපසු",
+                "txt-reg-title3": "පෞද්ගලික විස්තර",
+                "lbl-dob": "උපන් දිනය",
+                "btn-next-3": "ඉදිරියට", "btn-back-3": "ආපසු",
+                "txt-reg-title4": "ලේඛන",
+                "txt-doc-desc": "ජාතික හැඳුනුම්පත සහ රියදුරු බලපත්‍රය ඇතුලත් කරන්න",
+                "lbl-nic-f": "NIC ඉදිරිපස", "lbl-nic-b": "NIC පිටුපස",
+                "lbl-lic-f": "License ඉදිරිපස", "lbl-lic-b": "License පිටුපස",
+                "btn-next-4": "ඉදිරියට", "btn-back-4": "ආපසු",
+                "txt-reg-title5": "තහවුරු කිරීම",
+                "btn-cam": "ෆොටෝ එකක් ගන්න",
+                "btn-selfie-cont": "ඉදිරියට", "btn-selfie-retake": "නැවත ගන්න",
+                "btn-back-5": "ආපසු",
+                "txt-reg-title6": "ආරක්ෂාව",
+                "reg-pass": "මුරපදයක් දාන්න",
+                "reg-pass-conf": "නැවත මුරපදය දාන්න",
+                "btn-final-cont": "ඉදිරියට", "btn-back-6": "ආපසු",
+                "txt-slide-agree": "එකඟ නම් Slide කරන්න",
+                "status-pending-main": "ඔබේ ඉල්ලීම පරීක්ෂා කරමින් පවතී",
+                "status-pending-sub": "අපි ඉක්මනින්ම ඔබට දැනුම් දෙන්නෙමු.",
+                "status-declined-main": "ඔබේ ඉල්ලීම ප්‍රතික්ෂේප විය",
+                "btn-check-stat": "තත්වය බලන්න",
+                "btn-retry": "නැවත උත්සාහ කරන්න",
+                "btn-logout": "ඉවත් වන්න (Logout)",
+                "txt-reset-title": "මුරපදය වෙනස් කිරීම",
+                "reset-phone": "දුරකථන අංකය",
+                "btn-send-otp": "OTP එක යවන්න", "btn-cancel-reset": "එපා",
+                "txt-verify-title": "OTP තහවුරු කරන්න",
+                "txt-enter-code": "SMS මගින් ලැබුනු අංකය ගසන්න",
+                "btn-verify": "තහවුරු කරන්න", "btn-cancel-otp": "එපා",
+                "txt-new-pass-title": "අලුත් මුරපදය",
+                "new-pass-input": "අලුත් Password එක",
+                "confirm-new-pass-input": "නැවතත් අලුත් Password එක",
+                "btn-upd-pass": "වෙනස් කරන්න", "btn-cancel-upd": "එපා"
+            },
+            "ta": {
+                "txt-login-title": "சாரதி போர்டல்",
+                "txt-login-sub": "மீண்டும் வருக",
+                "login-phone": "தொலைபேசி எண்",
+                "login-password": "கடவுச்சொல்",
+                "btn-login-main": "உள்நுழைய",
+                "txt-forgot-pass": "கடவுச்சொல் மறந்துவிட்டதா?",
+                "txt-new-driver": "புதிய சாரதியா?",
+                "btn-goto-reg": "பதிவு செய்யவும்",
+                "txt-reg-title1": "பதிவு",
+                "lbl-name": "முழுப் பெயர்",
+                "reg-name": "பெயரை உள்ளிடவும்",
+                "btn-next-1": "அடுத்து", "btn-back-1": "பின்னால்",
+                "txt-reg-title2": "தொடர்பு தகவல்",
+                "lbl-phone": "தொலைபேசி எண்",
+                "reg-phone": "07xxxxxxxx",
+                "txt-phone-warn": "பயண விவரங்கள் இந்த எண்ணுக்கே வரும். சரியான எண்ணை உள்ளிடவும்.",
+                "btn-next-2": "அடுத்து", "btn-back-2": "பின்னால்",
+                "txt-reg-title3": "தனிப்பட்ட விவரங்கள்",
+                "lbl-dob": "பிறந்த தேதி",
+                "btn-next-3": "அடுத்து", "btn-back-3": "பின்னால்",
+                "txt-reg-title4": "ஆவணங்கள்",
+                "txt-doc-desc": "NIC மற்றும் உரிமத்தை பதிவேற்றவும்",
+                "lbl-nic-f": "NIC முன்", "lbl-nic-b": "NIC பின்",
+                "lbl-lic-f": "License முன்", "lbl-lic-b": "License பின்",
+                "btn-next-4": "அடுத்து", "btn-back-4": "பின்னால்",
+                "txt-reg-title5": "சரிபார்ப்பு",
+                "btn-cam": "புகைப்படம் எடுக்கவும்",
+                "btn-selfie-cont": "தொடரவும்", "btn-selfie-retake": "மீண்டும்",
+                "btn-back-5": "பின்னால்",
+                "txt-reg-title6": "பாதுகாப்பு",
+                "reg-pass": "கடவுச்சொல்",
+                "reg-pass-conf": "மீண்டும் கடவுச்சொல்",
+                "btn-final-cont": "தொடரவும்", "btn-back-6": "பின்னால்",
+                "txt-slide-agree": "ஏற்கவும்",
+                "status-pending-main": "விண்ணப்பம் நிலுவையில் உள்ளது",
+                "status-pending-sub": "நாங்கள் விரைவில் அறிவிப்போம்",
+                "status-declined-main": "விண்ணப்பம் நிராகரிக்கப்பட்டது",
+                "btn-check-stat": "நிலை",
+                "btn-retry": "மீண்டும்",
+                "btn-logout": "வெளியேறு",
+                "txt-reset-title": "கடவுச்சொல் மீட்டமைப்பு",
+                "reset-phone": "தொலைபேசி எண்",
+                "btn-send-otp": "OTP அனுப்பு", "btn-cancel-reset": "ரத்து",
+                "txt-verify-title": "OTP சரிபார்ப்பு",
+                "txt-enter-code": "குறியீட்டை உள்ளிடவும்",
+                "btn-verify": "சரிபார்க்கவும்", "btn-cancel-otp": "ரத்து",
+                "txt-new-pass-title": "புதிய கடவுச்சொல்",
+                "new-pass-input": "புதிய கடவுச்சொல்",
+                "confirm-new-pass-input": "உறுதிப்படுத்தவும்",
+                "btn-upd-pass": "புதுப்பிக்கவும்", "btn-cancel-upd": "ரத்து"
             }
-            if(!f) toast("Invalid Login",1);
-        } catch(e){ toast("Error",1); }
-        loading(false);
-    }
-</script>
+        };
+
+        // --- STATE MANAGEMENT ---
+        let regData = {};
+        let generatedOtp = null;
+        let resetPhoneTemp = "";
+        let currentLang = "en";
+
+        // --- LANGUAGE LOGIC ---
+        function applyLanguage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            if(!t) return;
+
+            // Loop through keys and update DOM
+            for (const [key, value] of Object.entries(t)) {
+                const el = document.getElementById(key);
+                if (el) {
+                    if (el.tagName === 'INPUT') {
+                        el.placeholder = value;
+                    } else {
+                        el.innerText = value;
+                    }
+                }
+            }
+        }
+
+        window.selectLanguage = function(lang) {
+            localStorage.setItem('speedo_lang', lang);
+            applyLanguage(lang);
+            showScreen('screen-login');
+        }
+
+        // --- UTILS ---
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            if(!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+
+        function toggleLoader(show) {
+            const l = document.getElementById('loader');
+            if(show) l.classList.remove('hidden');
+            else l.classList.add('hidden');
+        }
+
+        window.showScreen = function(id) {
+            document.querySelectorAll('.full-center').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            // If opening register screen, initialize the first step height
+            if(id === 'screen-register') {
+                setTimeout(() => updateViewportHeight(document.getElementById('reg-step-1')), 50);
+            }
+        }
+
+        // --- ANIMATION & STEP LOGIC ---
+        function updateViewportHeight(activeStep) {
+            const viewport = document.getElementById('step-viewport');
+            if(activeStep && viewport) {
+                viewport.style.height = activeStep.offsetHeight + 'px';
+            }
+        }
+
+        window.switchStep = function(fromStepNum, toStepNum, direction) {
+            const currentStep = document.getElementById(`reg-step-${fromStepNum}`);
+            const nextStep = document.getElementById(`reg-step-${toStepNum}`);
+            
+            if(!currentStep || !nextStep) return;
+
+            nextStep.classList.remove('hidden');
+            
+            if(direction === 'forward') {
+                nextStep.classList.remove('slide-out-left', 'slide-out-right');
+                nextStep.style.transform = 'translateX(100%)';
+                currentStep.classList.add('slide-out-left');
+                currentStep.classList.remove('active');
+            } else {
+                nextStep.classList.remove('slide-out-left', 'slide-out-right');
+                nextStep.style.transform = 'translateX(-100%)';
+                currentStep.classList.add('slide-out-right');
+                currentStep.classList.remove('active');
+            }
+
+            void nextStep.offsetWidth; // Reflow
+
+            nextStep.classList.add('active');
+            nextStep.style.transform = 'translateX(0)';
+            updateViewportHeight(nextStep);
+
+            setTimeout(() => {
+                currentStep.classList.remove('slide-out-left', 'slide-out-right');
+            }, 300);
+        }
+
+        // --- IMAGE COMPRESSION ---
+        function compressImage(file, maxWidth, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxWidth) {
+                        h = (maxWidth / w) * h;
+                        w = maxWidth;
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    callback(canvas.toDataURL('image/jpeg', 0.6));
+                }
+            }
+        }
+
+        // --- VALIDATION & NAVIGATION ---
+        window.validateStep1 = function() {
+            const name = document.getElementById('reg-name').value.trim();
+            if(name.length < 5) { showToast("Name too short"); return; }
+            regData.name = name;
+            switchStep(1, 2, 'forward');
+        }
+
+        window.validateStep2 = function() {
+            const phone = document.getElementById('reg-phone').value.trim();
+            if(phone.length !== 10 || !phone.startsWith('07')) { showToast("Invalid Phone Number"); return; }
+            regData.phone = phone;
+            checkDuplicate('phone', phone, 2);
+        }
+
+        window.validateStep3 = function() {
+            const dob = document.getElementById('reg-dob').value;
+            if(!dob) { showToast("Select DOB"); return; }
+            regData.dob = dob;
+            switchStep(3, 4, 'forward');
+        }
+
+        window.validateStep4 = function() {
+            if(!regData['nic-f'] || !regData['nic-b'] || !regData['lic-f'] || !regData['lic-b']) {
+                showToast("Upload all documents");
+                return;
+            }
+            switchStep(4, 5, 'forward');
+        }
+
+        window.validateStep5 = function() {
+            if(!regData.selfie) {
+                showToast("Take a selfie");
+                return;
+            }
+            switchStep(5, 6, 'forward');
+        }
+
+        window.validateStep6 = function() {
+            const p1 = document.getElementById('reg-pass').value;
+            const p2 = document.getElementById('reg-pass-conf').value;
+            if(p1.length < 6) { showToast("Password too short"); return; }
+            if(p1 !== p2) { showToast("Mismatch"); return; }
+            regData.password = p1;
+            openAgreement();
+        }
+
+        async function checkDuplicate(field, value, currentStepNum) {
+            toggleLoader(true);
+            try {
+                const snapshot = await window.fbGet(window.fbChild(window.fbRef(window.fbDb), 'drivers'));
+                if(snapshot.exists()) {
+                    const drivers = snapshot.val();
+                    for(let id in drivers) {
+                        if(drivers[id][field] === value) {
+                            toggleLoader(false);
+                            showToast(`Number already registered`);
+                            return false;
+                        }
+                    }
+                }
+                toggleLoader(false);
+                switchStep(currentStepNum, currentStepNum + 1, 'forward');
+                return true;
+            } catch(e) {
+                console.error(e);
+                toggleLoader(false);
+                showToast("Connection Error");
+            }
+        }
+
+        // --- UPLOADS ---
+        window.handleUpload = function(input, key) {
+            const file = input.files[0];
+            if(!file) return;
+            compressImage(file, 800, (base64) => {
+                regData[key] = base64;
+                const box = input.parentElement;
+                box.classList.add('active');
+                const img = box.querySelector('img');
+                img.src = base64;
+                img.classList.remove('hidden');
+            });
+        }
+
+        window.handleSelfie = function(input) {
+            const file = input.files[0];
+            if(!file) return;
+            compressImage(file, 600, (base64) => {
+                regData.selfie = base64;
+                const img = document.getElementById('selfie-img');
+                img.src = base64;
+                img.classList.remove('hidden');
+                
+                document.getElementById('btn-selfie-cont').classList.remove('hidden');
+                document.getElementById('btn-selfie-retake').classList.remove('hidden');
+                document.querySelector('.cam-btn').classList.add('hidden');
+                
+                updateViewportHeight(document.getElementById('reg-step-5'));
+            });
+        }
+
+        window.resetSelfie = function() {
+            regData.selfie = "";
+            document.getElementById('selfie-img').classList.add('hidden');
+            document.getElementById('selfie-input').value = "";
+            document.getElementById('btn-selfie-cont').classList.add('hidden');
+            document.getElementById('btn-selfie-retake').classList.add('hidden');
+            document.querySelector('.cam-btn').classList.remove('hidden');
+            updateViewportHeight(document.getElementById('reg-step-5'));
+        }
+
+        // --- AGREEMENT SLIDER ---
+        function openAgreement() {
+            document.getElementById('modal-agreement').classList.remove('hidden');
+        }
+
+        const slider = document.getElementById('agree-slider');
+        const thumb = document.getElementById('agree-thumb');
+        let isDragging = false, startX = 0;
+
+        thumb.addEventListener('mousedown', startDrag);
+        thumb.addEventListener('touchstart', startDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = (e.pageX || e.touches[0].pageX) - thumb.offsetLeft;
+            document.addEventListener('mousemove', moveDrag);
+            document.addEventListener('touchmove', moveDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function moveDrag(e) {
+            if(!isDragging) return;
+            const x = (e.pageX || e.touches[0].pageX) - startX;
+            const max = slider.offsetWidth - thumb.offsetWidth - 6;
+            if(x >= 0 && x <= max) {
+                thumb.style.transform = `translateX(${x}px)`;
+            }
+        }
+
+        function endDrag(e) {
+            if(!isDragging) return;
+            isDragging = false;
+            const x = (e.pageX || (e.changedTouches ? e.changedTouches[0].pageX : 0)) - startX;
+            const max = slider.offsetWidth - thumb.offsetWidth - 6;
+            
+            if(x >= max * 0.9) {
+                thumb.classList.add('unlocked');
+                finalizeRegistration();
+            } else {
+                thumb.style.transform = `translateX(0px)`;
+            }
+            document.removeEventListener('mousemove', moveDrag);
+            document.removeEventListener('touchmove', moveDrag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+        }
+
+        async function finalizeRegistration() {
+            toggleLoader(true);
+            const uid = 'driver_' + new Date().getTime();
+            const data = {
+                ...regData,
+                uid: uid,
+                approval: 'pending',
+                appliedAt: Date.now(),
+                language: currentLang
+            };
+
+            try {
+                await window.fbSet(window.fbRef(window.fbDb, 'drivers/' + uid), data);
+                localStorage.setItem('speedo_driver_id', uid);
+                toggleLoader(false);
+                document.getElementById('modal-agreement').classList.add('hidden');
+                showStatus('pending');
+            } catch(e) {
+                console.error(e);
+                toggleLoader(false);
+                showToast("Registration Failed");
+            }
+        }
+
+        // --- STATUS & LOGIN ---
+        function showStatus(status, reason = "") {
+            showScreen('screen-status');
+            const main = document.getElementById('status-main');
+            const sub = document.getElementById('status-reason');
+            const icon = document.getElementById('status-icon');
+            const retryBtn = document.getElementById('btn-retry');
+            
+            main.classList.remove('status-yellow', 'status-red');
+            icon.classList.remove('status-yellow', 'status-red');
+            retryBtn.classList.add('hidden');
+            
+            const t = translations[currentLang];
+
+            if(status === 'pending') {
+                main.innerText = t['status-pending-main'];
+                main.classList.add('status-yellow');
+                icon.innerText = "description";
+                icon.classList.add('status-yellow');
+                sub.innerText = t['status-pending-sub'];
+            } else if (status === 'declined') {
+                main.innerText = t['status-declined-main'];
+                main.classList.add('status-red');
+                icon.innerText = "cancel";
+                icon.classList.add('status-red');
+                sub.innerText = reason;
+                retryBtn.classList.remove('hidden');
+            } else if (status === 'approved') {
+                localStorage.setItem('speedo_verified', 'true');
+                window.location.href = 'main.html';
+            }
+        }
+
+        window.checkStatus = async function() {
+            const uid = localStorage.getItem('speedo_driver_id');
+            if(!uid) return;
+            toggleLoader(true);
+            try {
+                const snap = await window.fbGet(window.fbChild(window.fbRef(window.fbDb), 'drivers/' + uid));
+                if(snap.exists()) {
+                    const data = snap.val();
+                    if(data.approval === 'approved') {
+                        showStatus('approved');
+                    } else if (data.approval === 'declined') {
+                        showStatus('declined', data.declineReason || "Admin Review");
+                    } else {
+                        showStatus('pending');
+                    }
+                } else {
+                    toggleLoader(false);
+                    showToast("No data");
+                }
+            } catch(e) {
+                toggleLoader(false);
+                console.error(e);
+            }
+        }
+
+        window.reRegister = async function() {
+            const uid = localStorage.getItem('speedo_driver_id');
+            if(confirm("Delete previous data?")) {
+                if(uid) await window.fbRemove(window.fbRef(window.fbDb, 'drivers/' + uid));
+                localStorage.removeItem('speedo_driver_id');
+                location.reload();
+            }
+        }
+
+        window.handleLogin = async function() {
+            const phone = document.getElementById('login-phone').value;
+            const pass = document.getElementById('login-password').value;
+            if(!phone || !pass) { showToast("Empty fields"); return; }
+            
+            toggleLoader(true);
+            try {
+                const snap = await window.fbGet(window.fbChild(window.fbRef(window.fbDb), 'drivers'));
+                if(snap.exists()) {
+                    const drivers = snap.val();
+                    let user = null;
+                    let uid = null;
+                    for(let id in drivers) {
+                        if(drivers[id].phone === phone && drivers[id].password === pass) {
+                            user = drivers[id];
+                            uid = id;
+                            break;
+                        }
+                    }
+                    if(user) {
+                        localStorage.setItem('speedo_driver_id', uid);
+                        if(user.approval === 'approved') {
+                            localStorage.setItem('speedo_verified', 'true');
+                            toggleLoader(false);
+                            window.location.href = 'main.html';
+                        } else if (user.approval === 'declined') {
+                            toggleLoader(false);
+                            showStatus('declined', user.declineReason || "Admin Review");
+                        } else {
+                            toggleLoader(false);
+                            showStatus('pending');
+                        }
+                    } else {
+                        toggleLoader(false);
+                        showToast("Invalid Credentials");
+                    }
+                }
+            } catch(e) {
+                toggleLoader(false);
+                console.error(e);
+            }
+        }
+
+        // --- FORGOT PASSWORD & OTP ---
+        window.openForgotPassword = function() { document.getElementById('modal-forgot').classList.remove('hidden'); }
+        window.closeForgot = function() { document.getElementById('modal-forgot').classList.add('hidden'); }
+        
+        window.startReset = async function() {
+            const phone = document.getElementById('reset-phone').value;
+            if(phone.length < 10) { showToast("Invalid Phone"); return; }
+            resetPhoneTemp = phone;
+            generatedOtp = Math.floor(100000 + Math.random() * 900000);
+            
+            const recipient = phone.startsWith('0') ? '94' + phone.substring(1) : phone;
+            try {
+                // Simulating SMS for this example, replace with real API if needed
+                console.log("OTP Sent: " + generatedOtp); 
+                
+                await fetch("https://app.text.lk/api/v3/sms/send", {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer 2975|Wz0ile7QSbXVtBMEfs3qrJcFHiz74DOnCkgfnJni36b0e4bc`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ recipient: recipient, sender_id: "TextLKDemo", type: "plain", message: `Your Speedo reset code is: ${generatedOtp}` })
+                });
+
+                showToast("OTP Sent");
+                document.getElementById('modal-forgot').classList.add('hidden');
+                document.getElementById('modal-otp').classList.remove('hidden');
+                document.querySelectorAll('.otp-box').forEach(i => i.value = '');
+                document.querySelector('.otp-box').focus();
+            } catch(e) { showToast("SMS Error"); }
+        }
+
+        const otpInputs = document.querySelectorAll('.otp-box');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if(input.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if(e.key === 'Backspace' && input.value === '' && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        window.verifyOtp = function() {
+            let code = '';
+            otpInputs.forEach(i => code += i.value);
+            if(code.length < 6) { showToast("Enter full code"); return; }
+            if(parseInt(code) === generatedOtp) {
+                document.getElementById('modal-otp').classList.add('hidden');
+                document.getElementById('modal-new-pass').classList.remove('hidden');
+            } else {
+                showToast("Invalid OTP");
+            }
+        }
+        window.closeOtp = function() { document.getElementById('modal-otp').classList.add('hidden'); }
+
+        window.updateNewPassword = async function() {
+            const p1 = document.getElementById('new-pass-input').value;
+            const p2 = document.getElementById('confirm-new-pass-input').value;
+            if(p1.length < 6) { showToast("Too short"); return; }
+            if(p1 !== p2) { showToast("Mismatch"); return; }
+            
+            toggleLoader(true);
+            try {
+                const snap = await window.fbGet(window.fbChild(window.fbRef(window.fbDb), 'drivers'));
+                if(snap.exists()) {
+                    const drivers = snap.val();
+                    for(let id in drivers) {
+                        if(drivers[id].phone === resetPhoneTemp) {
+                            await window.fbSet(window.fbRef(window.fbDb, 'drivers/' + id + '/password'), p1);
+                            showToast("Updated");
+                            closeNewPass();
+                            toggleLoader(false);
+                            showScreen('screen-login');
+                            return;
+                        }
+                    }
+                }
+                toggleLoader(false);
+                showToast("User not found");
+            } catch(e) {
+                toggleLoader(false);
+                console.error(e);
+            }
+        }
+        window.closeNewPass = function() { document.getElementById('modal-new-pass').classList.add('hidden'); }
+
+        window.logout = function() { 
+            localStorage.removeItem('speedo_driver_id'); 
+            location.reload(); 
+        }
+
+        // --- INIT ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                // Splash Animation
+                const splash = document.getElementById('splash-screen');
+                splash.style.transform = 'translateY(-100%)';
+                
+                setTimeout(() => {
+                    splash.classList.add('hidden');
+                    
+                    // Logic: Check Language -> Check Auth
+                    const savedLang = localStorage.getItem('speedo_lang');
+                    const uid = localStorage.getItem('speedo_driver_id');
+
+                    if(savedLang) {
+                        applyLanguage(savedLang);
+                        if(uid) {
+                            checkStatus();
+                        } else {
+                            showScreen('screen-login');
+                        }
+                    } else {
+                        // Show Language Screen First
+                        showScreen('screen-language');
+                    }
+                }, 500);
+            }, 2500);
+        });
+    </script>
 </body>
 </html>
